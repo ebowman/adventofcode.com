@@ -7,5 +7,8 @@ class P03Test extends FunSuite {
     assert(visits(">") === 2)
     assert(visits("^>v<") === 4)
     assert(visits("^v^v^v^v^v") === 2)
+    assert(visitsRobo("^v") === 3)
+    assert(visitsRobo("^>v<") === 3)
+    assert(visitsRobo("^v^v^v^v^v") === 11)
   }
 }

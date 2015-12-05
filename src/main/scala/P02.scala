@@ -12,14 +12,19 @@ object P02 extends App {
     def slack = math.min(math.min(a, b), c)
 
     def total = area + slack
+
+    def ribbon: Int = Seq(2 * l, 2 * w, 2 * h).sorted.take(2).sum + l * w * h
   }
 
-  def dim(str: String): Int = {
+  def dims(str: String): Dims = {
     val Rx = """(\d+)x(\d+)x(\d+)""".r
     str match {
-      case Rx(l, w, h) => Dims(l.toInt, w.toInt, h.toInt).total
+      case Rx(l,w,h) => Dims(l.toInt, w.toInt, h.toInt)
     }
   }
+
+  def total(str: String): Int = dims(str).total
+  def ribbon(str: String): Int = dims(str).ribbon
 
   val input =
     """
@@ -1025,6 +1030,7 @@ object P02 extends App {
       |14x6x11
     """.stripMargin.trim
 
-  println(input.lines.map(dim).sum)
+  println(input.lines.map(total).sum)
+  println(input.lines.map(ribbon).sum)
 
 }
