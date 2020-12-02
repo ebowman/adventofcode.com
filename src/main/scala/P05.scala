@@ -1010,7 +1010,7 @@ object P05 extends App {
       |pxdfvcpvwaddrzwv
       |phdqqxleqdjfgfbg
       |cqfikbgxvjmnfncy
-    """.stripMargin.trim.lines
+    """.stripMargin.trim.split("\n")
 
   println(inputs.count(isNice))
 }

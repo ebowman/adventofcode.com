@@ -1,6 +1,6 @@
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class P02Test extends FunSuite {
+class P02Test extends AnyFunSuite {
   import P02._
 
   test("known inputs") {

@@ -1,6 +1,6 @@
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class P01Test extends FunSuite {
+class P01Test extends AnyFunSuite {
   test("sample inputs") {
     assert(P01.compute("(())") === 0)
     assert(P01.compute("()()") === 0)

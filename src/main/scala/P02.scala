@@ -1030,7 +1030,7 @@ object P02 extends App {
       |14x6x11
     """.stripMargin.trim
 
-  println(input.lines.map(total).sum)
-  println(input.lines.map(ribbon).sum)
+  println(input.split("\n").map(total).sum)
+  println(input.split("\n").map(ribbon).sum)
 
 }
