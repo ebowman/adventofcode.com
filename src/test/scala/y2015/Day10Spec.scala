@@ -2,7 +2,6 @@ package y2015
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
-import util.Loader
 
 class Day10Spec extends AnyFlatSpec with Matchers with Day10 {
   "Simple cases" should "pass" in {

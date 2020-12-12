@@ -10,8 +10,6 @@ Sugar: capacity 0, durability 0, flavor -2, texture 2, calories 1
  */
 trait Day15 {
 
-  case class Ingredient(name: String, capacity: Int, durability: Int, flavor: Int, texture: Int, calories: Int)
-
   val Parser = """([a-zA-Z]+): capacity (-?\d+), durability (-?\d+), flavor (-?\d+), texture (-?\d+), calories (-?\d+)""".r
 
   def parse(str: String): Ingredient = {
@@ -21,7 +19,35 @@ trait Day15 {
     }
   }
 
+  def solve(ingredients: Seq[Ingredient], totalVolume: Int): Int = {
+    @tailrec
+    def recurse(c: Option[Cursor], max: Int = 0): Int = {
+      c match {
+        case None => max
+        case Some(crs) =>
+          val newMax = Math.max(max, combine(ingredients, crs)) // compiler bug! temp var required!
+          recurse(crs.next, newMax)
+      }
+    }
+
+    recurse(Some(Cursor(ingredients.size, totalVolume)))
+  }
+
   def combine(ings: Seq[Ingredient], cursor: Cursor): Int = sumUp(ings.zip(cursor.values))
+
+  def solveCalories(ingredients: Seq[Ingredient], totalVolume: Int, calories: Int): Int = {
+    @tailrec
+    def recurse(c: Option[Cursor], max: Int = 0): Int = {
+      c match {
+        case None => max
+        case Some(crs) =>
+          val newMax = Math.max(max, combineCalories(ingredients, crs, calories))
+          recurse(crs.next, newMax)
+      }
+    }
+
+    recurse(Some(Cursor(ingredients.size, totalVolume)))
+  }
 
   def combineCalories(ings: Seq[Ingredient], cursor: Cursor, exactCalories: Int): Int = {
     val tmp = ings.zip(cursor.values)
@@ -39,10 +65,7 @@ trait Day15 {
       ck((ingredients.map { case (ing, amt) => ing.texture * amt }).sum)
   }
 
-  object Cursor {
-    def apply(n: Int, sum: Int): Cursor =
-      Cursor(sum, new Array[Int](n)).next.get
-  }
+  case class Ingredient(name: String, capacity: Int, durability: Int, flavor: Int, texture: Int, calories: Int)
 
   case class Cursor(sum: Int, values: Array[Int]) {
 
@@ -79,31 +102,8 @@ trait Day15 {
     }
   }
 
-  def solve(ingredients: Seq[Ingredient], totalVolume: Int): Int = {
-    @tailrec
-    def recurse(c: Option[Cursor], max: Int = 0): Int = {
-      c match {
-        case None => max
-        case Some(crs) =>
-          val newMax = Math.max(max, combine(ingredients, crs)) // compiler bug! temp var required!
-          recurse(crs.next, newMax)
-      }
-    }
-
-    recurse(Some(Cursor(ingredients.size, totalVolume)))
-  }
-
-  def solveCalories(ingredients: Seq[Ingredient], totalVolume: Int, calories: Int): Int = {
-    @tailrec
-    def recurse(c: Option[Cursor], max: Int = 0): Int = {
-      c match {
-        case None => max
-        case Some(crs) =>
-          val newMax = Math.max(max, combineCalories(ingredients, crs, calories))
-          recurse(crs.next, newMax)
-      }
-    }
-
-    recurse(Some(Cursor(ingredients.size, totalVolume)))
+  object Cursor {
+    def apply(n: Int, sum: Int): Cursor =
+      Cursor(sum, new Array[Int](n)).next.get
   }
 }

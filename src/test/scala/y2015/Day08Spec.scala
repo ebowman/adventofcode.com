@@ -18,10 +18,10 @@ class Day08Spec extends AnyFlatSpec with Matchers with Day08 {
   }
 
   "Part 2" should "pass the basic tests" in {
-    this.encode("\"\"") shouldBe (2, 6)
-    this.encode("\"abc\"") shouldBe (5, 9)
-    this.encode("\"aaa\\\"aaa\"") shouldBe (10, 16)
-    this.encode("\"\\x27\"") shouldBe (6, 11)
+    this.encode("\"\"") shouldBe(2, 6)
+    this.encode("\"abc\"") shouldBe(5, 9)
+    this.encode("\"aaa\\\"aaa\"") shouldBe(10, 16)
+    this.encode("\"\\x27\"") shouldBe(6, 11)
   }
 
   it should "pass the final test" in {

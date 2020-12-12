@@ -7,10 +7,17 @@ trait Day16 extends RegexParsers {
 
   override def skipWhitespace = true
 
+  def sue: Parser[Sue] = (name <~ ": ") ~ rep1sep(prop, ", ") ^^ { case sue ~ props => sue.copy(props = props.toMap) }
+
+  def name: Parser[Sue] = "Sue " ~> """\d+""".r ^^ { n => Sue(n.toInt) }
+
+  def prop: Parser[(String, Int)] = ("""[a-z]+""".r <~ ": ") ~ """\d+""".r ^^ { case key ~ value => (key, value.toInt) }
+
   case class Sue(num: Int, props: Map[String, Int] = Map()) {
-    def score(report: Map[String,Int]): Int = {
-      report.count {item => props.contains(item._1) && props(item._1) == item._2 }
+    def score(report: Map[String, Int]): Int = {
+      report.count { item => props.contains(item._1) && props(item._1) == item._2 }
     }
+
     def score2(report: Map[String, Int]): Int = {
       report.count {
         case (key, reading) if (key == "cats" || key == "trees") => props.contains(key) && props(key) > reading
@@ -19,10 +26,4 @@ trait Day16 extends RegexParsers {
       }
     }
   }
-
-  def name: Parser[Sue] = "Sue " ~> """\d+""".r ^^ { n => Sue(n.toInt) }
-
-  def prop: Parser[(String, Int)] = ("""[a-z]+""".r <~ ": ") ~ """\d+""".r ^^ { case key ~ value => (key, value.toInt) }
-
-  def sue: Parser[Sue] = (name <~ ": ") ~ rep1sep(prop, ", ") ^^ { case sue ~ props => sue.copy(props = props.toMap) }
 }

@@ -5,19 +5,17 @@ import scala.util.parsing.combinator.RegexParsers
 
 trait Day07 extends RegexParsers {
 
-  case class Bag(name: String, contains: Map[String, Int] = Map.empty)
-
-  def bag: Parser[Bag] = ("[a-z]+".r ~ "[a-z]+".r) <~ ("bags" | "bag") ^^ { case c1 ~ c2 => Bag(s"$c1 $c2") }
-
-  def bagCount: Parser[(String, Int)] = "\\d+".r ~ bag ^^ { case n ~ b => (b.name, n.toInt) }
-
-  def bagList: Parser[Seq[(String, Int)]] = rep1sep(bagCount, ",")
+  def bagDef: Parser[Bag] = bagDefFull | bagDefEmpty
 
   def bagDefFull: Parser[Bag] = (bag <~ "contain") ~ bagList <~ "." ^^ { case bag ~ list => bag.copy(contains = list.toMap) }
 
-  def bagDefEmpty: Parser[Bag] = bag <~ "contain no other bags." ^^ { b => b }
+  def bagList: Parser[Seq[(String, Int)]] = rep1sep(bagCount, ",")
 
-  def bagDef: Parser[Bag] = bagDefFull | bagDefEmpty
+  def bagCount: Parser[(String, Int)] = "\\d+".r ~ bag ^^ { case n ~ b => (b.name, n.toInt) }
+
+  def bag: Parser[Bag] = ("[a-z]+".r ~ "[a-z]+".r) <~ ("bags" | "bag") ^^ { case c1 ~ c2 => Bag(s"$c1 $c2") }
+
+  def bagDefEmpty: Parser[Bag] = bag <~ "contain no other bags." ^^ { b => b }
 
   def containedBy(name: String, bags: Seq[Bag]): Int = {
     def getParent(bag: Bag): Seq[Bag] = bags.filter(_.contains.keySet.contains(bag.name))
@@ -42,4 +40,6 @@ trait Day07 extends RegexParsers {
 
     recurse(bags(name)) - 1
   }
+
+  case class Bag(name: String, contains: Map[String, Int] = Map.empty)
 }

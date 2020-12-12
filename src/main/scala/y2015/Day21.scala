@@ -3,6 +3,7 @@ package y2015
 import scala.annotation.tailrec
 
 trait Day21 {
+
   case class Player(name: String, hit: Int = 100, damage: Int = 0, armor: Int = 0, cost: Int = 0, items: Seq[Item] = Seq()) {
     def dead: Boolean = hit <= 0
 
@@ -24,11 +25,31 @@ trait Day21 {
             cost = p.cost + i.head.cost), i.tail)
         }
       }
+
       recurse(this, items).copy(items = items)
     }
   }
 
   case class Item(name: String, cost: Int, damage: Int, armor: Int)
+
+  case class Game(player: Player, boss: Player) {
+    def playerWins: Boolean = boss.dead && !player.dead
+
+    def play: Game = {
+      @tailrec
+      def recurse(game: Game): Game = {
+        val newBoss = game.player.attack(game.boss)
+        if (newBoss.dead) Game(game.player, newBoss)
+        else {
+          val newPlayer = newBoss.attack(game.player)
+          if (newPlayer.dead) Game(newPlayer, newBoss)
+          else recurse(Game(newPlayer, newBoss))
+        }
+      }
+
+      recurse(this)
+    }
+  }
 
   object Items {
     val weapons = Seq( // note the rule: you must buy at least one weapon!
@@ -60,20 +81,4 @@ trait Day21 {
     )
   }
 
-  case class Game(player: Player, boss: Player) {
-    def playerWins: Boolean = boss.dead && !player.dead
-    def play: Game = {
-      @tailrec
-      def recurse(game: Game): Game = {
-        val newBoss = game.player.attack(game.boss)
-        if (newBoss.dead) Game(game.player, newBoss)
-        else {
-          val newPlayer = newBoss.attack(game.player)
-          if (newPlayer.dead) Game(newPlayer, newBoss)
-          else recurse(Game(newPlayer, newBoss))
-        }
-      }
-      recurse(this)
-    }
-  }
 }

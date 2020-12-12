@@ -3,7 +3,9 @@ package y2015
 import org.scalatest.funsuite._
 
 class Day05Test extends AnyFunSuite {
+
   import y2015.Day05._
+
   test("known inputs") {
     assert(isNice("ugknbfddgicrmopn"))
     assert(isNice("aaa"))

@@ -4,6 +4,15 @@ import scala.util.matching.Regex
 
 trait Day14 {
 
+  // Prancer can fly 25 km/s for 6 seconds, but then must rest for 143 seconds.
+  val Parse: Regex = """(.*?) can fly (\d+) km/s for (\d+) seconds, but then must rest for (\d+) seconds.""".r
+
+  def mkDeer(str: String): Reindeer = {
+    str match {
+      case Parse(name, speed, duration, rest) => Reindeer(name, speed.toInt, duration.toInt, rest.toInt)
+    }
+  }
+
   case class Reindeer(name: String, speed: Int, duration: Int, rest: Int, score: Int = 0) {
     def dist(time: Int): Int = {
       val fullCycles = time / (duration + rest)
@@ -17,16 +26,17 @@ trait Day14 {
     }
   }
 
-  // Prancer can fly 25 km/s for 6 seconds, but then must rest for 143 seconds.
-  val Parse: Regex = """(.*?) can fly (\d+) km/s for (\d+) seconds, but then must rest for (\d+) seconds.""".r
-
-  def mkDeer(str: String): Reindeer = {
-    str match {
-      case Parse(name, speed, duration, rest) => Reindeer(name, speed.toInt, duration.toInt, rest.toInt)
-    }
-  }
-
   case class Race(deer: Seq[Reindeer], time: Int = 0) {
+    def raceUntil(t: Int): Int = {
+      @scala.annotation.tailrec
+      def recurse(r: Race): Race = {
+        if (r.time == t) r
+        else recurse(r.next)
+      }
+
+      recurse(this).winner
+    }
+
     def next: Race = {
       val bestDist = deer.map(_.dist(time + 1)).max
       val nextDeer = deer.map { d =>
@@ -37,16 +47,6 @@ trait Day14 {
     }
 
     def winner: Int = deer.map(_.score).max
-
-    def raceUntil(t: Int): Int = {
-      @scala.annotation.tailrec
-      def recurse(r: Race): Race = {
-        if (r.time == t) r
-        else recurse(r.next)
-      }
-
-      recurse(this).winner
-    }
   }
 
 }

@@ -3,41 +3,6 @@ package y2015
 object Day05 extends App {
 
   lazy val disallowed = Set("ab", "cd", "pq", "xy")
-
-  def isVowel(char: Char): Boolean = char == 'a' || char == 'e' || char == 'i' || char == 'o' || char == 'u'
-
-  def isNice(str: String): Boolean = {
-    str.count(isVowel) >= 3 &&
-      str.zip(str.tail).exists(ab => ab._1 == ab._2) &&
-      disallowed.forall(d => !str.contains(d))
-  }
-
-  /* Part 2:
-  Now, a nice string is one with all of the following properties:
-
-  It contains a pair of any two letters that appears at least twice in the string without overlapping,
-    like xyxy (xy) or aabcdefgaa (aa), but not like aaa (aa, but it overlaps).
-  It contains at least one letter which repeats with exactly one letter between them,
-    like xyx, abcdefeghi (efe), or even aaa.
-   */
-  def isNice2(str: String): Boolean = {
-
-    var passed = false
-    for (i <- 0 until str.length - 3 if !passed) {
-      val piece = str.substring(i, i + 2)
-      if (str.substring(i + 2).contains(piece)) {
-        passed = true
-      }
-    }
-    if (passed) {
-      passed = false
-      for (i <- 0 until str.length - 2 if !passed) {
-        if (str(i) == str(i + 2)) passed = true
-      }
-    }
-    passed
-  }
-
   lazy val inputs =
     """
       |zgsnvdmlfuplrubt
@@ -1041,6 +1006,40 @@ object Day05 extends App {
       |phdqqxleqdjfgfbg
       |cqfikbgxvjmnfncy
     """.stripMargin.trim.split("\n")
+
+  def isNice(str: String): Boolean = {
+    str.count(isVowel) >= 3 &&
+      str.zip(str.tail).exists(ab => ab._1 == ab._2) &&
+      disallowed.forall(d => !str.contains(d))
+  }
+
+  def isVowel(char: Char): Boolean = char == 'a' || char == 'e' || char == 'i' || char == 'o' || char == 'u'
+
+  /* Part 2:
+  Now, a nice string is one with all of the following properties:
+
+  It contains a pair of any two letters that appears at least twice in the string without overlapping,
+    like xyxy (xy) or aabcdefgaa (aa), but not like aaa (aa, but it overlaps).
+  It contains at least one letter which repeats with exactly one letter between them,
+    like xyx, abcdefeghi (efe), or even aaa.
+   */
+  def isNice2(str: String): Boolean = {
+
+    var passed = false
+    for (i <- 0 until str.length - 3 if !passed) {
+      val piece = str.substring(i, i + 2)
+      if (str.substring(i + 2).contains(piece)) {
+        passed = true
+      }
+    }
+    if (passed) {
+      passed = false
+      for (i <- 0 until str.length - 2 if !passed) {
+        if (str(i) == str(i + 2)) passed = true
+      }
+    }
+    passed
+  }
 
   println(inputs.count(isNice))
   println(inputs.count(isNice2))

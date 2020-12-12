@@ -3,6 +3,7 @@ package y2015
 import org.scalatest.funsuite._
 
 class Day03Test extends AnyFunSuite {
+
   import y2015.Day03._
 
   test("known inputs") {

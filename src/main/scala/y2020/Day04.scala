@@ -1,22 +1,16 @@
 package y2020
 
 import scala.util.parsing.combinator.RegexParsers
+import scala.collection.mutable
 
 trait Day04 extends RegexParsers {
-  override def skipWhitespace = false
+  val fields = new mutable.HashMap[String, String]()
 
   import collection.mutable
-
-  val fields = new mutable.HashMap[String, String]()
-  var extended = false
-
   val Cm = "(\\d+)cm".r
   val In = "(\\d+)in".r
   val Color = """(#[0-9a-v]{6})""".r
   val Pid = """([0-9]{9})""".r
-
-  def isYearRange(x: String, min: Int, max: Int): Boolean = x.length == 4 && x.toInt >= min && x.toInt <= max
-
   val rules: Map[String, String => Boolean] = Map(
     "byr" -> { (byr: String) => isYearRange(byr, 1920, 2002) },
     "iyr" -> { iyr => isYearRange(iyr, 2010, 2020) },
@@ -39,18 +33,22 @@ trait Day04 extends RegexParsers {
       case _ => false
     }
   )
+  val requiredFields = Set("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid")
+  var extended = false
 
-  def label: Parser[String] = """[a-z]{3}""".r
+  override def skipWhitespace = false
 
-  def v: Parser[String] = """[^ ]+""".r
-
-  def keyvalue: Parser[(String, String)] = (label <~ ":") ~ v ^^ { case l ~ v => (l, v) }
+  def isYearRange(x: String, min: Int, max: Int): Boolean = x.length == 4 && x.toInt >= min && x.toInt <= max
 
   def line: Parser[Unit] = rep1sep(keyvalue, " ") ^^ {
     _.foreach(kv => fields.put(kv._1, kv._2))
   }
 
-  val requiredFields = Set("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid")
+  def keyvalue: Parser[(String, String)] = (label <~ ":") ~ v ^^ { case l ~ v => (l, v) }
+
+  def label: Parser[String] = """[a-z]{3}""".r
+
+  def v: Parser[String] = """[^ ]+""".r
 
   def validate(map: Map[String, String]): Boolean = {
     val result = requiredFields.forall(map.keySet.contains)

@@ -1,8 +1,6 @@
 package y2015
 
 trait Day18 {
-  def mkGrid(dim: Int): Array[Array[Boolean]] = Array.ofDim[Boolean](dim + 2, dim + 2)
-
   def parse(input: Iterable[String], pinned: Boolean = false): Grid = {
     val array = mkGrid(input.head.length)
     val inputIter = input.iterator
@@ -28,9 +26,29 @@ trait Day18 {
     Grid(dim, array, pinned)
   }
 
+  def mkGrid(dim: Int): Array[Array[Boolean]] = Array.ofDim[Boolean](dim + 2, dim + 2)
+
   case class Grid(dim: Int, board: Array[Array[Boolean]], pinned: Boolean = false) {
 
     assert(dim == board.length - 2)
+
+    def next: Grid = {
+      val nextBoard = mkGrid(dim)
+      for {y <- 1 to dim
+           x <- 1 to dim} {
+        val lit = Cursor(x, y).lit
+        nextBoard(y)(x) = if (board(y)(x)) lit == 2 || lit == 3 else lit == 3
+      }
+      if (pinned) {
+        nextBoard(1)(1) = true
+        nextBoard(1)(dim) = true
+        nextBoard(dim)(1) = true
+        nextBoard(dim)(dim) = true
+      }
+      Grid(dim, nextBoard, pinned)
+    }
+
+    def lit: Int = board.map(_.count(_ == true)).sum
 
     case class Cursor(x: Int, y: Int) extends Iterable[Boolean] {
 
@@ -57,24 +75,6 @@ trait Day18 {
         }
       }
     }
-
-    def next: Grid = {
-      val nextBoard = mkGrid(dim)
-      for {y <- 1 to dim
-           x <- 1 to dim} {
-        val lit = Cursor(x, y).lit
-        nextBoard(y)(x) = if (board(y)(x)) lit == 2 || lit == 3 else lit == 3
-      }
-      if (pinned) {
-        nextBoard(1)(1) = true
-        nextBoard(1)(dim) = true
-        nextBoard(dim)(1) = true
-        nextBoard(dim)(dim) = true
-      }
-      Grid(dim, nextBoard, pinned)
-    }
-
-    def lit: Int = board.map(_.count(_ == true)).sum
   }
 
 }

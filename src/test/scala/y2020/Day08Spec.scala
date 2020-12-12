@@ -5,7 +5,8 @@ import org.scalatest.matchers.should._
 import util.Loader
 
 class Day08Spec extends AnyFlatSpec with Matchers with Day08 {
-  lazy val testInput: IndexedSeq[Compiler.Instruction] = Compiler.compile( """
+  lazy val testInput: IndexedSeq[Compiler.Instruction] = Compiler.compile(
+    """
       |nop +0
       |acc +1
       |jmp +4

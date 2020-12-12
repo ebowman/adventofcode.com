@@ -2,33 +2,6 @@ package y2015
 
 object Day02 extends App {
 
-  case class Dims(l: Int, w: Int, h: Int) {
-    def a = l * w
-
-    def b = w * h
-
-    def c = l * h
-
-    def area = 2 * (a + b + c)
-
-    def slack = math.min(math.min(a, b), c)
-
-    def total = area + slack
-
-    def ribbon: Int = Seq(2 * l, 2 * w, 2 * h).sorted.take(2).sum + l * w * h
-  }
-
-  def dims(str: String): Dims = {
-    val Rx = """(\d+)x(\d+)x(\d+)""".r
-    str match {
-      case Rx(l, w, h) => Dims(l.toInt, w.toInt, h.toInt)
-    }
-  }
-
-  def total(str: String): Int = dims(str).total
-
-  def ribbon(str: String): Int = dims(str).ribbon
-
   val input =
     """
       |3x11x24
@@ -1032,6 +1005,33 @@ object Day02 extends App {
       |24x25x17
       |14x6x11
     """.stripMargin.trim
+
+  def total(str: String): Int = dims(str).total
+
+  def dims(str: String): Dims = {
+    val Rx = """(\d+)x(\d+)x(\d+)""".r
+    str match {
+      case Rx(l, w, h) => Dims(l.toInt, w.toInt, h.toInt)
+    }
+  }
+
+  def ribbon(str: String): Int = dims(str).ribbon
+
+  case class Dims(l: Int, w: Int, h: Int) {
+    def total = area + slack
+
+    def area = 2 * (a + b + c)
+
+    def slack = math.min(math.min(a, b), c)
+
+    def a = l * w
+
+    def b = w * h
+
+    def c = l * h
+
+    def ribbon: Int = Seq(2 * l, 2 * w, 2 * h).sorted.take(2).sum + l * w * h
+  }
 
   println(input.split("\n").map(total).sum)
   println(input.split("\n").map(ribbon).sum)

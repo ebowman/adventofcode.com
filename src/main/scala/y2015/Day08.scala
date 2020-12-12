@@ -25,6 +25,7 @@ trait Day08 {
           recurse(s.tail, b)
       }
     }
+
     (str.length, recurse(str.tail.init).length)
   }
 
@@ -45,6 +46,7 @@ trait Day08 {
         }
       }
     }
+
     val encoded = recurse(str).append("\"")
     (str.length, encoded.length)
   }

@@ -2,21 +2,22 @@ package y2015
 
 trait Day22 {
 
-  object Game {
-    var minSpent: Int = Int.MaxValue
+  def expire(debug: Boolean, time: Int, player: Player): Player = {
+    val expired = player.mana.filter(_.expired(time + 1))
+    val p4 = player.copy(mana = player.mana.diff(expired))
+    // turn off expired
+    expired.foldLeft(p4) {
+      case (p, m) => m.turnOff(debug, p)
+    }
   }
 
   case class Game(player: Player, boss: Player, time: Int = 0, debug: Boolean = false, pruning: Boolean = false) {
-    override def toString: String = s"Game(time=$time,$player,$boss"
-
-    def playerWins: Boolean = boss.dead
-
-    def isOver: Boolean = boss.dead || player.dead || pruned
-
     // used to prune the search space
     var pruned = false
 
-    import Game.minSpent
+    override def toString: String = s"Game(time=$time,$player,$boss"
+
+    def playerWins: Boolean = boss.dead
 
     def playAll: Seq[Seq[Game]] = {
       def recurse(gs: Seq[Game]): Seq[Seq[Game]] = {
@@ -35,6 +36,8 @@ trait Day22 {
 
       recurse(Seq(this))
     }
+
+    import Game.minSpent
 
     def next(filter: Player => Boolean = { _ => true }): Seq[Game] = {
       if ((time % 2) == 0) { // player turn
@@ -65,8 +68,8 @@ trait Day22 {
             println(s"minSpent = $minSpent")
           }
           if (pruning && p5.spent >= minSpent) {
-              println("pruned")
-              g.pruned = true
+            println("pruned")
+            g.pruned = true
           }
           g
         }
@@ -100,15 +103,12 @@ trait Day22 {
         }
       }
     }
+
+    def isOver: Boolean = boss.dead || player.dead || pruned
   }
 
-  def expire(debug: Boolean, time: Int, player: Player): Player = {
-    val expired = player.mana.filter(_.expired(time + 1))
-    val p4 = player.copy(mana = player.mana.diff(expired))
-    // turn off expired
-    expired.foldLeft(p4) {
-      case (p, m) => m.turnOff(debug, p)
-    }
+  object Game {
+    var minSpent: Int = Int.MaxValue
   }
 }
 
@@ -166,16 +166,16 @@ trait Mana {
 
 object Mana {
 
-  def mana(time: Int): Seq[Mana] = Seq(MagicMissile(time), Drain(time), Shield(time), Poison(time), Recharge(time))
-
   val minAvailable: Int = MagicMissile(0).cost // cheapest
+
+  def mana(time: Int): Seq[Mana] = Seq(MagicMissile(time), Drain(time), Shield(time), Poison(time), Recharge(time))
 
   case class MagicMissile(born: Int) extends Mana {
     val cost = 53
     val lifespan = 1
 
     override def turnOn(debug: Boolean, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 4 ) {
+      if (boss.hit <= 4) {
         if (debug) println(s"Player casts $name, dealing 4 damage. This kills the boss, and the player wins.")
       } else {
         if (debug) println(s"Player casts $name, dealing 4 damage.")
@@ -189,7 +189,7 @@ object Mana {
     val lifespan = 1
 
     override def turnOn(debug: Boolean, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 2 ) {
+      if (boss.hit <= 2) {
         if (debug) println(s"Player casts $name, dealing 2 damage, and healing 2 hit points. This kills the boss, and the player wins.")
       } else {
         if (debug) println(s"Player casts $name, dealing 2 damage, and healing 2 hit points.")
@@ -228,7 +228,7 @@ object Mana {
     val lifespan = 6
 
     override def playerTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 3 ) {
+      if (boss.hit <= 3) {
         if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}. This kills the boss, and the player wins.")
       } else {
         if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}")
@@ -237,7 +237,7 @@ object Mana {
     }
 
     override def bossTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 3 ) {
+      if (boss.hit <= 3) {
         if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}. This kills the boss, and the player wins.")
       } else {
         if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}")
@@ -254,9 +254,11 @@ object Mana {
       if (debug) println(s"$name provides 101 rama, its timer is now ${lifespan - age(time)}")
       (player.copy(available = player.available + 101), boss)
     }
+
     override def bossTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = {
       if (debug) println(s"$name provides 101 rama, its timer is now ${lifespan - age(time)}")
       (player.copy(available = player.available + 101), boss)
     }
   }
+
 }

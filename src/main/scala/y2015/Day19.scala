@@ -1,12 +1,9 @@
 package y2015
 
 import scala.annotation.tailrec
-import scala.util.Random
 import scala.util.parsing.combinator.RegexParsers
 
 trait Day19 extends RegexParsers {
-  def rule: Parser[(String, String)] = ("""[a-zA-Z]+""".r <~ "=>") ~ """[a-zA-Z]+""".r ^^ { case a ~ b => (a, b) }
-
   def mkSystem(input: Iterable[String]): System = {
     val rules = input.init.init.map(line => parseAll(rule, line).get)
     val dict = rules.foldLeft(Map[String, Set[String]]()) {
@@ -17,20 +14,7 @@ trait Day19 extends RegexParsers {
     System(input.last, dict)
   }
 
-  case class System(molecule: String, rules: Map[String, Set[String]]) {
-    def clear: System = System("e", rules)
-
-    def next: Seq[System] = {
-      rules.flatMap {
-        case (mol, repls) =>
-          repls.flatMap { repl =>
-            mol.r.findAllMatchIn(molecule).map { m =>
-              molecule.substring(0, m.start) + repl + molecule.substring(m.end)
-            }
-          }
-      }.toSeq.distinct.map(m => System(m, rules))
-    }
-  }
+  def rule: Parser[(String, String)] = ("""[a-zA-Z]+""".r <~ "=>") ~ """[a-zA-Z]+""".r ^^ { case a ~ b => (a, b) }
 
   // fails on big input (OOM)
   def solveWide(system: System, targetMolecule: String): Int = {
@@ -72,5 +56,20 @@ trait Day19 extends RegexParsers {
       }
     }
     count
+  }
+
+  case class System(molecule: String, rules: Map[String, Set[String]]) {
+    def clear: System = System("e", rules)
+
+    def next: Seq[System] = {
+      rules.flatMap {
+        case (mol, repls) =>
+          repls.flatMap { repl =>
+            mol.r.findAllMatchIn(molecule).map { m =>
+              molecule.substring(0, m.start) + repl + molecule.substring(m.end)
+            }
+          }
+      }.toSeq.distinct.map(m => System(m, rules))
+    }
   }
 }

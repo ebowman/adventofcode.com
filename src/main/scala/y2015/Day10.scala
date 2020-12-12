@@ -1,18 +1,17 @@
 package y2015
 
-import scala.util.parsing.combinator.RegexParsers
-
 trait Day10 {
 
   @scala.annotation.tailrec
   final def iterate(str: String, count: Int): String = {
-      if (count == 0) str
-      else iterate(speaknsay(str), count - 1)
+    if (count == 0) str
+    else iterate(speaknsay(str), count - 1)
   }
 
   def speaknsay(s: String): String = {
     var cur: Char = 0
     var count: Int = 0
+
     @scala.annotation.tailrec
     def recurse(s: String, cursor: Int, b: StringBuilder): StringBuilder = {
       if (cursor == s.length) {
@@ -36,6 +35,7 @@ trait Day10 {
         recurse(s, cursor + 1, b)
       }
     }
+
     recurse(s, 0, new StringBuilder).toString
   }
 }

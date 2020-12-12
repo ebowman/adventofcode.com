@@ -2,7 +2,7 @@ package y2015
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
-import y2015.Lights.{BitGrid, InstructionParser, IntGrid, Rect, Toggle, TurnOff, TurnOn}
+import y2015.Lights._
 
 class Day06Spec extends AnyFlatSpec with Matchers with InstructionParser {
   "Parser" should "pass basic tests" in {
@@ -28,7 +28,7 @@ class Day06Spec extends AnyFlatSpec with Matchers with InstructionParser {
   }
 
   it should "pass the final test" in {
-    val grid = new BitGrid(1000,1000)
+    val grid = new BitGrid(1000, 1000)
     util.Loader(this, "day06.txt").foreach { instruction =>
       parseAll(command, instruction).get.operate(grid)
     }
@@ -43,7 +43,7 @@ class Day06Spec extends AnyFlatSpec with Matchers with InstructionParser {
   }
 
   it should "pass the final test" in {
-    val grid = new IntGrid(1000,1000)
+    val grid = new IntGrid(1000, 1000)
     util.Loader(this, "day06.txt").foreach { instruction =>
       parseAll(command, instruction).get.operate(grid)
     }

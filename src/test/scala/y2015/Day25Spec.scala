@@ -9,7 +9,9 @@ class Day25Spec extends AnyFlatSpec with Matchers {
     // Infinite stream of cursors, not really efficient enough for solving the problem,
     // but it makes the tests easier
     lazy val cursors: Stream[Cursor] =
-      Cursor.origin #:: Cursor.origin.next #:: cursors.zip(cursors.tail).map { _._2.next }
+    Cursor.origin #:: Cursor.origin.next #:: cursors.zip(cursors.tail).map {
+      _._2.next
+    }
     cursors.take(6) shouldEqual Seq(
       Cursor(1, 1), Cursor(2, 1), Cursor(1, 2), Cursor(3, 1), Cursor(2, 2), Cursor(1, 3))
   }

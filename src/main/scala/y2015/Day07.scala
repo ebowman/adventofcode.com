@@ -8,6 +8,42 @@ trait Day07 extends RegexParsers {
 
   val wires = new mutable.HashMap[String, Signal]
 
+  def parser: Parser[Unit] = wire | wire1 | and | and1 | or | lshift | rshift | _not
+
+  def wire: Parser[Unit] = (num <~ "->") ~ name ^^ { case num ~ name => wires.put(name, Wire(name, num)) }
+
+  def wire1: Parser[Unit] = (name <~ "->") ~ name ^^ { case s ~ name => wires.put(name, Named(s)) }
+
+  def and: Parser[Unit] = (name <~ "AND") ~ name ~ ("->" ~> name) ^^ {
+    case s1 ~ s2 ~ d => wires.put(d, OpAnd(d, Named(s1), Named(s2)))
+  }
+
+  def and1: Parser[Unit] = (num <~ "AND") ~ name ~ ("->" ~> name) ^^ {
+    case n ~ s ~ d => wires.put(d, OpAnd(d, Wire("", n), Named(s)))
+  }
+
+  def or: Parser[Unit] = (name <~ "OR") ~ name ~ ("->" ~> name) ^^ {
+    case s1 ~ s2 ~ d => wires.put(d, OpOr(d, Named(s1), Named(s2)))
+  }
+
+  def lshift: Parser[Unit] = name ~ ("LSHIFT" ~> num) ~ ("->" ~> name) ^^ {
+    case s ~ shift ~ d => wires.put(d, OpLShift(d, Named(s), shift))
+  }
+
+  def rshift: Parser[Unit] = name ~ ("RSHIFT" ~> num) ~ ("->" ~> name) ^^ {
+    case s ~ shift ~ d => wires.put(d, OpRShift(d, Named(s), shift))
+  }
+
+  def num: Parser[Int] = """\d+""".r ^^ {
+    _.toInt
+  }
+
+  def name: Parser[String] = """[a-z]+""".r ^^ { x => x }
+
+  def _not: Parser[Unit] = ("NOT" ~> name) ~ ("->" ~> name) ^^ {
+    case s ~ d => wires.put(d, OpNot(d, Named(s)))
+  }
+
   trait Signal {
     def name: String
 
@@ -43,38 +79,4 @@ trait Day07 extends RegexParsers {
   case class OpNot(name: String, s: Signal) extends Signal {
     override def voltage: Int = (~s.voltage) & 0xFFFF
   }
-
-  def num: Parser[Int] = """\d+""".r ^^ { _.toInt }
-
-  def name: Parser[String] = """[a-z]+""".r ^^ { x => x }
-
-  def wire: Parser[Unit] = (num <~ "->") ~ name ^^ { case num ~ name => wires.put(name, Wire(name, num)) }
-
-  def wire1: Parser[Unit] = (name <~ "->") ~ name ^^ { case s ~ name => wires.put(name, Named(s)) }
-
-  def and: Parser[Unit] = (name <~ "AND") ~ name ~ ("->" ~> name) ^^ {
-    case s1 ~ s2 ~ d => wires.put(d, OpAnd(d, Named(s1), Named(s2)))
-  }
-
-  def and1: Parser[Unit] = (num <~ "AND") ~ name ~ ("->" ~> name) ^^ {
-    case n ~ s ~ d => wires.put(d, OpAnd(d, Wire("", n), Named(s)))
-  }
-
-  def or: Parser[Unit] = (name <~ "OR") ~ name ~ ("->" ~> name) ^^ {
-    case s1 ~ s2 ~ d => wires.put(d, OpOr(d, Named(s1), Named(s2)))
-  }
-
-  def lshift: Parser[Unit] = name ~ ("LSHIFT" ~> num) ~ ("->" ~> name) ^^ {
-    case s ~ shift ~ d => wires.put(d, OpLShift(d, Named(s), shift))
-  }
-
-  def rshift: Parser[Unit] = name ~ ("RSHIFT" ~> num) ~ ("->" ~> name) ^^ {
-    case s ~ shift ~ d => wires.put(d, OpRShift(d, Named(s), shift))
-  }
-
-  def _not: Parser[Unit] = ("NOT" ~> name) ~ ("->" ~> name) ^^ {
-    case s ~ d => wires.put(d, OpNot(d, Named(s)))
-  }
-
-  def parser: Parser[Unit] = wire | wire1 | and | and1 | or | lshift | rshift | _not
 }

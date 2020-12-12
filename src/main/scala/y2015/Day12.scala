@@ -8,11 +8,28 @@ trait Day12 extends JavaTokenParsers {
 
   def countNums(str: String): Int = Num.findAllIn(str).map(_.toInt).sum
 
+  def trimQuotes(s: String): String = s.tail.init
+
+  def expr: Parser[Json] = (
+    obj
+      | arr
+      | stringLiteral ^^ { x => JsonString(trimQuotes(x)) }
+      | floatingPointNumber ^^ (s => JsonNumber(BigDecimal(s)))
+    )
+
+  def obj: Parser[JsonObject] = "{" ~> repsep(member, ",") <~ "}" ^^ JsonObject
+
+  def arr: Parser[JsonArray] = "[" ~> repsep(expr, ",") <~ "]" ^^ JsonArray
+
+  def member: Parser[(String, Json)] = stringLiteral ~ ":" ~ expr ^^ {
+    case k ~ ":" ~ v => trimQuotes(k) -> v
+  }
+
+  def count(json: String): Int = parseAll(expr, json).get.count
+
   trait Json {
     def count: Int = 0
   }
-
-  case object JsonNull extends Json
 
   case class JsonBoolean(b: Boolean) extends Json
 
@@ -38,22 +55,5 @@ trait Day12 extends JavaTokenParsers {
     }
   }
 
-  def trimQuotes(s: String): String = s.tail.init
-
-  def expr: Parser[Json] = (
-    obj
-      | arr
-      | stringLiteral ^^ {x => JsonString(trimQuotes(x)) }
-      | floatingPointNumber ^^ (s => JsonNumber(BigDecimal(s)))
-    )
-
-  def obj: Parser[JsonObject] = "{" ~> repsep(member, ",") <~ "}" ^^ JsonObject
-
-  def arr: Parser[JsonArray] = "[" ~> repsep(expr, ",") <~ "]" ^^ JsonArray
-
-  def member: Parser[(String, Json)] = stringLiteral ~ ":" ~ expr ^^ {
-    case k ~ ":" ~ v => trimQuotes(k) -> v
-  }
-
-  def count(json: String): Int = parseAll(expr, json).get.count
+  case object JsonNull extends Json
 }
