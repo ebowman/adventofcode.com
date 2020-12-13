@@ -2,49 +2,43 @@ package y2015
 
 trait Day22 {
 
-  def expire(debug: Boolean, time: Int, player: Player): Player = {
-    val expired = player.mana.filter(_.expired(time + 1))
-    val p4 = player.copy(mana = player.mana.diff(expired))
-    // turn off expired
-    expired.foldLeft(p4) {
-      case (p, m) => m.turnOff(debug, p)
-    }
-  }
 
-  case class Game(player: Player, boss: Player, time: Int = 0, debug: Boolean = false, pruning: Boolean = false) {
-    // used to prune the search space
-    var pruned = false
+  case class Game(player: Player, boss: Player, time: Int = 0, debug: Boolean = false) {
 
     override def toString: String = s"Game(time=$time,$player,$boss"
 
     def playerWins: Boolean = boss.dead
 
-    def playAll: Seq[Seq[Game]] = {
-      def recurse(gs: Seq[Game]): Seq[Seq[Game]] = {
+    def playAll(filter: Boolean = false, mana: Seq[String] = Seq.empty): Seq[Seq[Game]] = {
+      def recurse(gs: Seq[Game], m: Seq[String]): Seq[Seq[Game]] = {
+        def f(p: Player): Boolean = {
+          m.isEmpty || p.newMana.get.name.startsWith(m.head)
+        }
         (for {
           g <- gs
-          n <- g.next()
+          n <- if (!filter) g.next() else g.next(f)
         } yield {
           if (n.isOver) {
             Seq(Seq(g, n).reverse)
           }
           else {
-            recurse(Seq(n)).map { s => s :+ g }
+            recurse(Seq(n), if (filter) m.tail else Seq.empty).map { s => s :+ g }
           }
         }).flatten
       }
 
-      recurse(Seq(this))
+      recurse(Seq(this), mana)
     }
 
     import Game.minSpent
 
     def next(filter: Player => Boolean = { _ => true }): Seq[Game] = {
+      if (debug) println(s"time = $time")
       if ((time % 2) == 0) { // player turn
-        val players = player.mananize(time).filter(filter)
-        if (players.isEmpty) Seq(Game(player.copy(outOfMoney = true), boss, time + 1))
+        val players = player.mananize(minSpent, time).filter(filter)
+        if (players.isEmpty) Seq(copy(player = player.copy(outOfMoney = true), time = time + 1))
         for {
-          player <- players if !pruning || player.spent < minSpent
+          player <- players
         } yield {
           if (debug) println("-- Player turn --")
           if (debug) println(s"- Player has ${player.hit} hit points, ${player.armor} armor, ${player.available + player.newMana.get.cost} mana")
@@ -60,16 +54,12 @@ trait Day22 {
             (p3.copy(mana = p3.mana :+ nM, newMana = None), b2)
           }.getOrElse((p1, b1))
 
-          val p5 = expire(debug, time, p2)
+          val p5 = p2.expire(debug, time)
 
-          val g = Game(p5, b3, time + 1)
+          val g = copy(player = p5, boss = b3, time = time + 1)
           if (g.isOver && p5.spent < minSpent) {
             minSpent = p5.spent
             println(s"minSpent = $minSpent")
-          }
-          if (pruning && p5.spent >= minSpent) {
-            println("pruned")
-            g.pruned = true
           }
           g
         }
@@ -95,16 +85,16 @@ trait Day22 {
             p1.copy(hit = p1.hit - damage)
           } else p1
 
-          val p5 = expire(debug, time, p2)
+          val p5 = p2.expire(debug, time)
 
-          Seq(Game(p5, b1, time + 1))
+          Seq(copy(player = p5, boss = b1, time = time + 1))
         } else {
-          Seq(Game(p1, b1, time + 1))
+          Seq(Game(player = p1, boss = b1, time = time + 1))
         }
       }
     }
 
-    def isOver: Boolean = boss.dead || player.dead || pruned
+    def isOver: Boolean = boss.dead || player.dead
   }
 
   object Game {
@@ -126,16 +116,26 @@ case class Player(name: String,
 
   override def toString = s"$name(hit=$hit,damage=$damage,armor=$armor,spent=$spent,available=$available,mana=$mana,next=${newMana.getOrElse("x")})"
 
-  def mananize(time: Int): Seq[Player] = {
+  def expire(debug: Boolean, time: Int): Player = {
+    val expired = mana.filter(_.expired(time + 1))
+    if (debug) println(s"Expired $expired from $this")
+    val player = copy(mana = mana.diff(expired))
+    // turn off expired
+    expired.foldLeft(player) {
+      case (p, m) => m.turnOff(debug, p)
+    }
+  }
+
+  def mananize(minSpent: Int, time: Int): Seq[Player] = {
     def avail(t: Int): Seq[Mana] = Mana.mana(t).filter(_.cost <= available)
 
-    avail(time).map(m => copy(newMana = Some(m), spent = spent + m.cost, available = available - m.cost))
+    avail(time).map(m => copy(newMana = Some(m), spent = spent + m.cost, available = available - m.cost)).filter(_.spent < minSpent)
   }
 }
 
 trait Mana {
 
-  override def toString: String = s"$name/$born/$lifespan"
+  override def toString: String = s"$name/${born+lifespan}"
 
   def name: String = getClass.getName.replaceAll(".*\\$", "")
 
