@@ -16,17 +16,6 @@ trait Common {
 }
 
 trait Part1 extends Common {
-  // return (and, or)
-  @tailrec
-  final def parseMask(maskStr: String, shift: Int = 0, and: Long = MASK, or: Long = 0): (Long, Long) = {
-    if (maskStr.isEmpty) (and, or)
-    else maskStr.last match {
-      case 'X' => parseMask(maskStr.init, shift + 1, and, or)
-      case '0' => parseMask(maskStr.init, shift + 1, and & ~(1L << shift), or)
-      case '1' => parseMask(maskStr.init, shift + 1, and, or | (1L << shift))
-    }
-  }
-
   def part1(instructions: IndexedSeq[String]): Long = {
     val memory = allocateMem()
 
@@ -37,25 +26,26 @@ trait Part1 extends Common {
 
     memory.values.sum
   }
-}
 
-trait Part2 extends Common {
-  // return (float, or)
+  // return (and, or)
   @tailrec
-  final def parseMask2(maskStr: String, shift: Int = 0, float: Long = 0, or: Long = 0): (Long, Long) = {
-    if (maskStr.isEmpty) (float, or)
+  private final def parseMask(maskStr: String, shift: Int = 0, and: Long = MASK, or: Long = 0): (Long, Long) = {
+    if (maskStr.isEmpty) (and, or)
     else maskStr.last match {
-      case 'X' => parseMask2(maskStr.init, shift + 1, float | (1L << shift), or)
-      case '0' => parseMask2(maskStr.init, shift + 1, float, or)
-      case '1' => parseMask2(maskStr.init, shift + 1, float, or | (1L << shift))
+      case 'X' => parseMask(maskStr.init, shift + 1, and, or)
+      case '0' => parseMask(maskStr.init, shift + 1, and & ~(1L << shift), or)
+      case '1' => parseMask(maskStr.init, shift + 1, and, or | (1L << shift))
     }
   }
 
+}
+
+trait Part2 extends Common {
   def part2(instructions: IndexedSeq[String]): Long = {
     val memory = allocateMem()
 
     instructions.foldLeft((0L, 0L)) {
-      case (_, Mask(m)) => parseMask2(m)
+      case (_, Mask(m)) => parseMask(m)
       case ((float, or), Write(addr, value)) =>
         floatOps(float).map(_ (or | addr.toLong)).foreach(addr => memory(addr) = value.toLong); (float, or)
     }
@@ -63,9 +53,20 @@ trait Part2 extends Common {
     memory.values.sum
   }
 
-  type Op = Long => Long
+  // return (float, or)
+  @tailrec
+  private final def parseMask(maskStr: String, shift: Int = 0, float: Long = 0, or: Long = 0): (Long, Long) = {
+    if (maskStr.isEmpty) (float, or)
+    else maskStr.last match {
+      case 'X' => parseMask(maskStr.init, shift + 1, float | (1L << shift), or)
+      case '0' => parseMask(maskStr.init, shift + 1, float, or)
+      case '1' => parseMask(maskStr.init, shift + 1, float, or | (1L << shift))
+    }
+  }
 
-  def floatOps(float: Long): Seq[Op] = {
+  private type Op = Long => Long
+
+  private def floatOps(float: Long): Seq[Op] = {
     val bits = (0 until 36).filter(bit => (float & (1L << bit)) != 0)
 
     @tailrec
