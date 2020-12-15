@@ -13,7 +13,7 @@ trait Day15 {
     for (t <- seeds.length + 1 to limit) {
       memory(lastSeen) match {
         case (t0, t1) if t0 == t1 => lastSeen = 0
-        case (t0, t1) => lastSeen = memory(lastSeen)._2 - memory(lastSeen)._1
+        case (_, _) => lastSeen = memory(lastSeen)._2 - memory(lastSeen)._1
       }
       if (memory(lastSeen) == (-1, -1)) memory(lastSeen) = (t, t)
       else memory(lastSeen) = (memory(lastSeen)._2, t)
