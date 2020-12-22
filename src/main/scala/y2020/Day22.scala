@@ -37,15 +37,15 @@ trait Day22 {
   }
 
   def part2(input: Iterable[String]): Int = {
-    def recursiveCombat(p1: Queue[Int], p2: Queue[Int], seen: Set[(Int, Int)] = Set()): (Int, Seq[Int], Seq[Int]) = {
-      if (p2.isEmpty) (1, p1, p2)
-      else if (p1.isEmpty) (2, p1, p2)
+    def recursiveCombat(p1: Queue[Int], p2: Queue[Int], seen: Set[(Int, Int)] = Set()): (Int, Seq[Int]) = {
+      if (p2.isEmpty) (1, p1)
+      else if (p1.isEmpty) (2, p2)
       else {
         val hash = (p1.hashCode(), p2.hashCode())
-        if (seen.contains(hash)) (1, p1, p2)
+        if (seen.contains(hash)) (1, p1)
         else {
           val ((card1, p1next), (card2, p2next)) = (p1.dequeue, p2.dequeue)
-          val winner: Int =
+          val winner =
             if (p1next.size >= card1 && p2next.size >= card2) recursiveCombat(p1next.take(card1), p2next.take(card2))._1
             else if (card1 > card2) 1 else 2
           if (winner == 1) recursiveCombat(p1next.enqueue[Int](immutable.Iterable(card1, card2)), p2next, seen + hash)
@@ -55,9 +55,6 @@ trait Day22 {
     }
 
     val (player1, player2) = parse(input)
-    (recursiveCombat(player1, player2) match {
-      case (1, d1, _) => d1
-      case (2, _, d2) => d2
-    }).reverse.zipWithIndex.map(score).sum
+    recursiveCombat(player1, player2)._2.reverse.zipWithIndex.map(score).sum
   }
 }
