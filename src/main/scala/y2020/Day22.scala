@@ -48,7 +48,6 @@ trait Day22 {
           val winner: Int =
             if (p1next.size >= card1 && p2next.size >= card2) recursiveCombat(p1next.take(card1), p2next.take(card2))._1
             else if (card1 > card2) 1 else 2
-
           if (winner == 1) recursiveCombat(p1next.enqueue[Int](immutable.Iterable(card1, card2)), p2next, seen + hash)
           else recursiveCombat(p1next, p2next.enqueue[Int](immutable.Iterable(card2, card1)), seen + hash)
         }
