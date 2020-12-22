@@ -6,8 +6,8 @@ import util.Loader
 
 class Day22Spec extends AnyFlatSpec with Matchers with Day22 {
 
-  lazy val testInput: IndexedSeq[String] = Loader.is(this, "day22.test.txt")
-  lazy val input: IndexedSeq[String] = Loader.is(this, "day22.txt")
+  lazy val testInput: Iterable[String] = Loader(this, "day22.test.txt")
+  lazy val input: Iterable[String] = Loader(this, "day22.txt")
 
   it should "solve part 1 test" in {
     part1(testInput) shouldBe 306

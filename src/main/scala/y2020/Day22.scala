@@ -1,8 +1,9 @@
 package y2020
 
-import scala.collection.mutable
+import scala.annotation.tailrec
+import scala.collection.immutable
+import scala.collection.immutable.Queue
 import scala.util.matching.Regex
-
 
 trait Day22 {
 
@@ -10,45 +11,48 @@ trait Day22 {
 
   def score(x: (Int, Int)): Int = x._1 * (x._2 + 1)
 
-  def parse(input: IndexedSeq[String]): (mutable.Queue[Int], mutable.Queue[Int]) = {
-    val players = input.foldLeft(Nil: List[mutable.Queue[Int]]) {
-      case (player, line) if line.startsWith("Player") => new mutable.Queue[Int] :: player
-      case (player, Num(num)) => player.head.enqueue(num.toInt); player
+  def parse(input: Iterable[String]): (Queue[Int], Queue[Int]) = {
+    val players = input.foldLeft(Nil: List[Queue[Int]]) {
+      case (player, line) if line.startsWith("Player") => Queue[Int]() :: player
+      case (player, Num(num)) => player.head.enqueue(num.toInt) :: player.tail
       case (player, _) => player
     }
-
     (players.tail.head, players.head)
   }
 
-  def part1(input: IndexedSeq[String]): Int = {
-    val (p1, p2) = parse(input)
-    while (p1.nonEmpty && p2.nonEmpty) {
-      val (play1, play2) = (p1.dequeue(), p2.dequeue())
-      if (play1 > play2) p1.enqueue(play1, play2)
-      else p2.enqueue(play2, play1)
+  def part1(input: Iterable[String]): Int = {
+    @tailrec
+    def recurse(p1: Queue[Int], p2: Queue[Int]): Queue[Int] = {
+      if (p1.isEmpty) p2
+      else if (p2.isEmpty) p1
+      else {
+        val ((play1, nextP1), (play2, nextP2)) = (p1.dequeue, p2.dequeue)
+        if (play1 > play2) recurse(nextP1.enqueue(immutable.Iterable(play1, play2)), nextP2)
+        else recurse(nextP1, nextP2.enqueue(immutable.Iterable(play2, play1)))
+      }
     }
-    (if (p1.isEmpty) p2 else p1).toIndexedSeq.reverse.zipWithIndex.map(score).sum
+
+    val (player1, player2) = parse(input)
+    recurse(player1, player2).reverse.zipWithIndex.map(score).sum
   }
 
-  def part2(input: IndexedSeq[String]): Int = {
-
-    def recursiveCombat(deck1: mutable.Queue[Int],
-                        deck2: mutable.Queue[Int]): (Int, Seq[Int], Seq[Int]) = {
-      var seen = Set[(Int, Int)]()
-      while (deck1.nonEmpty && deck2.nonEmpty) {
-        val hash = (deck1.hashCode(), deck2.hashCode())
-        if (seen.contains(hash)) return (1, deck1, deck2)
+  def part2(input: Iterable[String]): Int = {
+    def recursiveCombat(p1: Queue[Int], p2: Queue[Int], seen: Set[(Int, Int)] = Set()): (Int, Seq[Int], Seq[Int]) = {
+      if (p2.isEmpty) (1, p1, p2)
+      else if (p1.isEmpty) (2, p1, p2)
+      else {
+        val hash = (p1.hashCode(), p2.hashCode())
+        if (seen.contains(hash)) (1, p1, p2)
         else {
-          seen = seen + hash
-          val (card1, card2) = (deck1.dequeue(), deck2.dequeue())
-          val winner =
-            if (deck1.size >= card1 && deck2.size >= card2) recursiveCombat(deck1.take(card1), deck2.take(card2))._1
+          val ((card1, p1next), (card2, p2next)) = (p1.dequeue, p2.dequeue)
+          val winner: Int =
+            if (p1next.size >= card1 && p2next.size >= card2) recursiveCombat(p1next.take(card1), p2next.take(card2))._1
             else if (card1 > card2) 1 else 2
-          if (winner == 1) deck1.enqueue(card1, card2)
-          else deck2.enqueue(card2, card1)
+
+          if (winner == 1) recursiveCombat(p1next.enqueue[Int](immutable.Iterable(card1, card2)), p2next, seen + hash)
+          else recursiveCombat(p1next, p2next.enqueue[Int](immutable.Iterable(card2, card1)), seen + hash)
         }
       }
-      (if (deck1.nonEmpty) 1 else 2, deck1, deck2)
     }
 
     val (player1, player2) = parse(input)
