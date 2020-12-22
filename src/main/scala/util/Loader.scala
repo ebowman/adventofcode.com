@@ -6,4 +6,5 @@ object Loader {
     import scala.io.Source
     Source.fromInputStream(obj.getClass.getResourceAsStream(resource)).getLines().toIterable
   }
+  def is(obj: AnyRef, resource: String): IndexedSeq[String] = apply(obj, resource).toIndexedSeq
 }
