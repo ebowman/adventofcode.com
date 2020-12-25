@@ -9,8 +9,6 @@ trait Day16 extends RegexParsers {
 
   case class Rule(name: String, r1: Range, r2: Range) {
     def valid(num: Int): Boolean = r1.contains(num) || r2.contains(num)
-
-    def seq: Seq[Int] = r1 ++ r2
   }
 
   case class Ticket(fields: IndexedSeq[Int]) {
@@ -61,7 +59,7 @@ trait Day16 extends RegexParsers {
             case Some((i, rule)) =>
               (
                 groups.map {
-                  case (j, _) if (i == j) => (i, rule)
+                  case (j, _) if i == j => (i, rule)
                   case (j, rules) => (j, rules.filterNot(_ == rule.head))
                 },
                 rule

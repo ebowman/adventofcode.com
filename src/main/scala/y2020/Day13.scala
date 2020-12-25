@@ -55,11 +55,8 @@ trait Day13 {
         def euclid(a: BigInt, b: BigInt, x0: BigInt = 0, x1: BigInt = 1): BigInt =
           if (a > 1) euclid(b, a % b, x1 - (a / b) * x0, x0) else x1
 
-        if (b == 1) 1
-        else {
-          val x1 = euclid(a, b)
-          if (x1 < 0) x1 + b else x1
-        }
+        val x1 = euclid(a, b)
+        if (x1 < 0) x1 + b else x1
       }
 
       if (n.isEmpty) sum

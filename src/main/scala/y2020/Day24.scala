@@ -25,10 +25,10 @@ trait Day24 {
   @tailrec final def parse(i: String, c: Coord = Coord()): Coord = {
     if (i.isEmpty) c
     else {
-      i.take(1) match {
-        case dir@("e" | "w") => parse(i.tail, c.adjacent(dir))
-        case d1@("n" | "s") => i.slice(1, 2) match {
-          case d2@("e" | "w") => parse(i.drop(2), c.adjacent(d1 + d2))
+      i.head match {
+        case dir@('e' | 'w') => parse(i.tail, c.adjacent(dir.toString))
+        case d1@('n' | 's') => i.tail.head match {
+          case d2@('e' | 'w') => parse(i.drop(2), c.adjacent(d1.toString + d2))
         }
       }
     }

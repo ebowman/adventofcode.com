@@ -9,9 +9,7 @@ trait Common {
   val Write: Regex = """mem\[(.*?)] = (.*)""".r
 
   def allocateMem(): collection.mutable.Map[Long, Long] = {
-    new collection.mutable.HashMap[Long, Long]() {
-      override def default(key: Long): Long = 0L
-    }
+    new collection.mutable.HashMap[Long, Long]()
   }
 }
 
