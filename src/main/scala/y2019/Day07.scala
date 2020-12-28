@@ -53,23 +53,27 @@ trait Intcode {
           val op2 = read(cursor + 2, op.mode2)
           if (op1 != 0) execute(op2)
           else execute(cursor + 3)
-        case op if op.opcode == iJIF =>
-          val op1 = read(cursor + 1, op.mode1)
-          val op2 = read(cursor + 2, op.mode2)
-          if (op1 == 0) execute(op2)
-          else execute(cursor + 3)
+        /*
+      case op if op.opcode == iJIF =>
+        val op1 = read(cursor + 1, op.mode1)
+        val op2 = read(cursor + 2, op.mode2)
+        if (op1 == 0) execute(op2)
+        else execute(cursor + 3)
+         */
         case op if op.opcode == iSTLT =>
           val op1 = read(cursor + 1, op.mode1)
           val op2 = read(cursor + 2, op.mode2)
           if (op1 < op2) memory(memory(cursor + 3)) = 1
           else memory(memory(cursor + 3)) = 0
           execute(cursor + 4)
-        case op if op.opcode == iSTEQ =>
-          val op1 = read(cursor + 1, op.mode1)
-          val op2 = read(cursor + 2, op.mode2)
-          if (op1 == op2) memory(memory(cursor + 3)) = 1
-          else memory(memory(cursor + 3)) = 0
-          execute(cursor + 4)
+        /*
+      case op if op.opcode == iSTEQ =>
+        val op1 = read(cursor + 1, op.mode1)
+        val op2 = read(cursor + 2, op.mode2)
+        if (op1 == op2) memory(memory(cursor + 3)) = 1
+        else memory(memory(cursor + 3)) = 0
+        execute(cursor + 4)
+         */
         case stop if stop.opcode == 99 =>
           ()
       }

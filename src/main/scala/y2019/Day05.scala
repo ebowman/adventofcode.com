@@ -5,16 +5,15 @@ import scala.annotation.tailrec
 trait Day05 {
 
   object Intcode {
-    def compile(input: String, reps: Seq[(Int, Int)] = Seq.empty): Intcode = {
+    def compile(input: String): Intcode = {
       val mem = input.split(",").map(_.toInt)
-      reps.foreach { case (addr, value) => mem(addr) = value }
       Intcode(mem)
     }
   }
 
   case class PackedInstruction(byte: Int) {
-    lazy val str = byte.toString.reverse
-    lazy val opcode = str.take(2).reverse.toInt
+    lazy val str: String = byte.toString.reverse
+    lazy val opcode: Int = str.take(2).reverse.toInt
     lazy val mode1: Boolean = str.slice(2, 3) == "1"
     lazy val mode2: Boolean = str.slice(3, 4) == "1"
     lazy val mode3: Boolean = str.slice(4, 5) == "1"
@@ -22,7 +21,7 @@ trait Day05 {
 
   case class Intcode(memory: Array[Int]) {
     @tailrec final def execute(cursor: Int = 0, input: Int = 0, output: Int = 0): Int = {
-      def read(c: Int, mode: Boolean):Int = if (mode) memory(c) else memory(memory(c))
+      def read(c: Int, mode: Boolean): Int = if (mode) memory(c) else memory(memory(c))
 
       val (iADD, iMUL, iIN, iOUT, iJIT, iJIF, iSTLT, iSTEQ) = (1, 2, 3, 4, 5, 6, 7, 8)
       PackedInstruction(memory(cursor)) match {
