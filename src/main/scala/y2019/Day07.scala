@@ -3,8 +3,7 @@ package y2019
 import java.util.concurrent.{ArrayBlockingQueue, Executors, TimeUnit}
 import scala.annotation.tailrec
 
-trait Intcode {
-
+trait Day07 {
 
   object Intcode {
     def compile(code: String, input: ArrayBlockingQueue[Int], output: ArrayBlockingQueue[Int]): Intcode = {
@@ -79,10 +78,6 @@ trait Intcode {
       }
     }
   }
-
-}
-
-trait Day07 extends Intcode {
 
   def executeChain(code: String, phases: Seq[Int]): Int = {
     val pipelines = phases.map { phase =>
