@@ -24,6 +24,7 @@ class Day09Spec extends AnyFlatSpec with Matchers with Day09 {
       machine.execute()
       machine.outputs.asScala.toSeq shouldBe Seq(34915192L * 34915192)
     }
+
     {
       val code = "104,1125899906842624,99"
       val machine = Intcode.compiler(code).compile()
