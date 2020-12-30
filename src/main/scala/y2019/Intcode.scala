@@ -5,7 +5,24 @@ import scala.annotation.tailrec
 
 trait Intcode {
 
+  trait Source {
+    def take(): Long
+  }
+
+  trait Sink {
+    def put(value: Long): Unit
+  }
+
+  case class LBQSource(queue: LinkedBlockingQueue[Long]) extends Source {
+    def take(): Long = queue.take()
+  }
+
+  case class LBQSink(queue: LinkedBlockingQueue[Long] = new LinkedBlockingQueue[Long]) extends Sink {
+    def put(value: Long) { queue.put(value) }
+  }
+
   object Intcode {
+
     private def compileStr(code: String, bytes: Int): Array[Long] = {
       val tmp = code.split(",").map(_.toLong)
       tmp ++ new Array[Long](bytes - tmp.length)
@@ -18,13 +35,18 @@ trait Intcode {
         val compiled = compileStr(code, bytes)
         val input = new LinkedBlockingQueue[Long]
         inputs.foreach(input.put)
-        Intcode(compiled, input, new LinkedBlockingQueue[Long])
+        Intcode(compiled, LBQSource(input), LBQSink())
+      }
+
+      def compile(source: Source, sink: Sink): Intcode = {
+        val compiled = compileStr(code, bytes)
+        Intcode(compiled, source, sink)
       }
     }
 
   }
 
-  case class Intcode(memory: Array[Long], inputs: BlockingQueue[Long], outputs: BlockingQueue[Long]) {
+  case class Intcode(memory: Array[Long], source: Source, sink: Sink) {
     private var relativeBase: Int = 0
 
     private def readMem(c: Int, mode: Int): Long = {
@@ -84,10 +106,10 @@ trait Intcode {
           op.write(op.read() * op.read())
           execute(op.next())
         case op@Instruction(In, _) =>
-          op.write(inputs.take())
+          op.write(source.take())
           execute(op.next())
         case op@Instruction(Out, _) =>
-          outputs.put(op.read())
+          sink.put(op.read())
           execute(op.next())
         case op@Instruction(Jit, _) =>
           val value = op.read()
