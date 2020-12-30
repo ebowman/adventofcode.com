@@ -24,7 +24,7 @@ trait Day22 {
     @tailrec
     def recurse(p1: Queue[Int], p2: Queue[Int]): Queue[Int] = {
       if (p1.isEmpty) p2
-      else if (p2.isEmpty) p1
+      // else if (p2.isEmpty) p1
       else {
         val ((play1, nextP1), (play2, nextP2)) = (p1.dequeue, p2.dequeue)
         if (play1 > play2) recurse(nextP1.enqueue(immutable.Iterable(play1, play2)), nextP2)
