@@ -13,7 +13,7 @@ trait Intcode {
     def put(value: Long): Unit
   }
 
-  case class LBQSource(queue: LinkedBlockingQueue[Long]) extends Source {
+  case class LBQSource(queue: LinkedBlockingQueue[Long] = new LinkedBlockingQueue[Long]) extends Source {
     def take(): Long = queue.take()
   }
 
