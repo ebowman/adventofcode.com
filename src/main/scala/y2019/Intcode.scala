@@ -1,6 +1,6 @@
 package y2019
 
-import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
+import java.util.concurrent.LinkedBlockingQueue
 import scala.annotation.tailrec
 
 trait Intcode {
@@ -18,7 +18,9 @@ trait Intcode {
   }
 
   case class LBQSink(queue: LinkedBlockingQueue[Long] = new LinkedBlockingQueue[Long]) extends Sink {
-    def put(value: Long) { queue.put(value) }
+    def put(value: Long) {
+      queue.put(value)
+    }
   }
 
   object Intcode {
