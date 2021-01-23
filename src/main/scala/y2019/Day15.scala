@@ -1,9 +1,16 @@
 package y2019
 
-import scala.util.{Random, Try}
+import scala.annotation.tailrec
+import scala.util.Random
 
 
 trait Day15 extends Intcode {
+  type Board = Map[(Int, Int), Int]
+
+  val UNKNOWN: Int = -1
+  val WALL: Int = 0
+  val BLANK: Int = 1
+  val OXYGEN: Int = 2
 
   def move(pos: (Int, Int), dir: Int): (Int, Int) = {
     dir match {
@@ -14,63 +21,46 @@ trait Day15 extends Intcode {
     }
   }
 
-  val WALL: Char = 0.toChar
-  val BLANK: Char = 1.toChar
-  val OXYGEN: Char = 2.toChar
+  def discoverGrid(code: String): ((Int, Int), Board) = {
 
-  def fillGrid(code: String): ((Int, Int), Map[(Int, Int), Char]) = {
     Random.setSeed(0) // some sequences don't properly discover the maze
+
     def rndDir(): Int = Random.nextInt(4) + 1
 
-    var pos = (0, 0)
-    var grid = Map[(Int, Int), Char]() + (pos -> BLANK)
-    var dir = rndDir()
-    var goal = (0, 0)
+    val machine: Intcode.StepMachine = Intcode.compiler(code).stepMachine()
 
-    val sink = new Sink {
-      override def put(value: Long): Unit = {
-        value.toInt match {
+    @tailrec def recurse(pos: (Int, Int),
+                         goal: (Int, Int),
+                         dir: Int,
+                         grid: Board): ((Int, Int), Board) = {
+
+      if (goal != (0, 0) && !containsReachableUnexplored(grid)) (goal, grid + (goal -> OXYGEN))
+      else {
+        machine.step(dir) match {
           case 0 =>
-            grid = grid + (move(pos, dir) -> WALL)
+            recurse(pos, goal, dir = rndDir(), grid + (move(pos, dir) -> WALL))
           case 1 =>
-            grid = grid + (pos -> BLANK)
-            pos = move(pos, dir)
+            recurse(pos = move(pos, dir), goal, dir = rndDir(), grid + (pos -> BLANK))
           case 2 =>
-            grid = grid + (pos -> BLANK)
-            pos = move(pos, dir)
-            goal = pos
-        }
-        if (goal != (0, 0) && !containsReachableUnexplored(grid)) {
-          throw new RuntimeException("grid complete")
+            recurse(pos = move(pos, dir), goal = pos, dir = rndDir(), grid + (pos -> BLANK))
         }
       }
     }
 
-    val source = new Source {
-      override def take(): Long = {
-        do {
-          dir = rndDir()
-        } while (grid.getOrElse(move(pos, dir), -1) == WALL)
-        dir
-      }
-    }
-
-    // blows an exception to indicate it found the oxygen
-    Try(Intcode.compiler(code).compile(source, sink).execute())
-    (goal, grid)
+    recurse(pos = (0, 0), goal = (0, 0), dir = rndDir(), grid = Map() + ((0, 0) -> BLANK))
   }
 
   def part1(code: String): Int = {
-    val (goal, grid) = fillGrid(code)
+    val (goal, grid) = discoverGrid(code)
     var visited = Set[(Int, Int)]()
-    var distance = 0
+    var distance = 1
     var queue = goal :: Nil
     while (queue.nonEmpty) {
       var newQueue = List.empty[(Int, Int)]
       for (cell <- queue) {
         for {
           dir <- 1 to 4
-          neighbor = move(cell, dir) if grid.getOrElse(neighbor, -1) != WALL
+          neighbor = move(cell, dir) if grid.getOrElse(neighbor, UNKNOWN) != WALL
         } {
           if (neighbor == (0, 0)) {
             distance += 1
@@ -87,39 +77,33 @@ trait Day15 extends Intcode {
     distance
   }
 
-  def containsReachableUnexplored(grid: Map[(Int, Int), Char]): Boolean = {
-    val (minX, maxX) = (grid.keys.map(_._1).min, grid.keys.map(_._1).max)
-    val (minY, maxY) = (grid.keys.map(_._2).min, grid.keys.map(_._2).max)
-    (minX - 1 to maxX + 1).exists(x => (minY - 1 to maxY + 1).exists {
-      y =>
+  val dirs = Seq(1, 2, 3, 4)
+
+  def containsReachableUnexplored(grid: Board): Boolean = {
+    import math.{min,max}
+    val (minX, maxX, minY, maxY) = grid.keys.foldLeft((Int.MaxValue, Int.MinValue, Int.MaxValue, Int.MinValue)) {
+      case ((minX, maxX, minY, maxY), (x, y)) => (min(x, minX), max(x, maxX), min(y, minY), max(y, maxY))
+    }
+    (minX - 1 to maxX + 1).exists { x =>
+      (minY - 1 to maxY + 1).exists { y =>
         !grid.contains((x, y)) &&
-          (grid.getOrElse((x - 1, y), -1) == BLANK ||
-            grid.getOrElse((x + 1, y), -1) == BLANK ||
-            grid.getOrElse((x, y - 1), -1) == BLANK ||
-            grid.getOrElse((x, y + 1), -1) == BLANK)
-    })
+          dirs.exists(d => grid.getOrElse(move((x, y), d), UNKNOWN) == BLANK)
+      }
+    }
   }
 
   def part2(code: String): Int = {
-    var (oxygen, grid) = fillGrid(code)
-    val dirs = Seq(1, 2, 3, 4)
-    grid = grid + (oxygen -> OXYGEN)
+    val (_, grid) = discoverGrid(code)
 
-    def next(g: Map[(Int, Int), Char]): Map[(Int, Int), Char] = {
-      val toFill: Set[(Int, Int)] = g.toSeq.collect {
-        case (p, BLANK) if dirs.exists(d => g.getOrElse(move(p, d), -1) == OXYGEN) => p
-      }.toSet
-      g ++ toFill.map(_ -> OXYGEN)
+    def next(board: Board): Board = board ++ board.collect {
+      case (p, BLANK) if dirs.exists(d => board.getOrElse(move(p, d), UNKNOWN) == OXYGEN) => p -> OXYGEN
     }
 
-    var n = grid
-    var prev = n
-    var count = 0
-    do {
-      prev = n
-      n = next(prev)
-      count += 1
-    } while (n != prev)
-    count - 1
+    @tailrec def recurse(nxt: Board, cur: Board, count: Int = 0): Int = {
+      if (cur == nxt) count + 1
+      else recurse(nxt = next(nxt), cur = nxt, count + 1)
+    }
+
+    recurse(next(grid), grid)
   }
 }

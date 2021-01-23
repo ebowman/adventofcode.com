@@ -32,6 +32,15 @@ trait Intcode {
 
     def compiler(code: String, bytes: Int = 2048): Compiler = Compiler(code, bytes)
 
+    class StepMachine(machine: Intcode) {
+      private var cursor = 0
+      def step(input: Int): Int = {
+        machine.source.asInstanceOf[LBQSource].queue.put(input.toLong)
+        cursor = machine.execute(cursor, singleStep = true)
+        machine.sink.asInstanceOf[LBQSink].queue.take().toInt
+      }
+    }
+
     case class Compiler(code: String, bytes: Int) {
       def compile(inputs: Seq[Long] = Seq.empty): Intcode = {
         val compiled = compileStr(code, bytes)
@@ -44,8 +53,13 @@ trait Intcode {
         val compiled = compileStr(code, bytes)
         Intcode(compiled, source, sink)
       }
-    }
 
+      def stepMachine(): StepMachine = {
+        val compiled = compileStr(code, bytes)
+        val input = new LinkedBlockingQueue[Long]
+        new StepMachine(Intcode(compiled, LBQSource(input), LBQSink()))
+      }
+    }
   }
 
   case class Intcode(memory: Array[Long], source: Source, sink: Sink) {
@@ -98,45 +112,47 @@ trait Intcode {
       def next()(implicit cursor: Int): Int = cursor + localCursor
     }
 
-    @tailrec final def execute(cursor: Int = 0): Unit = {
+    @tailrec final def execute(cursor: Int = 0, singleStep: Boolean = false): Int = {
       implicit val cur: Int = cursor
       Instruction(memory(cursor).toInt) match {
         case op@Instruction(Add, _) =>
           op.write(op.read() + op.read())
-          execute(op.next())
+          execute(op.next(), singleStep)
         case op@Instruction(Mul, _) =>
           op.write(op.read() * op.read())
-          execute(op.next())
+          execute(op.next(), singleStep)
         case op@Instruction(In, _) =>
           op.write(source.take())
-          execute(op.next())
+          execute(op.next(), singleStep)
         case op@Instruction(Out, _) =>
-          sink.put(op.read())
-          execute(op.next())
+          val out = op.read()
+          sink.put(out)
+          if (singleStep) op.next()
+          else execute(op.next(), singleStep)
         case op@Instruction(Jit, _) =>
           val value = op.read()
           val jump = op.read().toInt
-          if (value != 0) execute(jump)
-          else execute(op.next())
+          if (value != 0) execute(jump, singleStep)
+          else execute(op.next(), singleStep)
         case op@Instruction(Jif, _) =>
           val value = op.read()
           val jump = op.read().toInt
-          if (value == 0) execute(jump)
-          else execute(op.next())
+          if (value == 0) execute(jump, singleStep)
+          else execute(op.next(), singleStep)
         case op@Instruction(Stlt, _) =>
           val op1 = op.read()
           val op2 = op.read()
           op.write(if (op1 < op2) 1 else 0)
-          execute(op.next())
+          execute(op.next(), singleStep)
         case op@Instruction(Steq, _) =>
           val op1 = op.read()
           val op2 = op.read()
           op.write(if (op1 == op2) 1 else 0)
-          execute(op.next())
+          execute(op.next(), singleStep)
         case op@Instruction(Arb, _) =>
           relativeBase += op.read().toInt
-          execute(op.next())
-        case Instruction(Stop, _) => ()
+          execute(op.next(), singleStep)
+        case Instruction(Stop, _) => -1
       }
     }
   }
