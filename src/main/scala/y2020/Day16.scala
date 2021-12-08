@@ -52,7 +52,7 @@ trait Day16 extends RegexParsers {
     // the others. We keep track of which rules we have already processed in 'done'.
     @tailrec
     def recurse(groups: Map[Int, Set[Rule]], done: Set[Rule] = Set.empty): Map[Int, Rule] = {
-      if (groups.forall(_._2.size == 1)) groups.mapValues(_.head)
+      if (groups.forall(_._2.size == 1)) groups.view.mapValues(_.head).toMap
       else {
         val (newRules, filteredRule) =
           groups.find(p => p._2.size == 1 && !done.contains(p._2.head)) match {
@@ -70,7 +70,7 @@ trait Day16 extends RegexParsers {
     }
 
     // recurse until 1 rule per field
-    val result = recurse(groups)
+    val result = recurse(groups.toMap)
 
     // pull out all the fields from my ticket that start with "departure"
     val indices = for (i <- result.keys if result(i).name.startsWith("departure")) yield i

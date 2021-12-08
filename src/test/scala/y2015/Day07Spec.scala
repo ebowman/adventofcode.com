@@ -21,7 +21,7 @@ class Day07Spec extends AnyFlatSpec with Matchers with Day07 {
     instructions.foreach { instruction =>
       parseAll(parser, instruction).get
     }
-    wires.toMap.mapValues(_.voltage) shouldBe Map(
+    wires.toMap.view.mapValues(_.voltage).toMap shouldBe Map(
       "d" -> 72, "e" -> 507, "f" -> 492, "g" -> 114, "h" -> 65412, "i" -> 65079, "x" -> 123, "y" -> 456)
   }
 
@@ -39,7 +39,7 @@ class Day07Spec extends AnyFlatSpec with Matchers with Day07 {
     instructions.foreach { instruction =>
       parseAll(parser, instruction).get
     }
-    wires.toMap.mapValues(_.voltage) shouldBe Map("e" -> 72, "x" -> 123, "y" -> 456, "f" -> 72, "i" -> 65079, "d" -> 72)
+    wires.toMap.view.mapValues(_.voltage).toMap shouldBe Map("e" -> 72, "x" -> 123, "y" -> 456, "f" -> 72, "i" -> 65079, "d" -> 72)
   }
 
   it should "pass the final test" in {

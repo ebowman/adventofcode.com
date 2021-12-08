@@ -42,7 +42,7 @@ trait Day11 {
 
         override def hasNext: Boolean = !working.equals(prev)
 
-        override def next: Seats = {
+        override def next(): Seats = {
           prev = working
           working = working.next(strategy)
           working
@@ -101,7 +101,7 @@ trait Day11 {
             }
           }
 
-          def next: Boolean = {
+          def next(): Boolean = {
             val found = data(row)(col) == OCCUPIED
             done = found || data(row)(col) == EMPTY
             row = row + iter._1
