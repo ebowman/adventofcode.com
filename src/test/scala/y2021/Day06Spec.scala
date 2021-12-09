@@ -8,7 +8,7 @@ class Day06Spec extends AnyFlatSpec with Matchers with Day06 {
   lazy val testInput = Loader(this, "day06.test.txt").toSeq
   lazy val input = Loader(this, "day06.txt").toSeq
 
-  "Day05" should "pass the part 1 tests" in {
+  "Day06" should "pass the part 1 tests" in {
     val fish = load(testInput.head)
     recurse(fish, 80).size shouldBe 5934
   }
