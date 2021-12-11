@@ -40,13 +40,7 @@ trait Day11 {
 
   def solve2(input: Seq[String]): Int = {
     val array = input.map(_.map(_ - '0').toArray).toArray
-    var allZeroes = false
-    var count = 0
-    while (!allZeroes) {
-      iter(array)
-      allZeroes = array.forall(row => row.forall(_ == 0))
-      count += 1
-    }
-    count
+    val stream = LazyList.continually(iter(array))
+    1 + stream.takeWhile(_ => !array.forall(row => row.forall(_ == 0))).size
   }
 }
