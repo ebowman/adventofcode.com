@@ -9,11 +9,11 @@ class Day07Spec extends AnyFlatSpec with Matchers with Day07 {
   lazy val input = Loader(this, "day07.txt").toSeq.head
 
   "Day07" should "pass the part 1 tests" in {
-    solve(testInput) shouldBe 37
+    solve1(testInput) shouldBe 37
   }
 
   it should "pass part 1" in {
-    solve(input) shouldBe 344535
+    solve1(input) shouldBe 344535
   }
 
   it should "pass part 2 test" in {
