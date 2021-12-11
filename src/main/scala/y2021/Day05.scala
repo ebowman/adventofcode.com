@@ -13,20 +13,18 @@ trait Day05 {
     def vertOrHorizOrDiag: Boolean = vertOrHoriz || diag
 
     def visit(f: ((Int, Int)) => Unit): Unit = {
-      val delta = if (a._1 == b._1)
-        if (a._2 < b._2) (0, 1)
-        else (0, -1)
-      else if (a._2 == b._2)
-        if (a._1 < b._1) (1, 0)
-        else (-1, 0)
-      else {
-        if (a._1 < b._1)
+      val delta =
+        if (a._1 == b._1)
+          if (a._2 < b._2) (0, 1)
+          else (0, -1)
+        else if (a._2 == b._2)
+          if (a._1 < b._1) (1, 0)
+          else (-1, 0)
+        else if (a._1 < b._1)
           if (a._2 < b._2) (1, 1)
           else (1, -1)
-        else
-          if (a._2 < b._2) (-1, 1)
-          else (-1, -1)
-      }
+        else if (a._2 < b._2) (-1, 1)
+        else (-1, -1)
       f(a)
       var cur = (a._1 + delta._1, a._2 + delta._2)
       while (cur != b) {
@@ -51,6 +49,7 @@ trait Day05 {
     val lines = input.map(Line.apply).filter(f)
     import math.max
     def max3(x: Int, y: Int, z: Int) = max(x, max(y, z))
+
     val (maxX, maxY) = lines.foldLeft((Int.MinValue, Int.MinValue)) {
       case ((maxX, maxY), line) => (max3(maxX, line.a._1, line.b._1), max3(maxY, line.a._2, line.b._2))
     }
