@@ -39,10 +39,7 @@ trait Day09 {
       y <- array.indices
       x <- array(y).indices
       v = get(y, x) if
-        v < get(y, x - 1) &&
-          v < get(y, x + 1) &&
-          v < get(y - 1, x) &&
-          v < get(y + 1, x)} yield (y, x)
+        v < get(y, x - 1) && v < get(y, x + 1) && v < get(y - 1, x) && v < get(y + 1, x)} yield (y, x)
 
     lowPoints.map(breadthFirst()).map(_.size).sorted.reverse.take(3).product
   }
