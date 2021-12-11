@@ -30,9 +30,8 @@ trait Day09 {
       val v = get(y, x)
       if (v == 9 || seen.contains(pt)) seen
       else {
-        Seq((y, x - 1), (y, x + 1), (y - 1, x), (y + 1, x)).filter(pt => get2(pt) >= v).foldLeft(seen + pt) {
-          case (pending, pt) => breadthFirst(pending)(pt)
-        }
+        Seq((y, x - 1), (y, x + 1), (y - 1, x), (y + 1, x)).filter(
+          pt => get2(pt) >= v).foldLeft(seen + pt)(breadthFirst(_)(_))
       }
     }
 
