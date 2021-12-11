@@ -19,15 +19,15 @@ trait Day10 {
   def solve2(input: Seq[String]): Long = {
     val scoreMap = Map('(' -> 1L, '[' -> 2L, '{' -> 3L, '<' -> 4L)
 
-    def recurse(stack: List[Char] = Nil)(i: String): String =
-      if (i.isEmpty) stack.mkString
+    def recurse(stack: List[Char] = Nil)(i: String): Option[String] =
+      if (i.isEmpty) Some(stack.mkString)
       else if (opens.contains(i.head)) recurse(i.head :: stack)(i.tail)
       else if (matcher(i.head) == stack.head) recurse(stack.tail)(i.tail)
-      else ""
+      else None
 
     def score(str: String): Long = str.foldLeft(0L) { case (score, letter) => 5L * score + scoreMap(letter) }
 
-    val scores = input.map(recurse()).filter(_.nonEmpty).map(score).sorted
+    val scores = input.flatMap(recurse()).map(score).sorted
     scores(scores.size / 2)
   }
 }
