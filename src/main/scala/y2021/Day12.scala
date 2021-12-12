@@ -1,6 +1,7 @@
 package y2021
 
 import scala.annotation.tailrec
+import collection.mutable.Queue
 
 trait Day12 {
 
@@ -8,7 +9,7 @@ trait Day12 {
                                 edges: Map[String, Seq[String]] = Map()): Map[String, Seq[String]] = {
     if (input.isEmpty) edges
     else {
-      val Array(x, y) = input.head.split("\\-")
+      val Array(x, y) = input.head.split("-")
       parseInput(input.tail,
         (edges + (x -> (edges.getOrElse(x, Seq()) :+ y))) + (y -> (edges.getOrElse(y, Seq()) :+ x)))
     }
@@ -16,15 +17,14 @@ trait Day12 {
 
   def solve1(input: Seq[String]): Int = {
     val edges = parseInput(input)
-    var queue: Seq[Seq[String]] = Seq(Seq("start"))
+    val queue = Queue(Seq("start"))
     var count = 0
     while (queue.nonEmpty) {
-      val path: Seq[String] = queue.head
-      queue = queue.tail
-      for (next: String <- edges(path.last)) {
+      val path = queue.dequeue()
+      for (next <- edges(path.last)) {
         if (next == "end") count += 1
         else if (!next.forall(_.isLower) || !path.contains(next)) {
-          queue :+= (path :+ next)
+          queue.enqueue(path :+ next)
         }
       }
     }
@@ -33,17 +33,15 @@ trait Day12 {
 
   def solve2(input: Seq[String]): Int = {
     val edges = parseInput(input)
-    var queue = Seq(Seq("start"))
+    val queue = Queue(Seq("start"))
     var count = 0
     while (queue.nonEmpty) {
-      val path = queue.head
-      queue = queue.tail
+      val path = queue.dequeue()
       for (next <- edges(path.last)) {
         val backPressure = if (next.forall(_.isLower) && path.contains(next)) Seq("<") else Seq.empty
         if (next == "end") count += 1
-        else if (next != "start" && path.head != "<" || backPressure.isEmpty) {
-          queue :+= ((backPressure ++ path) :+ next)
-        }
+        else if (next != "start" && path.head != "<" || backPressure.isEmpty)
+          queue.enqueue((backPressure ++ path) :+ next)
       }
     }
     count
