@@ -1,7 +1,7 @@
 package y2021
 
 import scala.annotation.tailrec
-import collection.mutable.Queue
+import scala.collection.mutable
 
 trait Day12 {
 
@@ -17,7 +17,7 @@ trait Day12 {
 
   def solve1(input: Seq[String]): Int = {
     val edges = parseInput(input)
-    val queue = Queue(Seq("start"))
+    val queue = mutable.Queue(Seq("start"))
     var count = 0
     while (queue.nonEmpty) {
       val path = queue.dequeue()
@@ -33,7 +33,7 @@ trait Day12 {
 
   def solve2(input: Seq[String]): Int = {
     val edges = parseInput(input)
-    val queue = Queue(Seq("start"))
+    val queue = mutable.Queue(Seq("start"))
     var count = 0
     while (queue.nonEmpty) {
       val path = queue.dequeue()

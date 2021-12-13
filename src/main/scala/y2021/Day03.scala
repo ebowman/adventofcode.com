@@ -15,7 +15,7 @@ trait Day03 {
 
     @tailrec def flip(s: String, b: StringBuilder = new StringBuilder): String = {
       if (s.isEmpty) b.toString()
-      else flip(s.tail, b.append(('a' - s(0)).toChar))
+      else flip(s.tail, b.append(('a' - s(0)).toChar)) // 'a' = '1' + '0'
     }
 
     val accum = Array.fill[Int](input.head.length)(0)
