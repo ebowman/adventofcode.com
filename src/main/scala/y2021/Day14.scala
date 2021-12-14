@@ -17,7 +17,7 @@ trait Day14 {
     val perLetterCounts = {
       val plc = (1 to count).foldLeft {
         seed.sliding(2).foldLeft(map()) { case (fc, r) =>
-          fc + (r -> (fc(r) + 1L))
+          fc + (r -> (fc(r) + 1))
         }
       } { case (tfc, _) =>
         tfc.foldLeft(map()) { case (map, (k, v)) =>
