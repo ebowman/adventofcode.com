@@ -1,7 +1,6 @@
 package y2021
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 
 trait Day14 {
 
@@ -14,63 +13,48 @@ trait Day14 {
     (seed, rules)
   }
 
-  def solve1(input: Seq[String], count: Int): Int = {
-    @tailrec def iter(rules: Map[String, String], seed: String, count: Int): String = {
-      if (count == 0) seed
-      else {
-        val sb = new StringBuilder
-        for ((cur, next) <- seed.zip(seed.tail)) {
-          val rule = s"$cur$next"
-          if (rules.contains(rule)) sb.append(s"$cur${rules(rule)}")
-          else sb.append(cur)
-        }
-        sb.append(seed.last)
-        iter(rules, sb.toString(), count - 1)
-      }
-    }
-
-    val (seed, rules) = loadRules(input)
-    val end = iter(rules, seed, count)
-    val sorted = end.groupBy(x => x).toSeq.sortBy(_._2.length)
-    sorted.last._2.length - sorted.head._2.length
-  }
-
-  def solve2(input: Seq[String], count: Int): Long = {
-    type RMap = mutable.Map[String, Long]
-
-    def newMap(): RMap = new collection.mutable.HashMap[String, Long]().withDefaultValue(0L)
+  def solve(input: Seq[String], count: Int): Long = {
+    type CMap = Map[String, Long]
 
     val (seed, rules) = loadRules(input)
 
-    @tailrec def compute(tupleFrequencyCounts: RMap, count: Int): RMap = {
+    @tailrec def compute(tupleFrequencyCounts: CMap, count: Int): CMap = {
       if (count == 0) tupleFrequencyCounts
       else {
-        val newFrequencies = {
-          val newM: RMap = newMap()
-          tupleFrequencyCounts.foreach { case (k, v) =>
-            newM(k(0) + rules(k)) += v
-            newM(rules(k) + k(1)) += v
+        def recurFreq(c: CMap, f: CMap = Map().withDefaultValue(0L)): CMap = {
+          if (c.isEmpty) f
+          else {
+            val (k, v) = c.head
+            val k1 = k(0) + rules(k)
+            val k2 = rules(k) + k(1)
+            recurFreq(c.tail, f + (k1 -> (f(k1) + v)) + (k2 -> (f(k2) + v)))
           }
-          newM
         }
-        compute(newFrequencies, count - 1)
+        compute(recurFreq(tupleFrequencyCounts), count - 1)
       }
     }
 
-    val pairFrequencyCounts = {
-      val fc = newMap()
-      seed.sliding(2).foreach { r => fc(r) += 1 }
-      fc
-    }
-    val finalPairFrequencyCounts = compute(pairFrequencyCounts, count)
-    val perLetterCounts = {
-      val plc = newMap()
-      finalPairFrequencyCounts.keys.foreach { letter =>
-        plc(s"${letter.head}") += finalPairFrequencyCounts(letter)
+    @tailrec def slideFreq(pairs: Iterator[String], fc: CMap = Map().withDefaultValue(0L)): CMap = {
+      if (pairs.isEmpty) fc
+      else {
+        val r = pairs.next()
+        slideFreq(pairs, fc + (r -> (fc(r) + 1L)))
       }
-      plc(s"${seed.last}") += 1
-      plc
     }
+
+    val pairFrequencyCounts = slideFreq(seed.sliding(2))
+    val finalPairFrequencyCounts = compute(pairFrequencyCounts, count)
+
+    @tailrec def recurseCount(keys: Iterable[String], plc: CMap = Map().withDefaultValue(0L)): CMap = {
+      if (keys.isEmpty) plc + (s"${seed.last}" -> (plc(s"${seed.last}") + 1))
+      else {
+        val letter = keys.head
+        val k = s"${letter.head}"
+        recurseCount(keys.tail, plc + (k -> (plc(k) + finalPairFrequencyCounts(letter))))
+      }
+    }
+
+    val perLetterCounts = recurseCount(finalPairFrequencyCounts.keys)
     perLetterCounts.maxBy(_._2)._2 - perLetterCounts.minBy(_._2)._2
   }
 }
