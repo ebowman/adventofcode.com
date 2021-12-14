@@ -20,8 +20,8 @@ trait Day14 {
       else {
         val sb = new StringBuilder
         for ((cur, next) <- seed.zip(seed.tail)) {
-          val rule = cur.toString + next.toString
-          if (rules.contains(rule)) sb.append(cur).append(rules(rule))
+          val rule = s"$cur$next"
+          if (rules.contains(rule)) sb.append(s"$cur${rules(rule)}")
           else sb.append(cur)
         }
         sb.append(seed.last)
@@ -42,30 +42,33 @@ trait Day14 {
 
     val (seed, rules) = loadRules(input)
 
-    @tailrec def compute(freqs: RMap, count: Int): RMap = {
-      if (count == 0) freqs
+    @tailrec def compute(tupleFrequencyCounts: RMap, count: Int): RMap = {
+      if (count == 0) tupleFrequencyCounts
       else {
-        val newM: RMap = newMap()
-        freqs.foreach { case (k, v) =>
-          newM(k(0) + rules(k)) += v
-          newM(rules(k) + k(1)) += v
+        val newFrequencies = {
+          val newM: RMap = newMap()
+          tupleFrequencyCounts.foreach { case (k, v) =>
+            newM(k(0) + rules(k)) += v
+            newM(rules(k) + k(1)) += v
+          }
+          newM
         }
-        compute(newM, count - 1)
+        compute(newFrequencies, count - 1)
       }
     }
 
-    val freqCounts = {
+    val pairFrequencyCounts = {
       val fc = newMap()
       seed.sliding(2).foreach { r => fc(r) += 1 }
       fc
     }
-    val finalFreqCounts = compute(freqCounts, count)
+    val finalPairFrequencyCounts = compute(pairFrequencyCounts, count)
     val perLetterCounts = {
       val plc = newMap()
-      finalFreqCounts.keys.foreach { letter =>
-        plc(letter.head.toString) += finalFreqCounts(letter)
+      finalPairFrequencyCounts.keys.foreach { letter =>
+        plc(s"${letter.head}") += finalPairFrequencyCounts(letter)
       }
-      plc(seed.last.toString) += 1
+      plc(s"${seed.last}") += 1
       plc
     }
     perLetterCounts.maxBy(_._2)._2 - perLetterCounts.minBy(_._2)._2
