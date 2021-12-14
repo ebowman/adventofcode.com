@@ -15,9 +15,11 @@ trait Day14 {
 
     val (seed, rules) = loadRules(input)
     val perLetterCounts = {
-      val plc = (1 to count).foldLeft(seed.sliding(2).foldLeft(map()) { case (fc, r) =>
-        fc + (r -> (fc(r) + 1L))
-      }) { case (tfc, _) =>
+      val plc = (1 to count).foldLeft {
+        seed.sliding(2).foldLeft(map()) { case (fc, r) =>
+          fc + (r -> (fc(r) + 1L))
+        }
+      } { case (tfc, _) =>
         tfc.foldLeft(map()) { case (map, (k, v)) =>
           val k1 = k(0) + rules(k)
           val k2 = rules(k) + k(1)
