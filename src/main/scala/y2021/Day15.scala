@@ -19,7 +19,7 @@ trait Day15 {
   }
 
   case class Puzzle(map: Map[Coord, Int], goal: Coord) {
-    def solve: Int = {
+    lazy val solve: Int = {
       import scala.collection.mutable
       val queue = mutable.PriorityQueue[Path]().reverse
       val visited = mutable.Set[Coord]()
@@ -36,7 +36,7 @@ trait Day15 {
       queue.head.cost
     }
 
-    def expand: Puzzle = {
+    lazy val expand: Puzzle = {
       def incr(score: Int, i: Int): Int = (((score - 1) + i) % 9) + 1
 
       val (maxX, maxY) = (map.keys.maxBy(_.x).x + 1, map.keys.maxBy(_.y).y + 1)
