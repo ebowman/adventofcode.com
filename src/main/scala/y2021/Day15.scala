@@ -39,12 +39,12 @@ trait Day15 {
     def expand: Puzzle = {
       def incr(score: Int, i: Int): Int = (((score - 1) + i) % 9) + 1
 
-      val (maxX, maxY) = (map.keys.maxBy(_.x).x, map.keys.maxBy(_.y).y)
-      val expandedMap = (0 to maxX).flatMap { x =>
-        (0 to maxY).flatMap { y =>
+      val (maxX, maxY) = (map.keys.maxBy(_.x).x + 1, map.keys.maxBy(_.y).y + 1)
+      val expandedMap = (0 until maxX).flatMap { x =>
+        (0 until maxY).flatMap { y =>
           (0 until 5).flatMap { i =>
             (0 until 5).flatMap { j =>
-              val (x2, y2, score) = (x + i * (maxX + 1), y + j * (maxY + 1), map(Coord(x, y)))
+              val (x2, y2, score) = (x + i * maxX, y + j * maxY, map(Coord(x, y)))
               Seq(Coord(x, y) -> score, Coord(x2, y) -> incr(score, i),
                 Coord(x, y2) -> incr(score, j), Coord(x2, y2) -> incr(score, i + j))
             }
