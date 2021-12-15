@@ -21,6 +21,22 @@ trait Day15 {
   }
 
   case class Puzzle(map: Map[Coord, Int], goal: Coord) {
+    def solve: Int = {
+      val queue = mutable.PriorityQueue[Path]().reverse
+      val visited = mutable.Set[Coord]()
+      queue.addOne(Path())
+      while (queue.nonEmpty && queue.head.pt != goal) {
+        val head = queue.dequeue()
+        head.pt.neighbors.filter(map.contains).filterNot(visited).map { pt =>
+          Path(pt, head.cost + map(pt))
+        }.foreach { path =>
+          visited.add(path.pt)
+          queue.addOne(path)
+        }
+      }
+      queue.head.cost
+    }
+
     def expand: Puzzle = {
       def incr(score: Int, i: Int): Int = (((score - 1) + i) % 9) + 1
 
@@ -37,22 +53,6 @@ trait Day15 {
         }
       }.toMap
       Puzzle(expandedMap, expandedMap.keys.max)
-    }
-
-    def solve: Int = {
-      val queue = mutable.PriorityQueue[Path]().reverse
-      val visited = mutable.Set[Coord]()
-      queue.addOne(Path())
-      while (queue.nonEmpty && queue.head.pt != goal) {
-        val head = queue.dequeue()
-        head.pt.neighbors.filter(map.contains).filterNot(visited).map { pt =>
-          Path(pt, head.cost + map(pt))
-        }.foreach { path =>
-          visited.add(path.pt)
-          queue.addOne(path)
-        }
-      }
-      queue.head.cost
     }
   }
 }
