@@ -1,7 +1,5 @@
 package y2021
 
-import scala.collection.mutable
-
 trait Day15 {
   case class Coord(x: Int, y: Int) extends Ordered[Coord] {
     def neighbors: Seq[Coord] = Seq(Coord(x - 1, y), Coord(x + 1, y), Coord(x, y - 1), Coord(x, y + 1))
@@ -22,6 +20,7 @@ trait Day15 {
 
   case class Puzzle(map: Map[Coord, Int], goal: Coord) {
     def solve: Int = {
+      import scala.collection.mutable
       val queue = mutable.PriorityQueue[Path]().reverse
       val visited = mutable.Set[Coord]()
       queue.addOne(Path())
