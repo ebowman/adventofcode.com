@@ -25,7 +25,7 @@ trait Day10 {
         }
     }
       .groupBy(_._1)
-      .mapValues(_.map(_._2).groupBy(_._2).size)
+      .view.mapValues(_.map(_._2).groupBy(_._2).size)
       .maxBy(_._2)
   }
 
@@ -71,7 +71,7 @@ trait Day10 {
     val angles = points.withFilter(_ != loc).map { other =>
       (other, (2 * math.Pi - theta(other, loc)) % (2 * math.Pi))
     }
-    recurse(angles.groupBy(_._2).mapValues(_.map(_._1)).toSeq.sortBy(_._1).map {
+    recurse(angles.groupBy(_._2).view.mapValues(_.map(_._1)).toSeq.sortBy(_._1).map {
       case (_, list) => list.sortWith {
         case (p1@(_, _), p2@(_, _)) => magnitude((p1._1 - loc._1, p1._2 - loc._2)) <
           magnitude((p2._1 - loc._1, p2._2 - loc._2))

@@ -26,6 +26,7 @@ trait Day18 extends JavaTokenParsers {
       case num ~ list => list.foldLeft(num) {
         case (x, "+" ~ y) => x + y
         case (x, "*" ~ y) => x * y
+        case err => sys.error(s"Unexpected $err")
       }
     }
   }

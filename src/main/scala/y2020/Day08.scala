@@ -46,6 +46,7 @@ trait Day08 extends RegexParsers {
         instructions(c) match {
           case Nop(x) => (instructions.take(c) :+ Jmp(x)) ++ instructions.drop(c + 1)
           case Jmp(x) => (instructions.take(c) :+ Nop(x)) ++ instructions.drop(c + 1)
+          case err => sys.error(s"Unknown instruction $err")
         }
       }
 

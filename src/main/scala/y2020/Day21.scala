@@ -23,15 +23,13 @@ trait Parser extends RegexParsers {
 trait Day21 extends Parser {
 
   def findImpossibles(ingredients: Seq[Ingredient]): Map[String, String] = {
-    val counter = new mutable.HashMap[String, Int]() {
-      override def default(key: String): Int = 0
-    }
-    val maybes = new mutable.HashMap[String, mutable.Set[String]]()
+    val counter = mutable.Map[String, Int]().withDefaultValue(0)
+    val maybes = mutable.Map[String, mutable.Set[String]]()
     for (ingredient <- ingredients) {
       ingredient.ingredients.foreach(ingredient => counter(ingredient) += 1)
       ingredient.allergans.foreach { allergan =>
         if (maybes.contains(allergan)) maybes(allergan) = maybes(allergan).intersect(ingredient.ingredients.toSet)
-        else maybes(allergan) = new mutable.HashSet[String]() ++ ingredient.ingredients
+        else maybes(allergan) = mutable.Set[String]() ++ ingredient.ingredients
       }
     }
 

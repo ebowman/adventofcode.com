@@ -18,7 +18,7 @@ trait Intcode {
   }
 
   case class LBQSink(queue: LinkedBlockingQueue[Long] = new LinkedBlockingQueue[Long]) extends Sink {
-    def put(value: Long) {
+    def put(value: Long): Unit = {
       queue.put(value)
     }
   }
@@ -96,7 +96,7 @@ trait Intcode {
       def apply(op: Int): Instruction = Instruction(byId(op - 100 * (op / 100)), modes(op / 100))
     }
 
-    private final case class Instruction(opCode: OpCode, modes: Seq[Int]) {
+    private case class Instruction(opCode: OpCode, modes: Seq[Int]) {
       private var localCursor = 1
 
       def read()(implicit cursor: Int): Long = {
@@ -153,6 +153,7 @@ trait Intcode {
           relativeBase += op.read().toInt
           execute(op.next(), singleStep)
         case Instruction(Stop, _) => -1
+        case err => sys.error(s"Unknown opcode $err")
       }
     }
   }

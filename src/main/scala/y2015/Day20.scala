@@ -2,8 +2,8 @@ package y2015
 
 trait Day20 {
 
-  lazy val elves: Stream[Elf] = Stream.from(1).map(Elf.apply)
-  lazy val houses: Stream[House] = Stream.from(1).map(House.apply)
+  lazy val elves: LazyList[Elf] = LazyList.from(1).map(Elf.apply)
+  lazy val houses: LazyList[House] = LazyList.from(1).map(House.apply)
 
   // from: https://www.reddit.com/r/adventofcode/comments/3xjpp2/day_20_solutions/cy59zd9/
   // using streams way too slow, both time & space inefficient :(

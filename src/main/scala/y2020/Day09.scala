@@ -14,7 +14,7 @@ trait Day09 {
 
     var (a, b) = (0, 0)
     var done = false
-    var r = 0l
+    var r = 0L
     while (a < data.size - 1 && !done) {
       b = a + 1
       while (b < data.size && !done) {

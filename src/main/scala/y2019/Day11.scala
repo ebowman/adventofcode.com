@@ -30,12 +30,12 @@ trait Day11 extends Intcode {
 
     var curHandler: Int => Unit = colorHandler
 
-    def colorHandler(color: Int) {
+    def colorHandler(color: Int): Unit = {
       grid = grid + (pos -> color)
       curHandler = turnHandler
     }
 
-    def turnHandler(turn: Int) {
+    def turnHandler(turn: Int): Unit = {
       dir = turns(turn)(dir)
       pos = (pos._1 + step(dir)._1, pos._2 + step(dir)._2)
       curHandler = colorHandler
@@ -57,7 +57,7 @@ trait Day11 extends Intcode {
            key = (y, x)} {
         array(y)(x) = grid.get(key) match {
           case Some(1) => 'X'
-          case Some(0) | None => ' '
+          case _ => ' '
         }
       }
       array.map(_.mkString).mkString("\n")

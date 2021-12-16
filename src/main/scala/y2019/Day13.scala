@@ -77,11 +77,11 @@ trait Day13 extends Intcode {
     val display = Array.ofDim[Char](height, width)
     for (y <- 0 until height; x <- 0 until width) {
       screen.get(x, y) match {
-        case Some(0) | None => display(y)(x) = ' '
         case Some(1) => display(y)(x) = '+'
         case Some(2) => display(y)(x) = '#'
         case Some(3) => display(y)(x) = '_'
         case Some(4) => display(y)(x) = 'O'
+        case _ => display(y)(x) = ' '
       }
     }
     display.foreach(row => println(row.mkString))

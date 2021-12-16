@@ -16,9 +16,9 @@ trait Day17 {
 
     def mkBoard(seed: IndexedSeq[String]): Set[T]
 
-    def nextBoard(): mutable.HashSet[T]
+    def nextBoard(): mutable.Set[T]
 
-    def neighborCount(): mutable.HashMap[T, Int]
+    def neighborCount(): mutable.Map[T, Int]
   }
 
   def solve[T](input: IndexedSeq[String], count: Int = 6, ops: Ops[T]): Int = {
@@ -42,7 +42,7 @@ trait Day17 {
 
     def neighbors(pt: P3): Iterator[P3] = {
       val deltaIter = (for (x <- -1 to 1; y <- -1 to 1; z <- -1 to 1
-                            if !(x == 0 && y == 0 && z == 0)) yield (x, y, z)).toIterator
+                            if !(x == 0 && y == 0 && z == 0)) yield (x, y, z)).iterator
       deltaIter.map(_ + pt)
     }
 
@@ -53,12 +53,10 @@ trait Day17 {
       } yield (x, y, 0)).toSet
     }
 
-    def nextBoard(): mutable.HashSet[P3] = new mutable.HashSet[P3]
+    def nextBoard(): mutable.Set[P3] = mutable.Set[P3]()
 
-    def neighborCount(): mutable.HashMap[P3, Int] =
-      new mutable.HashMap[P3, Int] {
-        override def default(key: P3): Int = 0
-      }
+    def neighborCount(): mutable.Map[P3, Int] =
+      mutable.Map[P3, Int]().withDefaultValue(0)
   }
 
   def part1(input: IndexedSeq[String], count: Int = 6): Int = {
@@ -73,7 +71,7 @@ trait Day17 {
 
     def neighbors(pt: P4): Iterator[P4] = {
       val deltaIter = (for (x <- -1 to 1; y <- -1 to 1; z <- -1 to 1; w <- -1 to 1
-                            if !(x == 0 && y == 0 && z == 0 && w == 0)) yield (x, y, z, w)).toIterator
+                            if !(x == 0 && y == 0 && z == 0 && w == 0)) yield (x, y, z, w)).iterator
       deltaIter.map(_ + pt)
     }
 
@@ -84,11 +82,9 @@ trait Day17 {
       } yield (x, y, 0, 0)).toSet
     }
 
-    def nextBoard() = new mutable.HashSet[P4]
+    def nextBoard() = mutable.Set[P4]()
 
-    def neighborCount(): mutable.HashMap[(Int, Int, Int, Int), Int] = new mutable.HashMap[P4, Int] {
-      override def default(key: P4): Int = 0
-    }
+    def neighborCount(): mutable.Map[(Int, Int, Int, Int), Int] = mutable.HashMap[P4, Int]().withDefaultValue(0)
   }
 
   def part2(input: IndexedSeq[String], count: Int = 6): Int = {

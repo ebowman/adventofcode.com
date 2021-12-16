@@ -21,8 +21,8 @@ trait Day12 extends JavaTokenParsers {
 
   def arr: Parser[JsonArray] = "[" ~> repsep(expr, ",") <~ "]" ^^ JsonArray
 
-  def member: Parser[(String, Json)] = stringLiteral ~ ":" ~ expr ^^ {
-    case k ~ ":" ~ v => trimQuotes(k) -> v
+  def member: Parser[(String, Json)] = (stringLiteral <~ ":") ~ expr ^^ {
+    case k ~ v => trimQuotes(k) -> v
   }
 
   def count(json: String): Int = parseAll(expr, json).get.count

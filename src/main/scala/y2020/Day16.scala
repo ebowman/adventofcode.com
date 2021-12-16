@@ -45,7 +45,7 @@ trait Day16 extends RegexParsers {
     val groups = (for {
       i <- 0 until validTickets.map(_.fields.size).max
       rule <- rules if validTickets.forall(ticket => rule.valid(ticket.fields(i)))
-    } yield (i, rule)).groupBy(_._1).mapValues(_.map(_._2).toSet)
+    } yield (i, rule)).groupBy(_._1).view.mapValues(_.map(_._2).toSet)
 
     // recurse until there is 1 row per field left. To do that we find the "next"
     // set of rules with one one rule in it, and then remove that rule from all
@@ -55,8 +55,8 @@ trait Day16 extends RegexParsers {
       if (groups.forall(_._2.size == 1)) groups.view.mapValues(_.head).toMap
       else {
         val (newRules, filteredRule) =
-          groups.find(p => p._2.size == 1 && !done.contains(p._2.head)) match {
-            case Some((i, rule)) =>
+          groups.find(p => p._2.size == 1 && !done.contains(p._2.head)).get match {
+            case (i, rule) =>
               (
                 groups.map {
                   case (j, _) if i == j => (i, rule)

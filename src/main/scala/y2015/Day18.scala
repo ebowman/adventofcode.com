@@ -5,7 +5,7 @@ trait Day18 {
     val array = mkGrid(input.head.length)
     val inputIter = input.iterator
     val rowIter = array.iterator
-    rowIter.next // skip the top slop row
+    rowIter.next() // skip the top slop row
     while (inputIter.hasNext) {
       val inputRow = inputIter.next()
       val row = rowIter.next()
@@ -57,7 +57,7 @@ trait Day18 {
       override def iterator: Iterator[Boolean] = new Iterator[Boolean] {
         private var (cx, cy) = (-1, -1)
 
-        override def hasNext(): Boolean = !(cx == 2 && cy == 2)
+        override def hasNext: Boolean = !(cx == 2 && cy == 2)
 
         override def next(): Boolean = {
           val result = board(y + cy)(x + cx)

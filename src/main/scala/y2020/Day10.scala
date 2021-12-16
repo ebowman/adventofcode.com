@@ -16,7 +16,7 @@ trait Day10 {
     val sorted = (0 +: myAdapters.sorted).map(_.toLong)
     val deltas = sorted.zip(sorted.tail).map(x => x._2 - x._1).mkString
     lazy val tribSeq = {
-      lazy val seq: Stream[Long] = 0L #:: 0L #:: 1L #:: seq.zip(seq.tail.zip(seq.tail.tail)).map {
+      lazy val seq: LazyList[Long] = 0L #:: 0L #:: 1L #:: seq.zip(seq.tail.zip(seq.tail.tail)).map {
         case (a, (b, c)) => a + b + c
       }
       seq.drop(4)
@@ -31,7 +31,7 @@ trait Day10 {
       else {
         val reps = countReps(deltas, "1" * (count + 2))
         if (reps == 0) recurse(accum, trib.tail, count + 1)
-        else recurse(accum :+ math.pow(trib.head, reps).toLong, trib.tail, count + 1)
+        else recurse(accum :+ math.pow(trib.head.toDouble, reps).toLong, trib.tail, count + 1)
       }
     }
 

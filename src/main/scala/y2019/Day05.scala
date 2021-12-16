@@ -63,6 +63,7 @@ trait Day05 {
           else memory(memory(cursor + 3)) = 0
           execute(cursor + 4, input, output)
         case stop if stop.opcode == 99 => output
+        case err => sys.error(s"Unknown opcode: $err")
       }
     }
   }

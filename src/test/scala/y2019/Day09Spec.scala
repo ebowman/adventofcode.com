@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should._
 import util.Loader
 
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+import scala.jdk.CollectionConverters._
 
 class Day09Spec extends AnyFlatSpec with Matchers with Day09 {
 

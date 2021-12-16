@@ -75,6 +75,7 @@ trait Day07 {
          */
         case stop if stop.opcode == 99 =>
           ()
+        case err => sys.error(s"Unknown opcode $err")
       }
     }
   }

@@ -40,7 +40,7 @@ trait Day12 {
   case class System(bodies: Seq[Body]) {
     def next: System = copy(bodies = bodies.combinations(2).flatMap { case Seq(body1, body2) =>
       Seq(body1 -> body1.computeGravity(body2), body2 -> body2.computeGravity(body1))
-    }.toSeq.groupBy(_._1).mapValues(_.map(_._2)).map { case (body, gravities) =>
+    }.toSeq.groupBy(_._1).view.mapValues(_.map(_._2)).map { case (body, gravities) =>
       gravities.foldLeft(body) {
         case (body, delta) => body.copy(vel = body.vel + delta)
       }
@@ -75,7 +75,7 @@ trait Day12 {
 
     def lcm(list: Seq[Int]): Long = {
       list.foldLeft(1L) { (a, b) =>
-        b * a / Stream.iterate((a, b.toLong)) { case (x, y) =>
+        b * a / LazyList.iterate((a, b.toLong)) { case (x, y) =>
           (y, x % y)
         }.dropWhile(_._2 != 0).head._1.abs
       }
