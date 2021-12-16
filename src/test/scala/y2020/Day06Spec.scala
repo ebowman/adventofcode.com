@@ -36,7 +36,7 @@ class Day06Spec extends AnyFlatSpec with Matchers with Day06 {
       |a
       |a
       |
-      |b""".stripMargin.trim.linesIterator.toIterable)
+      |b""".stripMargin.trim.linesIterator.iterator.to(Iterable))
 
   lazy val input: Seq[Seq[String]] = lines(Loader(this, "day06.txt"))
 

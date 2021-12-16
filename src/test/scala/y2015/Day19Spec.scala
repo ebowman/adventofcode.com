@@ -10,7 +10,7 @@ class Day19Spec extends AnyFlatSpec with Matchers with Day19 {
     val input =
       """H => HO
         |H => OH
-        |O => HH""".stripMargin.trim.linesIterator.toIterable
+        |O => HH""".stripMargin.trim.linesIterator.iterator.to(Iterable)
 
     input.map(line => parseAll(rule, line).get) shouldBe Seq(("H", "HO"), ("H", "OH"), ("O", "HH"))
   }
@@ -21,7 +21,7 @@ class Day19Spec extends AnyFlatSpec with Matchers with Day19 {
         |H => OH
         |O => HH
         |
-        |HOH""".stripMargin.trim.linesIterator.toIterable
+        |HOH""".stripMargin.trim.linesIterator.iterator.to(Iterable)
 
     val sys = mkSystem(input)
     sys.next.size shouldBe 4
@@ -40,7 +40,7 @@ class Day19Spec extends AnyFlatSpec with Matchers with Day19 {
         |H => OH
         |O => HH
         |
-        |HOH""".stripMargin.trim.linesIterator.toIterable
+        |HOH""".stripMargin.trim.linesIterator.iterator.to(Iterable)
     val target = mkSystem(input)
     solveWide(target.clear, target.molecule) shouldBe 3
     solveDeep(target.clear, target.molecule) shouldBe 3
@@ -54,7 +54,7 @@ class Day19Spec extends AnyFlatSpec with Matchers with Day19 {
         |H => OH
         |O => HH
         |
-        |HOHOHO""".stripMargin.trim.linesIterator.toIterable
+        |HOHOHO""".stripMargin.trim.linesIterator.iterator.to(Iterable)
     val target = mkSystem(input)
     solveWide(target.clear, target.molecule) shouldBe 6
     solveDeep(target.clear, target.molecule) shouldBe 6

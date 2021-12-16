@@ -27,8 +27,8 @@ trait Day22 {
       // else if (p2.isEmpty) p1
       else {
         val ((play1, nextP1), (play2, nextP2)) = (p1.dequeue, p2.dequeue)
-        if (play1 > play2) recurse(nextP1.enqueue(immutable.Iterable(play1, play2)), nextP2)
-        else recurse(nextP1, nextP2.enqueue(immutable.Iterable(play2, play1)))
+        if (play1 > play2) recurse(nextP1.enqueueAll(immutable.Iterable(play1, play2)), nextP2)
+        else recurse(nextP1, nextP2.enqueueAll(immutable.Iterable(play2, play1)))
       }
     }
 
@@ -48,8 +48,8 @@ trait Day22 {
           val winner =
             if (p1next.size >= card1 && p2next.size >= card2) recursiveCombat(p1next.take(card1), p2next.take(card2))._1
             else if (card1 > card2) 1 else 2
-          if (winner == 1) recursiveCombat(p1next.enqueue[Int](immutable.Iterable(card1, card2)), p2next, seen + hash)
-          else recursiveCombat(p1next, p2next.enqueue[Int](immutable.Iterable(card2, card1)), seen + hash)
+          if (winner == 1) recursiveCombat(p1next.enqueueAll[Int](immutable.Iterable(card1, card2)), p2next, seen + hash)
+          else recursiveCombat(p1next, p2next.enqueueAll[Int](immutable.Iterable(card2, card1)), seen + hash)
         }
       }
     }

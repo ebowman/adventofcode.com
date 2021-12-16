@@ -10,7 +10,7 @@ trait Day06 {
   }
 
   object LanternFish {
-    def apply(str: String): Seq[LanternFish] = str.split(",").map(_.toInt).map(c => LanternFish(c))
+    def apply(str: String): Seq[LanternFish] = str.split(",").map(_.toInt).map(c => LanternFish(c)).toSeq
   }
 
   @tailrec final def solve1(fish: Seq[LanternFish], n: Int): Seq[LanternFish] =

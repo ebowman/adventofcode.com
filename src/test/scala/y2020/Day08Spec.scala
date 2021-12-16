@@ -16,7 +16,7 @@ class Day08Spec extends AnyFlatSpec with Matchers with Day08 {
       |acc +1
       |jmp -4
       |acc +6
-      |""".stripMargin.trim.linesIterator.toIterable)
+      |""".stripMargin.trim.linesIterator.iterator.to(Iterable))
 
   lazy val input: IndexedSeq[Compiler.Instruction] = Compiler.compile(Loader(this, "day08.txt"))
 

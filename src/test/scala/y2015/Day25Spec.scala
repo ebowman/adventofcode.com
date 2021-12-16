@@ -8,7 +8,7 @@ class Day25Spec extends AnyFlatSpec with Matchers {
 
     // Infinite stream of cursors, not really efficient enough for solving the problem,
     // but it makes the tests easier
-    lazy val cursors: Stream[Cursor] =
+    lazy val cursors: LazyList[Cursor] =
     Cursor.origin #:: Cursor.origin.next #:: cursors.zip(cursors.tail).map {
       _._2.next
     }
@@ -67,7 +67,7 @@ class Day25Spec extends AnyFlatSpec with Matchers {
     )
 
     // this is inefficient but helpful to confirm correctness
-    lazy val cursors: Stream[Generator] =
+    lazy val cursors: LazyList[Generator] =
       Generator.origin #:: Generator.origin.next #:: cursors.zip(cursors.tail).map {
         _._2.next
       }

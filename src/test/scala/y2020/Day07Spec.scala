@@ -16,7 +16,7 @@ class Day07Spec extends AnyFlatSpec with Matchers with Day07 {
       |dark olive bags contain 3 faded blue bags, 4 dotted black bags.
       |vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
       |faded blue bags contain no other bags.
-      |dotted black bags contain no other bags.""".stripMargin.trim.linesIterator.toIterable
+      |dotted black bags contain no other bags.""".stripMargin.trim.linesIterator.iterator.to(Iterable)
 
   it should "parse the input" in {
     // "pale chartreuse bags contain 3 faded orange bags."

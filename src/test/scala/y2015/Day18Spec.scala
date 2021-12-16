@@ -14,7 +14,7 @@ class Day18Spec extends AnyFlatSpec with Matchers with Day18 {
         |#....#
         |..#...
         |#.#..#
-        |####..""".stripMargin.trim.linesIterator.toIterable
+        |####..""".stripMargin.trim.linesIterator.iterator.to(Iterable)
     val board = parse(input)
     board.Cursor(1, 1).lit shouldBe 1
     board.Cursor(4, 2).lit shouldBe 2

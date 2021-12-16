@@ -9,7 +9,7 @@ class Day13Spec extends AnyFlatSpec with Matchers with Day13 {
   it should "solve part 1 test" in {
     new Solver1(
       """|939
-         |7,13,x,x,59,x,31,19""".stripMargin.linesIterator.toIterable).solve shouldBe 295
+         |7,13,x,x,59,x,31,19""".stripMargin.linesIterator.iterator.to(Iterable)).solve shouldBe 295
   }
   it should "solve part 1" in {
     new Solver1(Loader(this, "day13.txt")).solve shouldBe 370

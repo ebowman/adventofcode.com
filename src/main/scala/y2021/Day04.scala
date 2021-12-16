@@ -33,7 +33,7 @@ trait Day04 {
 
   def loadBoard(lines: Iterable[String]): (Seq[Int], Set[Board]) = {
     val iter = lines.iterator
-    val plays = iter.next().split(",").map(_.toInt)
+    val plays = iter.next().split(",").map(_.toInt).toSeq
     var set = Set[Board]()
     while (iter.hasNext) {
       iter.next()

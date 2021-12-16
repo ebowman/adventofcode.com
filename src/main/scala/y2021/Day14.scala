@@ -21,8 +21,8 @@ trait Day14 {
         }
       } { case (tfc, _) =>
         tfc.foldLeft(map()) { case (map, (k, v)) =>
-          val k1 = k(0) + rules(k)
-          val k2 = rules(k) + k(1)
+          val k1 = s"${k(0)}${rules(k)}"
+          val k2 = s"${rules(k)}${k(1)}"
           map + (k1 -> (map(k1) + v)) + (k2 -> (map(k2) + v))
         }
       }.foldLeft(map()) { case (plc, (letter, value)) =>

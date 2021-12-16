@@ -41,7 +41,8 @@ trait Day21 extends Parser {
         val (allergan, ingredients) = maybes.minBy(_._2.size)
         val next = ingredients.head
         maybes.foreach(maybe => maybe._2.remove(next))
-        recurse(maybes - allergan, impossible + (allergan -> next))
+        maybes.remove(allergan)
+        recurse(maybes, impossible + (allergan -> next))
       }
     }
 

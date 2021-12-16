@@ -30,7 +30,7 @@ trait Day23 {
   def part2(input: Int): Long = {
     val cups = {
       val nums = input.toString.map(_ - '0')
-      val tmp = Stream.from(1).take(1000001).toArray
+      val tmp = LazyList.from(1).take(1000001).toArray
       tmp(0) = nums.head
       tmp(1000000) = nums.head
       nums.zip(nums.tail).foreach(curnext => tmp(curnext._1) = curnext._2)
