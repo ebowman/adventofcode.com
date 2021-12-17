@@ -3,12 +3,8 @@ package y2021
 import scala.annotation.tailrec
 
 trait Day17 {
-
   def solve1(input: String): (Int, Int) = {
-    val RE = """.*?x=(\d+)\.\.(\d+).*?y=(-?\d+)\.\.(-?\d+)""".r
-    val (x1, x2, y1, y2) = input match {
-      case RE(x1, x2, y1, y2) => (x1.toInt, x2.toInt, y1.toInt, y2.toInt)
-    }
+    val Array(x1, x2, y1, y2) = """-?\d+""".r.findAllIn(input).toArray.map(_.toInt)
 
     def peak(velX: Int, velY: Int): Int = {
       var (vx, vy) = (velX, velY)
@@ -32,16 +28,8 @@ trait Day17 {
       recurse(300)
     }
 
-    var result = Int.MinValue
-    var count = 0
-    for (yVel <- -200 to 200; xVel <- 0 to 300) {
-      peak(xVel, yVel) match {
-        case Int.MinValue => ()
-        case trial =>
-          result = math.max(result, trial)
-          count += 1
-      }
-    }
-    (result, count)
+    val solutions =
+      for (velY <- -200 to 200; velX <- 0 to 300; t = peak(velX, velY) if t != Int.MinValue) yield t
+    (solutions.max, solutions.size)
   }
 }
