@@ -17,7 +17,7 @@ trait Day17 {
           x += vx
           y += vy
           maxY = math.max(maxY, y)
-          if (vx < 0) vx += 1 else if (vx > 0) vx -= 1
+          vx -= math.signum(vx)
           vy -= 1
           if (x < x1 && vx <= 0 || x > x2 && vx >= 0 || y < y1 && vy <= 0) Int.MinValue
           else if (x1 <= x && x <= x2 && y1 <= y && y <= y2) maxY
