@@ -7,6 +7,15 @@ trait Day18 {
 
   case class Num(num: Int, depth: Int)
 
+  object NumOps {
+    @tailrec def reduceImpl(seq: Seq[Num]): Seq[Num] = {
+      val tmp = if (seq.canExplode) seq.explode
+      else if (seq.canSplit) seq.split
+      else seq
+      if (tmp.canReduce) reduceImpl(tmp) else tmp
+    }
+  }
+
   implicit class NumOps(seq: Seq[Num]) {
 
     def canExplode: Boolean = seq.indexWhere(_.depth == 5) != -1
@@ -41,54 +50,44 @@ trait Day18 {
       }
     }
 
-    def reduce: Seq[Num] = {
-      val tmp = if (canExplode) explode
-      else if (canSplit) split
-      else seq
-      val ops = new NumOps(tmp)
-      if (ops.canReduce) ops.reduce else tmp
-    }
+    def reduce: Seq[Num] = NumOps.reduceImpl(seq)
 
-    def |+|(that: Seq[Num]): Seq[Num] = {
-      val tmp: Seq[Num] = (seq.map(num => num.copy(depth = num.depth + 1)) ++
+    def |+|(that: Seq[Num]): Seq[Num] =
+      NumOps.reduceImpl(seq.map(num => num.copy(depth = num.depth + 1)) ++
         that.map(num => num.copy(depth = num.depth + 1)))
-      new NumOps(tmp).reduce
-    }
 
     def magnitude: Int = {
       var copy = seq.toArray
-      while (copy.maxBy(_.depth).depth > 0) {
-        val maxDepth = copy.maxBy(_.depth).depth
+      var maxDepth = copy.maxBy(_.depth).depth
+      while (maxDepth > 0) {
         val i = copy.indexWhere(_.depth == maxDepth)
         copy(i) = Num(3 * copy(i).num + Try(2 * copy(i + 1).num).getOrElse(0), copy(i).depth - 1)
         copy = copy.take(i + 1) ++ copy.drop(i + 2)
+        maxDepth = copy.maxBy(_.depth).depth
       }
       copy(0).num
     }
   }
 
-
   def parse(str: String): Seq[Num] = {
     @tailrec def recurse(in: String, depth: Int = 0, accum: List[Num] = Nil): Seq[Num] = {
       if (in.isEmpty) accum.reverse
-      else
-        in.head match {
-          case '[' => recurse(in.tail, depth + 1, accum)
-          case ']' => recurse(in.tail, depth - 1, accum)
-          case ',' => recurse(in.tail, depth, accum)
-          case n if n.isDigit =>
-            val digits = in.takeWhile(_.isDigit)
-            recurse(in.drop(digits.length), depth, Num(s"$digits".toInt, depth) :: accum)
-          case x => sys.error(s"Unexpected: $x parsing $str")
-        }
+      else in.head match {
+        case '[' => recurse(in.tail, depth + 1, accum)
+        case ']' => recurse(in.tail, depth - 1, accum)
+        case ',' => recurse(in.tail, depth, accum)
+        case n if n.isDigit =>
+          val digits = in.takeWhile(_.isDigit)
+          recurse(in.drop(digits.length), depth, Num(s"$digits".toInt, depth) :: accum)
+        case x => sys.error(s"Unexpected: $x parsing $str")
+      }
     }
 
     recurse(str)
   }
 
-  def solve1(input: Seq[String]): Int = input.map(i => parse(i)).reduce(_ |+| _).magnitude
+  def solve1(input: Seq[String]): Int = input.map(parse).reduce(_ |+| _).magnitude
 
   def solve2(input: Seq[String]): Int =
     input.map(parse).combinations(2).flatMap(a => Seq(a, a.reverse)).map(_.reduce(_ |+| _).magnitude).max
 }
-
