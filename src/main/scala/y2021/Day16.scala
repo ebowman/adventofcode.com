@@ -1,72 +1,94 @@
 package y2021
 
 import scodec.bits._
+import scala.annotation.tailrec
 
 trait Day16 {
-  case class Parser(bits: String) {
-    var versions: List[Int] = Nil
-    def parse(pos: Int = 0): (Int, Long) = {
-      def binToInt(in: String): Int = BitVector.fromBin(in).get.toInt(signed = false)
-      def binToLong(in: String): Long = BitVector.fromBin(in).get.toLong(signed = false)
-      var cursor = pos
-      versions = binToInt(bits.slice(cursor, cursor + 3)) :: versions
-      cursor += 3
-      val typ = binToInt(bits.slice(cursor, cursor + 3))
-      cursor += 3
-      if (typ == 4) {
-        val sb = new StringBuilder()
-        var done = false
-        while (!done) {
-          val tmp = bits.slice(cursor, cursor + 5)
-          cursor += 5
-          sb.append(tmp.drop(1))
-          if (tmp(0) == '0') done = true
-        }
-        (cursor, binToLong(sb.toString()))
-      } else {
-        val flag = bits(cursor)
-        cursor += 1
-        var values = List.empty[Long]
-        if (flag == '0') {
-          val toRead = binToInt(bits.slice(cursor, cursor + 15))
-          cursor += 15
-          val end = cursor + toRead
-          while (cursor < end) {
-            val p = Parser(bits)
-            val (newCursor, value) = p.parse(cursor)
-            versions = p.versions ++ versions
-            cursor = newCursor
-            values ::= value
-          }
-        } else {
-          val count = binToInt(bits.slice(cursor, cursor + 11))
-          cursor += 11
-          for (_ <- 0 until count) {
-            val p = Parser(bits)
-            val (newCursor, value) = p.parse(cursor)
-            versions = p.versions ++ versions
-            cursor = newCursor
-            values ::= value
-          }
-        }
-        (cursor, typ match {
-          case 0 => values.sum
-          case 1 => values.product
-          case 2 => values.tail.foldLeft(values.head)(math.min)
-          case 3 => values.tail.foldLeft(values.head)(math.max)
-          case 5 => if (values(1) > values(0)) 1 else 0
-          case 6 => if (values(1) < values(0)) 1 else 0
-          case 7 => if (values(1) == values(0)) 1 else 0
-        })
-      }
+  object ops {
+    implicit class cv(s: String) {
+      def h2b: String = BitVector.fromHex(s).get.toBin
+
+      def b2i: Int = BitVector.fromBin(s).get.toInt(signed = false)
+
+      def b2l: Long = BitVector.fromBin(s).get.toLong(signed = false)
     }
   }
 
-  def solve1(input: String): Long = {
-    val p = Parser(BitVector.fromHex(input).get.toBin)
-    p.parse()
-    p.versions.sum
+  import ops._
+  import collection.mutable
+
+  object StackString {
+    def apply(str: String): StackString = new StackString(mutable.Stack.from(str.toCharArray.toSeq))
   }
 
-  def solve2(input: String): Long =  Parser(BitVector.fromHex(input).get.toBin).parse()._2
+  case class StackString(stack: mutable.Stack[Char]) {
+    def take(n: Int): String =
+      (1 to n).foldLeft(new StringBuilder) { case (sb, _) => sb.append(stack.pop()) }.toString()
+
+    def takeUntil(n: Int, f: (String => Boolean)): Seq[String] = {
+      @tailrec def recurse(i: Int = 0, accum: List[String] = Nil): Seq[String] = {
+        if (accum.nonEmpty && f(accum.head)) accum.reverse
+        else recurse(i + 1, take(n) :: accum)
+      }
+
+      recurse()
+    }
+  }
+
+  case class State(bits: StackString, versions: List[Int] = Nil, values: List[Long] = Nil) {
+    def pushVersion(version: Int): State = copy(versions = version :: versions)
+
+    def pushVersions(version: List[Int]): State = copy(versions = version ::: versions)
+
+    def pushValue(value: Long): State = copy(values = value :: values)
+
+    def pushValues(value: List[Long]): State = copy(values = value ::: values)
+
+    def absorb(that: State): State = pushValues(that.values.reverse).pushVersions(that.versions)
+
+    def amnesia: State = copy(versions = Nil, values = Nil)
+
+    def isEmpty: Boolean = bits.stack.size < 8
+
+    def exhaust: State = if (isEmpty) this else parse(this).exhaust
+
+    def mutate1(f: List[Long] => Long): State = copy(values = List(f(values)))
+
+    def mutateR(f: (Long, Long) => Long): State = copy(values = List(values.reduce(f)))
+
+    def mutateOp(f: (Long, Long) => Boolean): State = copy(values = List(if (f(values(1), values(0))) 1 else 0))
+  }
+
+  def handleState(op: Int, state: State): State = {
+    if (op == 4) state.pushValue(state.bits.takeUntil(5, _ (0) == '0').map(_.tail).mkString.b2l)
+    else {
+      var subState = state.bits.take(1).b2i match {
+        case 0 => State(bits = StackString(state.bits.take(state.bits.take(15).b2i))).exhaust
+        case 1 => Iterator.iterate(state.amnesia, state.bits.take(11).b2i + 1)(parse).toSeq.last
+      }
+      subState = op match {
+        case 0 => subState.mutate1(_.sum)
+        case 1 => subState.mutate1(_.product)
+        case 2 => subState.mutateR(math.min)
+        case 3 => subState.mutateR(math.max)
+        case 5 => subState.mutateOp(_ > _)
+        case 6 => subState.mutateOp(_ < _)
+        case 7 => subState.mutateOp(_ == _)
+      }
+      state.absorb(subState)
+    }
+  }
+
+  def parse(state: State): State = {
+    if (state.isEmpty) state
+    else {
+      val version = state.bits.take(3).b2i
+      val op = state.bits.take(3).b2i
+      handleState(op, state.pushVersion(version))
+    }
+  }
+
+  def solve1(input: String): Int = parse(State(StackString(input.h2b))).versions.sum
+
+  def solve2(input: String): Long = parse(State(StackString(input.h2b))).values.head
 }
