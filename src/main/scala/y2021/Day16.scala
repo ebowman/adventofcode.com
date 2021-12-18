@@ -22,14 +22,12 @@ trait Day16 {
   }
 
   case class StackString(stack: mutable.Stack[Char]) {
-    def take(n: Int): String =
-      (1 to n).foldLeft(new StringBuilder) { case (sb, _) => sb.append(stack.pop()) }.toString()
+    def take(n: Int): String = Iterator.iterate(new StringBuilder, n + 1)(_.append(stack.pop())).toSeq.last.toString()
 
     def takeUntil(n: Int, f: (String => Boolean)): Seq[String] = {
-      @tailrec def recurse(i: Int = 0, accum: List[String] = Nil): Seq[String] = {
+      @tailrec def recurse(i: Int = 0, accum: List[String] = Nil): Seq[String] =
         if (accum.nonEmpty && f(accum.head)) accum.reverse
         else recurse(i + 1, take(n) :: accum)
-      }
 
       recurse()
     }
