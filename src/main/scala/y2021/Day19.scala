@@ -64,9 +64,8 @@ trait Day19 {
   def load(input: Seq[String]): Seq[Scanner] = {
     var (running, i, beacons, scanners) = (input, 0, List.empty[Coord], List.empty[Scanner])
     while (running.nonEmpty) {
-      if (running.head.startsWith("---")) {
-        i = """\d+""".r.findFirstIn(running.head).get.toInt
-      } else if (running.head.trim.isEmpty) {
+      if (running.head.startsWith("---")) i = """\d+""".r.findFirstIn(running.head).get.toInt
+      else if (running.head.trim.isEmpty) {
         if (i == 0) scanners ::= Scanner(i, beacons.reverse, Some((0, 0, 0)))
         else scanners ::= Scanner(i, beacons.reverse)
         beacons = Nil
