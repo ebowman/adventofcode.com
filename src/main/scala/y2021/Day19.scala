@@ -27,19 +27,17 @@ trait Day19 {
 
   case class Scanner(i: Int, beacons: Seq[Coord], position: Option[Coord] = None) {
     def orient(that: Scanner): Option[Scanner] = {
-      var result = Option.empty[Scanner]
-      for {
-        orientation <- orientations
-        perm <- IndexedSeq(0, 1, 2).permutations if result.isEmpty
-      } {
+      (for {
+        orientation <- orientations.iterator
+        perm <- IndexedSeq(0, 1, 2).permutations
+      } yield {
         val counter = new Counter[Coord]()
         counter.addAll(for (our <- beacons; their <- that.beacons) yield
           (our(0) + orientation(0) * their(perm(0)),
             our(1) + orientation(1) * their(perm(1)),
             our(2) + orientation(2) * their(perm(2))))
-        result = counter.find(_ >= 3).map { candidate => that.reorient(candidate, orientation, perm) } // 12 is overkill
-      }
-      result
+        counter.find(_ >= 3).map { candidate => that.reorient(candidate, orientation, perm) } // 12 is overkill
+      }).dropWhile(_.isEmpty).nextOption().flatten
     }
 
     def reorient(pos: Coord, orientation: Coord, perm: IndexedSeq[Int]): Scanner =
