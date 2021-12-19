@@ -18,13 +18,9 @@ trait Day19 {
 
     import collection.mutable
 
-    val map = new mutable.HashMap[A, Int]().withDefaultValue(0)
-
-    def add(item: A): Unit = map(item) += 1
+    private val map = new mutable.HashMap[A, Int]().withDefaultValue(0)
 
     def addAll(items: Iterable[A]): Unit = items.foreach(item => map(item) += 1)
-
-    def count(item: A): Int = map(item)
 
     def find(f: Int => Boolean): Option[A] = map.find(x => f(x._2)).map(_._1)
   }
@@ -41,9 +37,7 @@ trait Day19 {
           (our(0) + orientation(0) * their(perm(0)),
             our(1) + orientation(1) * their(perm(1)),
             our(2) + orientation(2) * their(perm(2))))
-        result = counter.find(_ >= 12).map { candidate =>
-          that.reorient(candidate, orientation, perm)
-        }
+        result = counter.find(_ >= 12).map { candidate => that.reorient(candidate, orientation, perm) }
       }
       result
     }
@@ -60,9 +54,7 @@ trait Day19 {
       if (!s.exists(_.position.isEmpty)) s
       else {
         val (known, unknown) = s.partition(_.position.nonEmpty)
-        recurse(known.flatMap(k => unknown.flatMap(k.orient)).foldLeft(s) {
-          case (s, u) => s.updated(u.i, u)
-        })
+        recurse(known.flatMap(k => unknown.flatMap(k.orient)).foldLeft(s) { case (s, u) => s.updated(u.i, u) })
       }
     }
 
