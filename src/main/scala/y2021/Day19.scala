@@ -37,7 +37,7 @@ trait Day19 {
           (our(0) + orientation(0) * their(perm(0)),
             our(1) + orientation(1) * their(perm(1)),
             our(2) + orientation(2) * their(perm(2))))
-        result = counter.find(_ >= 12).map { candidate => that.reorient(candidate, orientation, perm) }
+        result = counter.find(_ >= 3).map { candidate => that.reorient(candidate, orientation, perm) } // 12 is overkill
       }
       result
     }
