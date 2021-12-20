@@ -67,7 +67,6 @@ trait Day19 {
     scanners.updated(0, scanners.head.copy(position = Some((0, 0, 0)))).toSeq
   }
 
-
   def scanner(input: Seq[String]): Seq[Scanner]
 
   def solve1(input: Seq[String]): Int = scanner(input).flatMap(_.beacons).distinct.size
