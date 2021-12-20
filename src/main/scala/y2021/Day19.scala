@@ -58,13 +58,12 @@ trait Day19 {
   }
 
   def load(input: Seq[String]): Seq[Scanner] = {
-    val scanners = input.mkString("\n").split("\n{2}").zipWithIndex.map { case (scanner, idx) =>
-      Scanner(idx, scanner.linesIterator.drop(1).toIndexedSeq.map { coord =>
-        val Array(x, y, z) = """-?\d+""".r.findAllIn(coord).toArray
-        (x.toInt, y.toInt, z.toInt)
-      })
+    input.mkString("\n").split("\n{2}").zipWithIndex.toIndexedSeq.map { case (scanner, idx) =>
+      Scanner(idx, scanner.linesIterator.drop(1).toSeq.map { coord =>
+        val Seq(x, y, z) = """-?\d+""".r.findAllIn(coord).toSeq.map(_.toInt)
+        (x, y, z)
+      }, Some((0, 0, 0)).filter(_ => idx == 0))
     }
-    scanners.updated(0, scanners.head.copy(position = Some((0, 0, 0)))).toSeq
   }
 
   def scanner(input: Seq[String]): Seq[Scanner]
