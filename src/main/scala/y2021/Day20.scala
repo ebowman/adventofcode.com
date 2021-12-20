@@ -1,6 +1,5 @@
 package y2021
 
-import scodec.bits.BitVector
 import scala.collection.mutable
 
 trait Day20 {
@@ -15,10 +14,11 @@ trait Day20 {
       val (maxX, maxY) = (inputImage.maxBy(_._1)._1 + 1, inputImage.maxBy(_._2)._2 + 1)
       val outputImage = inputImage.clone()
       for (y <- minY to maxY; x <- minX to maxX) {
-        val index = BitVector.fromBin((for (y1 <- -1 to 1; x1 <- -1 to 1) yield {
+        var index = 0
+        for (y1 <- -1 to 1; x1 <- -1 to 1) {
           val inSpace = minX >= x + x1 || maxX <= x + x1 || minY >= y + y1 || maxY <= y + y1
-          if (inputImage((x + x1, y + y1)) || (empty == '#' && inSpace)) '1' else '0'
-        }).mkString).get.toInt(signed = false)
+          index = (index << 1) | (if (empty == '#' && inSpace || inputImage((x + x1, y + y1))) 1 else 0)
+        }
         (if (algo(index) == '#') outputImage.add _ else outputImage.remove _) ((x, y))
       }
       empty = if (empty == '#') algo.last else algo.head
