@@ -1,6 +1,7 @@
 package y2021
 
 import scala.annotation.tailrec
+import collection.mutable
 
 trait Day19 {
   type Coord = (Int, Int, Int)
@@ -15,9 +16,6 @@ trait Day19 {
     Seq((-1, -1, -1), (-1, -1, 1), (-1, 1, -1), (-1, 1, 1), (1, -1, -1), (1, -1, 1), (1, 1, -1), (1, 1, 1))
 
   class Counter[A] {
-
-    import collection.mutable
-
     private val map = new mutable.HashMap[A, Int]().withDefaultValue(0)
 
     def addAll(items: Iterable[A]): Unit = items.foreach(item => map(item) += 1)
@@ -60,22 +58,15 @@ trait Day19 {
   }
 
   def load(input: Seq[String]): Seq[Scanner] = {
-    var (running, i, beacons, scanners) = (input, 0, List.empty[Coord], List.empty[Scanner])
-    while (running.nonEmpty) {
-      if (running.head.startsWith("---")) i = """\d+""".r.findFirstIn(running.head).get.toInt
-      else if (running.head.trim.isEmpty) {
-        if (i == 0) scanners ::= Scanner(i, beacons.reverse, Some((0, 0, 0)))
-        else scanners ::= Scanner(i, beacons.reverse)
-        beacons = Nil
-      } else {
-        val Array(x, y, z) = """-?\d+""".r.findAllIn(running.head).toArray
-        beacons ::= (x.toInt, y.toInt, z.toInt)
-      }
-      running = running.tail
+    val scanners = input.mkString("\n").split("[\r\n]{2}").zipWithIndex.map { case (scanner, idx) =>
+      Scanner(idx, scanner.linesIterator.drop(1).toIndexedSeq.map { coord =>
+        val Array(x, y, z) = """-?\d+""".r.findAllIn(coord).toArray
+        (x.toInt, y.toInt, z.toInt)
+      })
     }
-    if (beacons != Nil) scanners ::= Scanner(i, beacons.reverse)
-    scanners.reverse
+    scanners.updated(0, scanners.head.copy(position = Some((0, 0, 0)))).toSeq
   }
+
 
   def scanner(input: Seq[String]): Seq[Scanner]
 
