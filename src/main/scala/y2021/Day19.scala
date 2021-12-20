@@ -58,7 +58,7 @@ trait Day19 {
   }
 
   def load(input: Seq[String]): Seq[Scanner] = {
-    val scanners = input.mkString("\n").split("[\r\n]{2}").zipWithIndex.map { case (scanner, idx) =>
+    val scanners = input.mkString("\n").split("\n{2}").zipWithIndex.map { case (scanner, idx) =>
       Scanner(idx, scanner.linesIterator.drop(1).toIndexedSeq.map { coord =>
         val Array(x, y, z) = """-?\d+""".r.findAllIn(coord).toArray
         (x.toInt, y.toInt, z.toInt)
