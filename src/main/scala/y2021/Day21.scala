@@ -1,7 +1,5 @@
 package y2021
 
-import scala.collection.mutable
-
 trait Day21 {
 
   def parse(lines: Seq[String]): IndexedSeq[Int] =
@@ -34,7 +32,7 @@ trait Day21 {
   }
 
   case class memoize[A, B, C, D](f: (A, B, C) => D) extends ((A, B, C) => D) {
-    private val map = mutable.Map[(A, B, C), D]()
+    private val map = collection.mutable.Map[(A, B, C), D]()
 
     override def apply(a: A, b: B, c: C): D = map.getOrElseUpdate((a, b, c), f(a, b, c))
   }
