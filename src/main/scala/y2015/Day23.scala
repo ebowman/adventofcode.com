@@ -16,7 +16,7 @@ trait Day23 {
     def next: Machine = {
       instructions(cursor) match {
         case Jmp(d) => copy(cursor = cursor + d.toInt)
-        case Jio(r, d) => if ((reg(r) & 1) == 1) copy(cursor = cursor + d.toInt) else copy(cursor = cursor + 1)
+        case Jio(r, d) => if (reg(r)  == 1) copy(cursor = cursor + d.toInt) else copy(cursor = cursor + 1)
         case Jie(r, d) => if ((reg(r) & 1) == 0) copy(cursor = cursor + d.toInt) else copy(cursor = cursor + 1)
         case Inc(r) => copy(cursor = cursor + 1, regs = {
           if (r == "a") (regs._1 + 1, regs._2) else (regs._1, regs._2 + 1)
