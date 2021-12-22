@@ -18,14 +18,14 @@ class Day22Spec extends AnyFlatSpec with Matchers with Day22 {
   }
 
   it should "pass part 2 simple tests" in {
-    solve3(testSimpleInput) shouldBe 7957L
+    solve2(testSimpleInput) shouldBe 7957L
   }
 
   it should "pass part 2 tests" in {
-    solve3(test3Input) shouldBe 2758514936282235L
+    solve2(test3Input) shouldBe 2758514936282235L
   }
 
   it should "pass part 2" in {
-    solve3(input) shouldBe 1160011199157381L
+    solve2(input) shouldBe 1160011199157381L
   }
 }
