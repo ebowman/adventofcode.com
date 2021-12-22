@@ -6,8 +6,6 @@ trait Day21 {
     Array(lines.head.split(": ")(1).toInt, lines.tail.head.split(": ")(1).toInt).toIndexedSeq
 
   case class DeterministicDie(var die: Int = 0) {
-    def reset(): Unit = die = 0
-
     def roll(): Int = {
       val r = die + 1
       die = r % 100

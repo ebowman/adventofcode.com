@@ -78,12 +78,9 @@ trait Day16 {
   }
 
   def parse(state: State): State = {
-    if (state.isEmpty) state
-    else {
-      val version = state.bits.take(3).b2i
-      val op = state.bits.take(3).b2i
-      handleState(op, state.pushVersion(version))
-    }
+    val version = state.bits.take(3).b2i
+    val op = state.bits.take(3).b2i
+    handleState(op, state.pushVersion(version))
   }
 
   def solve1(input: String): Int = parse(State(StackString(input.h2b))).versions.sum

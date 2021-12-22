@@ -26,31 +26,23 @@ trait Day18 {
 
     def explode: Seq[Num] = {
       val i = seq.indexWhere(_.depth == 5)
-      if (i == -1) seq
-      else {
-        var copy = seq.toArray
-        val (left, right) = (copy(i), copy(i + 1))
-        Try(copy(i - 1) = copy(i - 1).copy(num = copy(i - 1).num + left.num))
-        Try(copy(i + 2) = copy(i + 2).copy(num = copy(i + 2).num + right.num))
-        copy = copy.take(i) ++ copy.drop(i + 1)
-        copy(i) = Num(0, left.depth - 1)
-        copy.toSeq
-      }
+      var copy = seq.toArray
+      val (left, right) = (copy(i), copy(i + 1))
+      Try(copy(i - 1) = copy(i - 1).copy(num = copy(i - 1).num + left.num))
+      Try(copy(i + 2) = copy(i + 2).copy(num = copy(i + 2).num + right.num))
+      copy = copy.take(i) ++ copy.drop(i + 1)
+      copy(i) = Num(0, left.depth - 1)
+      copy.toSeq
     }
 
     def split: Seq[Num] = {
       val i = seq.indexWhere(_.num >= 10)
-      if (i == -1) seq
-      else {
-        var copy = seq.toArray
-        copy = copy.take(i + 1) ++ copy.drop(i)
-        copy(i + 1) = Num(math.round(copy(i).num / 2f), copy(i).depth + 1)
-        copy(i) = Num(copy(i).num / 2, copy(i).depth + 1)
-        copy.toSeq
-      }
+      var copy = seq.toArray
+      copy = copy.take(i + 1) ++ copy.drop(i)
+      copy(i + 1) = Num(math.round(copy(i).num / 2f), copy(i).depth + 1)
+      copy(i) = Num(copy(i).num / 2, copy(i).depth + 1)
+      copy.toSeq
     }
-
-    def reduce: Seq[Num] = NumOps.reduceImpl(seq)
 
     def |+|(that: Seq[Num]): Seq[Num] =
       NumOps.reduceImpl(seq.map(num => num.copy(depth = num.depth + 1)) ++
@@ -76,10 +68,9 @@ trait Day18 {
         case '[' => recurse(in.tail, depth + 1, accum)
         case ']' => recurse(in.tail, depth - 1, accum)
         case ',' => recurse(in.tail, depth, accum)
-        case n if n.isDigit =>
+        case n =>
           val digits = in.takeWhile(_.isDigit)
           recurse(in.drop(digits.length), depth, Num(s"$digits".toInt, depth) :: accum)
-        case x => sys.error(s"Unexpected: $x parsing $str")
       }
     }
 

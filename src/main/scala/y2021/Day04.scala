@@ -70,9 +70,11 @@ trait Day04 {
       var next = playIter.next()
       if (boards.size == 1) {
         val b = boards.head
-        while (!done) {
-          if (b.play(next)) done = true else next = playIter.next()
-        }
+        b.play(next)
+        done = true
+//        while (!done) {
+//          if (b.play(next)) done = true else next = playIter.next()
+//        }
         score = b.sumUnmarked * next
       } else for (b <- boards if b.play(next)) boards = boards - b
     }
