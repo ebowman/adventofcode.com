@@ -54,7 +54,7 @@ trait Day01 {
 
       def path(endPoint: Pos): Seq[(Int, Int)] =
         if (x == endPoint.x) {
-          val r = if (y < endPoint.y) y + 1 until endPoint.y else endPoint.y until y
+          val r = if (y < endPoint.y) y + 1 to endPoint.y else endPoint.y until y
           for (i <- r) yield (x, i)
         } else {
           val r = if (x < endPoint.x) x + 1 to endPoint.x else endPoint.x until x
