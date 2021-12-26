@@ -17,11 +17,9 @@ trait Day24 {
           val (j, x) = working.head
           val diff = x + blocks.head(4).split(" ").last.toInt
           if (diff < 0) recurse(blocks.tail, working.tail, i + 1,
-            min.updated(j, 9).updated(i, 9 + diff),
-            max.updated(j, 1 - diff).updated(i, 1))
+            min.updated(i, 9 + diff).updated(j, 9), max.updated(i, 1).updated(j, 1 - diff))
           else recurse(blocks.tail, working.tail, i + 1,
-            min.updated(i, 9).updated(j, 9 - diff),
-            max.updated(i, 1 + diff).updated(j, 1))
+            min.updated(i, 9).updated(j, 9 - diff), max.updated(i, 1 + diff).updated(j, 1))
       }
     }
 
