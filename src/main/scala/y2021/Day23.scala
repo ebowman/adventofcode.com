@@ -28,36 +28,6 @@ trait Day23 {
     override def toString: String = s"Path(${states.reverse})"
   }
 
-  object Config {
-    val energy = Map('A' -> 1, 'B' -> 10, 'C' -> 100, 'D' -> 1000)
-    val illegalSpots = Set((0, 2), (0, 4), (0, 6), (0, 8))
-
-    def part1(input: Seq[String]): Config = {
-      val letters = input.mkString.filter(_.isLetter)
-      Config.init(
-        room1 = IndexedSeq(letters(0), letters(4)),
-        room2 = IndexedSeq(letters(1), letters(5)),
-        room3 = IndexedSeq(letters(2), letters(6)),
-        room4 = IndexedSeq(letters(3), letters(7)))
-    }
-
-    def part2(input: Seq[String]): Config = {
-      val letters = input.mkString.filter(_.isLetter)
-      Config.init(
-        room1 = IndexedSeq(letters(0), 'D', 'D', letters(4)),
-        room2 = IndexedSeq(letters(1), 'C', 'B', letters(5)),
-        room3 = IndexedSeq(letters(2), 'B', 'A', letters(6)),
-        room4 = IndexedSeq(letters(3), 'A', 'C', letters(7)))
-    }
-
-    def init(hallway: IndexedSeq[Char] = ("." * 11).toIndexedSeq,
-             room1: IndexedSeq[Char],
-             room2: IndexedSeq[Char],
-             room3: IndexedSeq[Char],
-             room4: IndexedSeq[Char]): Config =
-      new Config(IndexedSeq(hallway, room1, room2, room3, room4), 0)
-  }
-
   case class Config(state: IndexedSeq[IndexedSeq[Char]], cost: Int) {
     val rooms: IndexedSeq[IndexedSeq[Char]] = state
 
@@ -142,6 +112,36 @@ trait Day23 {
           s"  #########  \n"
       }
     }
+  }
+
+  object Config {
+    val energy = Map('A' -> 1, 'B' -> 10, 'C' -> 100, 'D' -> 1000)
+    val illegalSpots = Set((0, 2), (0, 4), (0, 6), (0, 8))
+
+    def part1(input: Seq[String]): Config = {
+      val letters = input.mkString.filter(_.isLetter)
+      Config.init(
+        room1 = IndexedSeq(letters(0), letters(4)),
+        room2 = IndexedSeq(letters(1), letters(5)),
+        room3 = IndexedSeq(letters(2), letters(6)),
+        room4 = IndexedSeq(letters(3), letters(7)))
+    }
+
+    def part2(input: Seq[String]): Config = {
+      val letters = input.mkString.filter(_.isLetter)
+      Config.init(
+        room1 = IndexedSeq(letters(0), 'D', 'D', letters(4)),
+        room2 = IndexedSeq(letters(1), 'C', 'B', letters(5)),
+        room3 = IndexedSeq(letters(2), 'B', 'A', letters(6)),
+        room4 = IndexedSeq(letters(3), 'A', 'C', letters(7)))
+    }
+
+    def init(hallway: IndexedSeq[Char] = ("." * 11).toIndexedSeq,
+             room1: IndexedSeq[Char],
+             room2: IndexedSeq[Char],
+             room3: IndexedSeq[Char],
+             room4: IndexedSeq[Char]): Config =
+      new Config(IndexedSeq(hallway, room1, room2, room3, room4), 0)
   }
 }
 
