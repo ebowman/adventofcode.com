@@ -70,9 +70,9 @@ trait Day23 {
       queue.addOne(Path(List(this)))
       while (queue.nonEmpty && !queue.head.endState.matches(finalState)) {
         val path = queue.dequeue()
-        path.nextMove.filter(p => p.endState.matches(finalState) || !visited(p.endState)).foreach { path =>
+        path.nextMove.filterNot(p => visited(p.endState)).foreach { path =>
           queue.addOne(path)
-          visited.add((path.endState))
+          visited.add(path.endState)
         }
       }
       if (print) println(queue.head)
