@@ -14,14 +14,14 @@ trait Day23 {
 
   case class Path(states: List[Config] = Nil) extends Ordered[Path] {
     val cost: Int = states.map(_.cost).sum
-    val endState: Config = states.head
+    val targetConfig: Config = states.head
 
     def nextMove: Seq[Path] = for {
-      ampCoord <- coords if endState.at(ampCoord) != '.'
-      move <- endState.nextMoves(ampCoord) if endState.isLegalPath(move)
-      newState = endState.moveAmp(move.last, move.head) if !states.contains(newState)
-      cost = Config.energy(endState.at(ampCoord)) * (move.size - 1)
-    } yield copy(states = Config(state = newState, cost = cost) :: states)
+      nextAmpCoord <- coords if targetConfig.at(nextAmpCoord) != '.'
+      nextPath <- targetConfig.nextPaths(nextAmpCoord) if targetConfig.isLegalPath(nextPath)
+      nextState = targetConfig.nextState(nextPath) if !states.contains(nextState)
+      cost = Config.energy(targetConfig.at(nextAmpCoord)) * (nextPath.size - 1)
+    } yield copy(states = Config(state = nextState, cost = cost) :: states)
 
     override def compare(that: Path): Int = this.cost - that.cost
 
@@ -29,8 +29,6 @@ trait Day23 {
   }
 
   case class Config(state: IndexedSeq[IndexedSeq[Char]], cost: Int) {
-    val rooms: IndexedSeq[IndexedSeq[Char]] = state
-
     private def matches(that: Config): Boolean = this.state == that.state
 
     def dijkstra(print: Boolean): Int = {
@@ -38,11 +36,11 @@ trait Day23 {
       val queue = mutable.PriorityQueue[Path]().reverse
       val visited = mutable.Set[Config]()
       queue.addOne(Path(List(this)))
-      while (queue.nonEmpty && !queue.head.endState.matches(finalState)) {
+      while (queue.nonEmpty && !queue.head.targetConfig.matches(finalState)) {
         val path = queue.dequeue()
-        path.nextMove.filterNot(p => visited(p.endState)).foreach { path =>
+        path.nextMove.filterNot(p => visited(p.targetConfig)).foreach { path =>
           queue.addOne(path)
-          visited.add(path.endState)
+          visited.add(path.targetConfig)
         }
       }
       if (print) println(queue.head)
@@ -51,7 +49,7 @@ trait Day23 {
 
     def at(c: Point): Char = state(c._1)(c._2)
 
-    def nextMoves(from: Point): Seq[Seq[Point]] = {
+    def nextPaths(from: Point): Seq[Seq[Point]] = {
       def nextMovesLong(p: List[Point]): Seq[List[Point]] =
         neighbors(p.head).filter(c => at(c) == '.').filterNot(p.contains) match {
           case seq if seq.isEmpty => List(p)
@@ -65,9 +63,11 @@ trait Day23 {
       nextMovesLong(List(from)).filter(_.size > 1).flatMap(m => subMoves(m)).filter(_.size > 1)
     }
 
-    def moveAmp(from: Point, to: Point): IndexedSeq[IndexedSeq[Char]] =
+    def nextState(path: Seq[Point]): IndexedSeq[IndexedSeq[Char]] = {
+      val (from, to) = (path.last, path.head)
       state.updated(from._1, state(from._1).updated(from._2, '.')).
         updated(to._1, state(to._1).updated(to._2, at(from)))
+    }
 
     def isLegalPath(path: Seq[Point]): Boolean = {
       val amp = at(path.last)
@@ -80,12 +80,12 @@ trait Day23 {
         case ((_, _), dest@(0, _)) if Config.illegalSpots.contains(dest) => false
         // rule 2: moving from hallway to room (or room to room)
         case ((_, _), (room, _)) if room >= 1 && room <= 4 && (room != homeRoom ||
-          !rooms(room).forall(i => i == '.' || i == amp)) => false
+          !state(room).forall(i => i == '.' || i == amp)) => false
         // my heuristic: never move from bottom of the room room to anywhere
         case ((room, idx), (_, _)) if room == homeRoom &&
-          (idx to maxRoomIdx).forall(i => rooms(room)(i) == amp) => false
+          (idx to maxRoomIdx).forall(i => state(room)(i) == amp) => false
         // my heuristic: if dest is homeRoom(0) & homeRoom(1) is empty, not allowed
-        case ((_, _), (room, i)) if room == homeRoom && i < maxRoomIdx && rooms(room)(i + 1) == '.' => false
+        case ((_, _), (room, i)) if room == homeRoom && i < maxRoomIdx && state(room)(i + 1) == '.' => false
         // my heuristic: nobody ever moves from 1 to 0 in a room
         // (homeRoom, 1) is the only option
         case ((room, i), (room2, j)) if room == room2 && i <= maxRoomIdx && j < i => false
@@ -96,19 +96,19 @@ trait Day23 {
     override def toString: String = {
       def hallway: IndexedSeq[Char] = state(0)
 
-      if (rooms(1).size == 2) {
+      if (state(1).size == 2) {
         s"\n${"#" * 13}\n" +
           s"#${hallway.mkString}#\n" +
-          s"###${rooms(1)(0)}#${rooms(2)(0)}#${rooms(3)(0)}#${rooms(4)(0)}### ${cost}\n" +
-          s"  #${rooms(1)(1)}#${rooms(2)(1)}#${rooms(3)(1)}#${rooms(4)(1)}#  \n" +
+          s"###${state(1)(0)}#${state(2)(0)}#${state(3)(0)}#${state(4)(0)}### ${cost}\n" +
+          s"  #${state(1)(1)}#${state(2)(1)}#${state(3)(1)}#${state(4)(1)}#  \n" +
           s"  #########  \n"
       } else {
         s"\n${"#" * 13}\n" +
           s"#${hallway.mkString}#\n" +
-          s"###${rooms(1)(0)}#${rooms(2)(0)}#${rooms(3)(0)}#${rooms(4)(0)}### ${cost}\n" +
-          s"  #${rooms(1)(1)}#${rooms(2)(1)}#${rooms(3)(1)}#${rooms(4)(1)}#  \n" +
-          s"  #${rooms(1)(2)}#${rooms(2)(2)}#${rooms(3)(2)}#${rooms(4)(2)}#  \n" +
-          s"  #${rooms(1)(3)}#${rooms(2)(3)}#${rooms(3)(3)}#${rooms(4)(3)}#  \n" +
+          s"###${state(1)(0)}#${state(2)(0)}#${state(3)(0)}#${state(4)(0)}### ${cost}\n" +
+          s"  #${state(1)(1)}#${state(2)(1)}#${state(3)(1)}#${state(4)(1)}#  \n" +
+          s"  #${state(1)(2)}#${state(2)(2)}#${state(3)(2)}#${state(4)(2)}#  \n" +
+          s"  #${state(1)(3)}#${state(2)(3)}#${state(3)(3)}#${state(4)(3)}#  \n" +
           s"  #########  \n"
       }
     }
