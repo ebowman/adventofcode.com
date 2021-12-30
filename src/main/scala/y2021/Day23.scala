@@ -42,7 +42,7 @@ trait Day23 {
     case class Path(states: List[Config] = Nil) extends Ordered[Path] {
       override def compare(that: Path): Int = this.cost - that.cost
 
-      def cost: Int = states.map(_.cost).sum
+      lazy val cost: Int = states.map(_.cost).sum
 
       override def toString: String = s"Path(${states.reverse})"
 
