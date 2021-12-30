@@ -11,16 +11,16 @@ trait Day23 {
   def finalState: Config
 
   object Config {
-    def apply(hallway: IndexedSeq[Char] = ("." * 11).toIndexedSeq,
+    def init(hallway: IndexedSeq[Char] = ("." * 11).toIndexedSeq,
               room1: IndexedSeq[Char],
               room2: IndexedSeq[Char],
               room3: IndexedSeq[Char],
               room4: IndexedSeq[Char]): Config =
-      new Config(IndexedSeq(hallway, room1, room2, room3, room4))
+      new Config(IndexedSeq(hallway, room1, room2, room3, room4), 0)
 
     def part1(input: Seq[String]): Config = {
       val letters = input.mkString.filter(_.isLetter)
-      Config(
+      Config.init(
         room1 = IndexedSeq(letters(0), letters(4)),
         room2 = IndexedSeq(letters(1), letters(5)),
         room3 = IndexedSeq(letters(2), letters(6)),
@@ -29,7 +29,7 @@ trait Day23 {
 
     def part2(input: Seq[String]): Config = {
       val letters = input.mkString.filter(_.isLetter)
-      Config(
+      Config.init(
         room1 = IndexedSeq(letters(0), 'D', 'D', letters(4)),
         room2 = IndexedSeq(letters(1), 'C', 'B', letters(5)),
         room3 = IndexedSeq(letters(2), 'B', 'A', letters(6)),
@@ -39,12 +39,12 @@ trait Day23 {
     val energy = Map('A' -> 1, 'B' -> 10, 'C' -> 100, 'D' -> 1000)
     val illegalSpots = Set((0, 2), (0, 4), (0, 6), (0, 8))
 
-    case class Path(states: List[Config] = Nil, costs: List[Int] = 0 :: Nil) extends Ordered[Path] {
+    case class Path(states: List[Config] = Nil) extends Ordered[Path] {
       override def compare(that: Path): Int = this.cost - that.cost
 
-      def cost: Int = costs.sum
+      def cost: Int = states.map(_.cost).sum
 
-      override def toString: String = s"Path(${states.zip(costs).reverse})"
+      override def toString: String = s"Path(${states.reverse})"
 
       def endState: Config = states.head
 
@@ -54,7 +54,7 @@ trait Day23 {
         subMove <- subMoves(move) if subMove.size > 1 && isLegalPath(endState, subMove)
         newState = endState.moveAmp(subMove.last, subMove.head) if !states.contains(newState)
         cost = energy(endState.at(ampCoord)) * (subMove.size - 1)
-      } yield copy(states = Config(newState) :: states, cost :: costs)).distinct
+      } yield copy(states = Config(state = newState, cost = cost) :: states)).distinct
     }
 
     def subMoves(move: List[(Int, Int)]): List[List[(Int, Int)]] = {
@@ -68,38 +68,36 @@ trait Day23 {
     def isLegalPath(config: Config, path: List[(Int, Int)]): Boolean = {
       val amp = config.at(path.last)
       val homeRoom = amp - 'A' + 1
-      var allowed = true
       val maxRoomIdx = coords.filter(_._1 == 1).maxBy(_._2)._2
       (path.last, path.head) match {
         // rule 3: no hallway-to-hallway moves
-        case ((0, _), (0, _)) => allowed = false
+        case ((0, _), (0, _)) => false
         // rule 1: can't stop immediately outside a room
-        case ((_, _), dest@(0, _)) if illegalSpots.contains(dest) => allowed = false
+        case ((_, _), dest@(0, _)) if illegalSpots.contains(dest) => false
         // rule 2: moving from hallway to room (or room to room)
         case ((_, _), (room, _)) if room >= 1 && room <= 4 && (room != homeRoom ||
-          !config.rooms(room).forall(i => i == '.' || i == amp)) =>
-            allowed = false
+          !config.rooms(room).forall(i => i == '.' || i == amp)) => false
         // my heuristic: never move from bottom of the room room to anywhere
-        case ((room, idx), (_, _)) if room == homeRoom && idx == maxRoomIdx => allowed = false
+        case ((room, idx), (_, _)) if room == homeRoom && idx == maxRoomIdx => false
         // my heuristic: if dest is homeRoom(0) & homeRoom(1) is empty, not allowed
-        case ((_, _), (room, i)) if room == homeRoom && i < maxRoomIdx && config.rooms(room)(i + 1) == '.' =>
-          allowed = false
+        case ((_, _), (room, i)) if room == homeRoom && i < maxRoomIdx && config.rooms(room)(i + 1) == '.' => false
         // my heuristic: nobody ever moves from 1 to 0 in a room
         // (homeRoom, 1) is the only option
-        case ((room, i), (room2, j)) if room == room2 && i <= maxRoomIdx && j < i => allowed = false
-        case _ => ()
+        case ((room, i), (room2, j)) if room == room2 && i <= maxRoomIdx && j < i => false
+        case _ => true
       }
-      allowed
     }
   }
 
-  case class Config(state: IndexedSeq[IndexedSeq[Char]]) {
+  case class Config(state: IndexedSeq[IndexedSeq[Char]], cost: Int) {
 
     import Config.Path
 
     def rooms: IndexedSeq[IndexedSeq[Char]] = state
 
     def at(c: (Int, Int)): Char = state(c._1)(c._2)
+
+    def matches(that: Config): Boolean = this.state == that.state
 
     override def toString: String = {
       def hallway: IndexedSeq[Char] = state(0)
@@ -138,13 +136,13 @@ trait Day23 {
     def findSolution(print: Boolean): Int = {
       import collection.mutable
       val queue = mutable.PriorityQueue[Path]().reverse
-      val visited = mutable.Set[(Config, Int)]()
+      val visited = mutable.Set[(Config)]()
       queue.addOne(Path(List(this)))
-      while (queue.nonEmpty && queue.head.endState != finalState) {
+      while (queue.nonEmpty && !queue.head.endState.matches(finalState)) {
         val path = queue.dequeue()
-        path.nextMove.filter(p => p.endState == finalState || !visited((p.endState, p.costs.head))).foreach { path =>
+        path.nextMove.filter(p => p.endState.matches(finalState) || !visited((p.endState))).foreach { path =>
           queue.addOne(path)
-          visited.add((path.endState, path.costs.head))
+          visited.add((path.endState))
         }
       }
       if (print) println(queue.head)
@@ -155,7 +153,7 @@ trait Day23 {
 
 trait Day23Part1 extends Day23 {
 
-  lazy val finalState: Config = Config(
+  lazy val finalState: Config = Config.init(
     room1 = IndexedSeq('A', 'A'),
     room2 = IndexedSeq('B', 'B'),
     room3 = IndexedSeq('C', 'C'),
@@ -206,7 +204,7 @@ trait Day23Part1 extends Day23 {
 
 trait Day23Part2 extends Day23 {
 
-  lazy val finalState: Config = Config(
+  lazy val finalState: Config = Config.init(
     room1 = IndexedSeq('A', 'A', 'A', 'A'),
     room2 = IndexedSeq('B', 'B', 'B', 'B'),
     room3 = IndexedSeq('C', 'C', 'C', 'C'),
