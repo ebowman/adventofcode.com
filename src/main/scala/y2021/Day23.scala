@@ -18,7 +18,7 @@ trait Day23 {
 
     def nextMove: Seq[Path] = for {
       ampCoord <- coords if endState.at(ampCoord) != '.'
-      move <- endState.nextMoves(ampCoord) if move.size > 1 && endState.isLegalPath(move)
+      move <- endState.nextMoves(ampCoord) if endState.isLegalPath(move)
       newState = endState.moveAmp(move.last, move.head) if !states.contains(newState)
       cost = Config.energy(endState.at(ampCoord)) * (move.size - 1)
     } yield copy(states = Config(state = newState, cost = cost) :: states)
@@ -92,7 +92,7 @@ trait Day23 {
         if (m.size == 1) accum
         else subMoves(m.tail, m :: accum)
 
-      nextMovesLong(List(from)).filter(_.size > 1).flatMap(m => subMoves(m))
+      nextMovesLong(List(from)).filter(_.size > 1).flatMap(m => subMoves(m)).filter(_.size > 1)
     }
 
     def moveAmp(from: Point, to: Point): IndexedSeq[IndexedSeq[Char]] =
