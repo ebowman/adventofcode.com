@@ -48,13 +48,13 @@ trait Day23 {
 
       def endState: Config = states.head
 
-      def nextMove: Seq[Path] = (for {
+      def nextMove: Seq[Path] = for {
         ampCoord <- coords if endState.at(ampCoord) != '.'
         move <- endState.allNextMoves(ampCoord) if move.size > 1
         subMove <- subMoves(move) if subMove.size > 1 && isLegalPath(endState, subMove)
         newState = endState.moveAmp(subMove.last, subMove.head) if !states.contains(newState)
         cost = energy(endState.at(ampCoord)) * (subMove.size - 1)
-      } yield copy(states = Config(state = newState, cost = cost) :: states)).distinct
+      } yield copy(states = Config(state = newState, cost = cost) :: states)
     }
 
     def subMoves(move: List[(Int, Int)]): List[List[(Int, Int)]] = {
