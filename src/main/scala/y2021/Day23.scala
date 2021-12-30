@@ -105,13 +105,13 @@ trait Day23 {
       if (rooms(1).size == 2) {
         s"\n${"#" * 13}\n" +
           s"#${hallway.mkString}#\n" +
-          s"###${rooms(1)(0)}#${rooms(2)(0)}#${rooms(3)(0)}#${rooms(4)(0)}###\n" +
+          s"###${rooms(1)(0)}#${rooms(2)(0)}#${rooms(3)(0)}#${rooms(4)(0)}### ${cost}\n" +
           s"  #${rooms(1)(1)}#${rooms(2)(1)}#${rooms(3)(1)}#${rooms(4)(1)}#  \n" +
           s"  #########  \n"
       } else {
         s"\n${"#" * 13}\n" +
           s"#${hallway.mkString}#\n" +
-          s"###${rooms(1)(0)}#${rooms(2)(0)}#${rooms(3)(0)}#${rooms(4)(0)}###\n" +
+          s"###${rooms(1)(0)}#${rooms(2)(0)}#${rooms(3)(0)}#${rooms(4)(0)}### ${cost}\n" +
           s"  #${rooms(1)(1)}#${rooms(2)(1)}#${rooms(3)(1)}#${rooms(4)(1)}#  \n" +
           s"  #${rooms(1)(2)}#${rooms(2)(2)}#${rooms(3)(2)}#${rooms(4)(2)}#  \n" +
           s"  #${rooms(1)(3)}#${rooms(2)(3)}#${rooms(3)(3)}#${rooms(4)(3)}#  \n" +
