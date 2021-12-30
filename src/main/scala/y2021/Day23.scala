@@ -6,16 +6,16 @@ trait Day23 {
 
   def coords: Seq[(Int, Int)]
 
-  def neighbors(coord: (Int, Int)): List[(Int, Int)]
+  def neighbors: ((Int, Int)) => Seq[(Int, Int)]
 
   def finalState: Config
 
   object Config {
     def init(hallway: IndexedSeq[Char] = ("." * 11).toIndexedSeq,
-              room1: IndexedSeq[Char],
-              room2: IndexedSeq[Char],
-              room3: IndexedSeq[Char],
-              room4: IndexedSeq[Char]): Config =
+             room1: IndexedSeq[Char],
+             room2: IndexedSeq[Char],
+             room3: IndexedSeq[Char],
+             room4: IndexedSeq[Char]): Config =
       new Config(IndexedSeq(hallway, room1, room2, room3, room4), 0)
 
     def part1(input: Seq[String]): Config = {
@@ -50,43 +50,12 @@ trait Day23 {
 
       def nextMove: Seq[Path] = for {
         ampCoord <- coords if endState.at(ampCoord) != '.'
-        move <- endState.allNextMoves(ampCoord) if move.size > 1
-        subMove <- subMoves(move) if subMove.size > 1 && isLegalPath(endState, subMove)
-        newState = endState.moveAmp(subMove.last, subMove.head) if !states.contains(newState)
-        cost = energy(endState.at(ampCoord)) * (subMove.size - 1)
+        move <- endState.allNextMoves(ampCoord) if move.size > 1 && endState.isLegalPath(move)
+        newState = endState.moveAmp(move.last, move.head) if !states.contains(newState)
+        cost = energy(endState.at(ampCoord)) * (move.size - 1)
       } yield copy(states = Config(state = newState, cost = cost) :: states)
     }
 
-    def subMoves(move: List[(Int, Int)]): List[List[(Int, Int)]] = {
-      @tailrec def recurse(m: List[(Int, Int)], accum: List[List[(Int, Int)]] = Nil): List[List[(Int, Int)]] =
-        if (m.size == 1) accum
-        else recurse(m.tail, m :: accum)
-
-      recurse(move)
-    }
-
-    def isLegalPath(config: Config, path: List[(Int, Int)]): Boolean = {
-      val amp = config.at(path.last)
-      val homeRoom = amp - 'A' + 1
-      val maxRoomIdx = coords.filter(_._1 == 1).maxBy(_._2)._2
-      (path.last, path.head) match {
-        // rule 3: no hallway-to-hallway moves
-        case ((0, _), (0, _)) => false
-        // rule 1: can't stop immediately outside a room
-        case ((_, _), dest@(0, _)) if illegalSpots.contains(dest) => false
-        // rule 2: moving from hallway to room (or room to room)
-        case ((_, _), (room, _)) if room >= 1 && room <= 4 && (room != homeRoom ||
-          !config.rooms(room).forall(i => i == '.' || i == amp)) => false
-        // my heuristic: never move from bottom of the room room to anywhere
-        case ((room, idx), (_, _)) if room == homeRoom && idx == maxRoomIdx => false
-        // my heuristic: if dest is homeRoom(0) & homeRoom(1) is empty, not allowed
-        case ((_, _), (room, i)) if room == homeRoom && i < maxRoomIdx && config.rooms(room)(i + 1) == '.' => false
-        // my heuristic: nobody ever moves from 1 to 0 in a room
-        // (homeRoom, 1) is the only option
-        case ((room, i), (room2, j)) if room == room2 && i <= maxRoomIdx && j < i => false
-        case _ => true
-      }
-    }
   }
 
   case class Config(state: IndexedSeq[IndexedSeq[Char]], cost: Int) {
@@ -119,24 +88,52 @@ trait Day23 {
       }
     }
 
-    def allNextMoves(path: (Int, Int)): List[List[(Int, Int)]] = {
-      def recurse(p: List[(Int, Int)]): List[List[(Int, Int)]] =
+    def allNextMoves(path: (Int, Int)): Seq[Seq[(Int, Int)]] = {
+      def nextMoves(p: List[(Int, Int)]): Seq[List[(Int, Int)]] =
         neighbors(p.head).filter(c => this.at(c) == '.').filterNot(p.contains) match {
           case seq if seq.isEmpty => List(p)
-          case neighbors => neighbors.map(_ :: p).flatMap(recurse)
+          case neighbors => neighbors.map(_ :: p).flatMap(nextMoves)
         }
 
-      recurse(List(path))
+      @tailrec def subMoves(m: List[(Int, Int)], accum: List[List[(Int, Int)]] = Nil): List[List[(Int, Int)]] =
+        if (m.size == 1) accum
+        else subMoves(m.tail, m :: accum)
+
+      nextMoves(List(path)).filter(_.size > 1).flatMap(m => subMoves(m))
     }
 
     def moveAmp(from: (Int, Int), to: (Int, Int)): IndexedSeq[IndexedSeq[Char]] =
       state.updated(from._1, state(from._1).updated(from._2, '.')).
         updated(to._1, state(to._1).updated(to._2, at(from)))
 
+    def isLegalPath(path: Seq[(Int, Int)]): Boolean = {
+      val amp = this.at(path.last)
+      val homeRoom = amp - 'A' + 1
+      val maxRoomIdx = coords.filter(_._1 == 1).maxBy(_._2)._2
+      (path.last, path.head) match {
+        // rule 3: no hallway-to-hallway moves
+        case ((0, _), (0, _)) => false
+        // rule 1: can't stop immediately outside a room
+        case ((_, _), dest@(0, _)) if Config.illegalSpots.contains(dest) => false
+        // rule 2: moving from hallway to room (or room to room)
+        case ((_, _), (room, _)) if room >= 1 && room <= 4 && (room != homeRoom ||
+          !this.rooms(room).forall(i => i == '.' || i == amp)) => false
+        // my heuristic: never move from bottom of the room room to anywhere
+        case ((room, idx), (_, _)) if room == homeRoom &&
+          (idx to maxRoomIdx).forall(i => rooms(room)(i) == amp) => false
+        // my heuristic: if dest is homeRoom(0) & homeRoom(1) is empty, not allowed
+        case ((_, _), (room, i)) if room == homeRoom && i < maxRoomIdx && this.rooms(room)(i + 1) == '.' => false
+        // my heuristic: nobody ever moves from 1 to 0 in a room
+        // (homeRoom, 1) is the only option
+        case ((room, i), (room2, j)) if room == room2 && i <= maxRoomIdx && j < i => false
+        case _ => true
+      }
+    }
+
     def findSolution(print: Boolean): Int = {
       import collection.mutable
       val queue = mutable.PriorityQueue[Path]().reverse
-      val visited = mutable.Set[(Config)]()
+      val visited = mutable.Set[Config]()
       queue.addOne(Path(List(this)))
       while (queue.nonEmpty && !queue.head.endState.matches(finalState)) {
         val path = queue.dequeue()
@@ -153,58 +150,45 @@ trait Day23 {
 
 trait Day23Part1 extends Day23 {
 
-  lazy val finalState: Config = Config.init(
+  val finalState: Config = Config.init(
     room1 = IndexedSeq('A', 'A'),
     room2 = IndexedSeq('B', 'B'),
     room3 = IndexedSeq('C', 'C'),
     room4 = IndexedSeq('D', 'D'))
 
-  def coords: Seq[(Int, Int)] = Seq(
+  val coords: Seq[(Int, Int)] = Seq(
     (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9), (0, 10),
     (1, 0), (1, 1),
     (2, 0), (2, 1),
     (3, 0), (3, 1),
-    (4, 0), (4, 1)
-  )
+    (4, 0), (4, 1))
 
-  def neighbors(pt: (Int, Int)): List[(Int, Int)] = {
-    pt._1 match {
-      case 0 => pt._2 match {
-        case 0 => List((0, 1))
-        case 1 => List((0, 0), (0, 2))
-        case 2 => List((0, 1), (0, 3), (1, 0))
-        case 3 => List((0, 2), (0, 4))
-        case 4 => List((0, 3), (0, 5), (2, 0))
-        case 5 => List((0, 4), (0, 6))
-        case 6 => List((0, 5), (0, 7), (3, 0))
-        case 7 => List((0, 6), (0, 8))
-        case 8 => List((0, 7), (0, 9), (4, 0))
-        case 9 => List((0, 8), (0, 10))
-        case 10 => List((0, 9))
-      }
-      case 1 => pt._2 match {
-        case 0 => List((0, 2), (1, 1))
-        case 1 => List((1, 0))
-      }
-      case 2 => pt._2 match {
-        case 0 => List((0, 4), (2, 1))
-        case 1 => List((2, 0))
-      }
-      case 3 => pt._2 match {
-        case 0 => List((0, 6), (3, 1))
-        case 1 => List((3, 0))
-      }
-      case 4 => pt._2 match {
-        case 0 => List((0, 8), (4, 1))
-        case 1 => List((4, 0))
-      }
-    }
-  }
+  val neighbors = Map[(Int, Int), Seq[(Int, Int)]](
+    (0, 0) -> Seq((0, 1)),
+    (0, 1) -> Seq((0, 0), (0, 2)),
+    (0, 2) -> Seq((0, 1), (0, 3), (1, 0)),
+    (0, 3) -> Seq((0, 2), (0, 4)),
+    (0, 4) -> Seq((0, 3), (0, 5), (2, 0)),
+    (0, 5) -> Seq((0, 4), (0, 6)),
+    (0, 6) -> Seq((0, 5), (0, 7), (3, 0)),
+    (0, 7) -> Seq((0, 6), (0, 8)),
+    (0, 8) -> Seq((0, 7), (0, 9), (4, 0)),
+    (0, 9) -> Seq((0, 8), (0, 10)),
+    (0, 10) -> Seq((0, 9)),
+    (1, 0) -> Seq((0, 2), (1, 1)),
+    (1, 1) -> Seq((1, 0)),
+    (2, 0) -> Seq((0, 4), (2, 1)),
+    (2, 1) -> Seq((2, 0)),
+    (3, 0) -> Seq((0, 6), (3, 1)),
+    (3, 1) -> Seq((3, 0)),
+    (4, 0) -> Seq((0, 8), (4, 1)),
+    (4, 1) -> Seq((4, 0))
+  )
 }
 
 trait Day23Part2 extends Day23 {
 
-  lazy val finalState: Config = Config.init(
+  val finalState: Config = Config.init(
     room1 = IndexedSeq('A', 'A', 'A', 'A'),
     room2 = IndexedSeq('B', 'B', 'B', 'B'),
     room3 = IndexedSeq('C', 'C', 'C', 'C'),
@@ -218,45 +202,32 @@ trait Day23Part2 extends Day23 {
     (4, 0), (4, 1), (4, 2), (4, 3)
   )
 
-  def neighbors(pt: (Int, Int)): List[(Int, Int)] = {
-    pt._1 match {
-      case 0 => pt._2 match {
-        case 0 => List((0, 1))
-        case 1 => List((0, 0), (0, 2))
-        case 2 => List((0, 1), (0, 3), (1, 0))
-        case 3 => List((0, 2), (0, 4))
-        case 4 => List((0, 3), (0, 5), (2, 0))
-        case 5 => List((0, 4), (0, 6))
-        case 6 => List((0, 5), (0, 7), (3, 0))
-        case 7 => List((0, 6), (0, 8))
-        case 8 => List((0, 7), (0, 9), (4, 0))
-        case 9 => List((0, 8), (0, 10))
-        case 10 => List((0, 9))
-      }
-      case 1 => pt._2 match {
-        case 0 => List((0, 2), (1, 1))
-        case 1 => List((1, 0), (1, 2))
-        case 2 => List((1, 1), (1, 3))
-        case 3 => List((1, 2))
-      }
-      case 2 => pt._2 match {
-        case 0 => List((0, 4), (2, 1))
-        case 1 => List((2, 0), (2, 2))
-        case 2 => List((2, 1), (2, 3))
-        case 3 => List((2, 2))
-      }
-      case 3 => pt._2 match {
-        case 0 => List((0, 6), (3, 1))
-        case 1 => List((3, 0), (3, 2))
-        case 2 => List((3, 1), (3, 3))
-        case 3 => List((3, 2))
-      }
-      case 4 => pt._2 match {
-        case 0 => List((0, 8), (4, 1))
-        case 1 => List((4, 0), (4, 2))
-        case 2 => List((4, 1), (4, 3))
-        case 3 => List((4, 2))
-      }
-    }
-  }
+  val neighbors = Map[(Int, Int), Seq[(Int, Int)]](
+    (0, 0) -> Seq((0, 1)),
+    (0, 1) -> Seq((0, 0), (0, 2)),
+    (0, 2) -> Seq((0, 1), (0, 3), (1, 0)),
+    (0, 3) -> Seq((0, 2), (0, 4)),
+    (0, 4) -> Seq((0, 3), (0, 5), (2, 0)),
+    (0, 5) -> Seq((0, 4), (0, 6)),
+    (0, 6) -> Seq((0, 5), (0, 7), (3, 0)),
+    (0, 7) -> Seq((0, 6), (0, 8)),
+    (0, 8) -> Seq((0, 7), (0, 9), (4, 0)),
+    (0, 9) -> Seq((0, 8), (0, 10)),
+    (0, 10) -> Seq((0, 9)),
+    (1, 0) -> Seq((0, 2), (1, 1)),
+    (1, 1) -> Seq((1, 0), (1, 2)),
+    (1, 2) -> Seq((1, 1), (1, 3)),
+    (1, 3) -> Seq((1, 2)),
+    (2, 0) -> Seq((0, 4), (2, 1)),
+    (2, 1) -> Seq((2, 0), (2, 2)),
+    (2, 2) -> Seq((2, 1), (2, 3)),
+    (2, 3) -> Seq((2, 2)),
+    (3, 0) -> Seq((0, 6), (3, 1)),
+    (3, 1) -> Seq((3, 0), (3, 2)),
+    (3, 2) -> Seq((3, 1), (3, 3)),
+    (3, 3) -> Seq((3, 2)),
+    (4, 0) -> Seq((0, 8), (4, 1)),
+    (4, 1) -> Seq((4, 0), (4, 2)),
+    (4, 2) -> Seq((4, 1), (4, 3)),
+    (4, 3) -> Seq((4, 2)))
 }
