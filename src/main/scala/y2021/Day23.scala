@@ -10,20 +10,22 @@ trait Day23 {
 
   def neighbors: Point => Seq[Point]
 
+  def load(input: Seq[String]): State
+
   def finalState: State
 
-  case class Path(states: List[State] = Nil) extends Ordered[Path] {
+  case class StatePath(states: List[State] = Nil) extends Ordered[StatePath] {
     val cost: Int = states.map(_.cost).sum
     val latestConfig: State = states.head
 
-    def nextMove: Seq[Path] = for {
+    def nextMove: Seq[StatePath] = for {
       nextAmpCoord <- coords if latestConfig.at(nextAmpCoord) != '.'
       nextPath <- latestConfig.nextPaths(nextAmpCoord) if latestConfig.isLegalPath(nextPath)
       nextState = latestConfig.generateNextConfig(nextPath) if !states.contains(nextState)
       cost = State.energy(latestConfig.at(nextAmpCoord)) * (nextPath.size - 1)
     } yield copy(states = State(config = nextState, cost = cost) :: states)
 
-    override def compare(that: Path): Int = this.cost - that.cost
+    override def compare(that: StatePath): Int = this.cost - that.cost
 
     override def toString: String = s"Path(${states.reverse})"
   }
@@ -33,9 +35,9 @@ trait Day23 {
 
     def dijkstra(print: Boolean): Int = {
       import collection.mutable
-      val queue = mutable.PriorityQueue[Path]().reverse
+      val queue = mutable.PriorityQueue[StatePath]().reverse
       val visited = mutable.Set[State]()
-      queue.addOne(Path(List(this)))
+      queue.addOne(StatePath(List(this)))
       while (queue.nonEmpty && !queue.head.latestConfig.matches(finalState)) {
         val path = queue.dequeue()
         path.nextMove.filterNot(p => visited(p.latestConfig)).foreach { path =>
@@ -118,24 +120,6 @@ trait Day23 {
     val energy = Map('A' -> 1, 'B' -> 10, 'C' -> 100, 'D' -> 1000)
     val illegalSpots = Set((0, 2), (0, 4), (0, 6), (0, 8))
 
-    def part1(input: Seq[String]): State = {
-      val letters = input.mkString.filter(_.isLetter)
-      State.init(
-        room1 = IndexedSeq(letters(0), letters(4)),
-        room2 = IndexedSeq(letters(1), letters(5)),
-        room3 = IndexedSeq(letters(2), letters(6)),
-        room4 = IndexedSeq(letters(3), letters(7)))
-    }
-
-    def part2(input: Seq[String]): State = {
-      val letters = input.mkString.filter(_.isLetter)
-      State.init(
-        room1 = IndexedSeq(letters(0), 'D', 'D', letters(4)),
-        room2 = IndexedSeq(letters(1), 'C', 'B', letters(5)),
-        room3 = IndexedSeq(letters(2), 'B', 'A', letters(6)),
-        room4 = IndexedSeq(letters(3), 'A', 'C', letters(7)))
-    }
-
     def init(hallway: IndexedSeq[Char] = ("." * 11).toIndexedSeq,
              room1: IndexedSeq[Char],
              room2: IndexedSeq[Char],
@@ -152,6 +136,15 @@ trait Day23Part1 extends Day23 {
     room2 = IndexedSeq('B', 'B'),
     room3 = IndexedSeq('C', 'C'),
     room4 = IndexedSeq('D', 'D'))
+
+  override def load(input: Seq[String]): State = {
+    val letters = input.mkString.filter(_.isLetter)
+    State.init(
+      room1 = IndexedSeq(letters(0), letters(4)),
+      room2 = IndexedSeq(letters(1), letters(5)),
+      room3 = IndexedSeq(letters(2), letters(6)),
+      room4 = IndexedSeq(letters(3), letters(7)))
+  }
 
   val coords: Seq[Point] = Seq(
     (0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (0, 8), (0, 9), (0, 10),
@@ -184,6 +177,15 @@ trait Day23Part1 extends Day23 {
 }
 
 trait Day23Part2 extends Day23 {
+
+  override def load(input: Seq[String]): State = {
+    val letters = input.mkString.filter(_.isLetter)
+    State.init(
+      room1 = IndexedSeq(letters(0), 'D', 'D', letters(4)),
+      room2 = IndexedSeq(letters(1), 'C', 'B', letters(5)),
+      room3 = IndexedSeq(letters(2), 'B', 'A', letters(6)),
+      room4 = IndexedSeq(letters(3), 'A', 'C', letters(7)))
+  }
 
   val finalState: State = State.init(
     room1 = IndexedSeq('A', 'A', 'A', 'A'),
