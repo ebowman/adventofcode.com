@@ -31,19 +31,14 @@ trait Day09 {
     recurse(input).length
   }
 
-  def solve2(input: String): Long = {
-    if (!input.contains("(")) input.length
+  def solve2(input: String, accum: Long = 0): Long = {
+    if (!input.contains("("))  accum + input.length
     else {
-      var len = 0L
-      var working = input
-      while (working.contains("(")) {
-        val open = working.indexOf("(")
-        val close = working.indexOf(")")
-        val marker = working.slice(open + 1, close).split("x").map(_.toInt)
-        len += open + solve2(working.slice(close + 1, close + 1 + marker(0)) * marker(1))
-        working = working.drop(close + 1 + marker(0))
-      }
-      len + working.length
+      val open = input.indexOf("(")
+      val close = input.indexOf(")")
+      val marker = input.slice(open + 1, close).split("x").map(_.toInt)
+      solve2(input.drop(close + 1 + marker(0)),
+        accum + open + solve2(input.slice(close + 1, close + 1 + marker(0)) * marker(1), 0))
     }
   }
 }
