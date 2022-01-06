@@ -38,7 +38,7 @@ trait Day09 {
       val close = input.indexOf(")")
       val marker = input.slice(open + 1, close).split("x").map(_.toInt)
       solve2(input.drop(close + 1 + marker(0)),
-        accum + open + solve2(input.slice(close + 1, close + 1 + marker(0)) * marker(1), 0))
+        accum + open + solve2(input.slice(close + 1, close + 1 + marker(0)) * marker(1)))
     }
   }
 }
