@@ -37,7 +37,7 @@ trait Day11 {
 
     def nonEmpty: Parser[(Int, Set[Item])] =
       (floor <~ " contains ") ~ repsep(item, ", ") ~ (",? and ".r ~> item <~ ".") ^^ {
-        case f ~ items ~ lastItem => f -> (items.toSet + lastItem)
+        case floor ~ items ~ lastItem => floor -> (items.toSet + lastItem)
       }
 
     def empty: Parser[(Int, Set[Item])] = floor <~ " contains nothing relevant." ^^ (n => n -> Set())
@@ -72,11 +72,10 @@ trait Day11 {
     }
 
     def nextStates: Seq[State] = {
-      val minE = { // prune the search space ... once above a certain level, never go back
-        if (elevator == 1 && floors(0).isEmpty) 2
-        else if (elevator == 2 && floors(0).isEmpty && floors(1).isEmpty) 3
-        else math.max(elevator - 1, 0)
-      }
+      // prune the search space ... once above a certain level, never go back
+      val minE = if (elevator == 1 && floors(0).isEmpty) 2
+      else if (elevator == 2 && floors(0).isEmpty && floors(1).isEmpty) 3
+      else math.max(elevator - 1, 0)
       for {
         nextFloor <- minE to math.min(elevator + 1, 3) if nextFloor != elevator
         items <- floors(elevator).toSeq.combinations(1) ++ floors(elevator).toSeq.combinations(2)
@@ -87,14 +86,11 @@ trait Day11 {
 
     def isLegal: Boolean = floors.values.forall(isLegalFloor)
 
-    def isLegalFloor(floor: Set[Item]): Boolean = {
-      if (floor.size < 2) true
-      else {
-        val microchips = floor.filter(_.isInstanceOf[Microchip]).map(_.name)
-        val generators = floor.filter(_.isInstanceOf[Generator]).map(_.name)
-        val solos = microchips -- generators
-        if (solos.nonEmpty) generators.isEmpty else true
-      }
+    def isLegalFloor(floor: Set[Item]): Boolean = if (floor.size < 2) true else {
+      val microchips = floor.filter(_.isInstanceOf[Microchip]).map(_.name)
+      val generators = floor.filter(_.isInstanceOf[Generator]).map(_.name)
+      val solos = microchips -- generators
+      if (solos.nonEmpty) generators.isEmpty else true
     }
 
     def isTarget: Boolean = (0 to 2).forall(f => floors(f).isEmpty)
