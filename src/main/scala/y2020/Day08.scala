@@ -16,7 +16,9 @@ object Compiler extends RegexParsers {
 
   def acc: Parser[Acc] = "acc" ~> "[+-]?\\d+".r ^^ { x => Acc(x.toInt) }
 
-  sealed trait Instruction
+  sealed trait Instruction {
+    def x: Int
+  }
 
   case class Nop(x: Int) extends Instruction
 
@@ -45,8 +47,7 @@ trait Day08 extends RegexParsers {
       def flip(instructions: IndexedSeq[Instruction], c: Int): IndexedSeq[Instruction] = {
         instructions(c) match {
           case Nop(x) => (instructions.take(c) :+ Jmp(x)) ++ instructions.drop(c + 1)
-          case Jmp(x) => (instructions.take(c) :+ Nop(x)) ++ instructions.drop(c + 1)
-          case err => sys.error(s"Unknown instruction $err")
+          case ins => (instructions.take(c) :+ Nop(ins.x)) ++ instructions.drop(c + 1)
         }
       }
 

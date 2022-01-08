@@ -15,7 +15,7 @@ class Day23Spec extends AnyFlatSpec with Matchers {
 
   it should "pass part 1" in {
     new Day23Part1 {
-      load(input).dijkstra(print = false) shouldBe 15516
+      load(input).dijkstra(print = true) shouldBe 15516
     }
   }
 

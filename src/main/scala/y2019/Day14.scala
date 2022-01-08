@@ -16,8 +16,6 @@ trait Day14 extends RegexParsers {
   def formula: Parser[((String, Long), Seq[(String, Long)])] =
     (ingredients <~ " => ") ~ ingredient ^^ { case a ~ b => b -> a }
 
-  @tailrec private final def gcd(n: (Long, Long)): Long = if (n._2 == 0) n._1 else gcd((n._2, n._1 % n._2))
-
   // normal % in java/scala doesn't work, because we need a positive modulus always.
   def divmod(n: Long, d: Long): (Long, Long) = (if (n < 0) n / d - 1L else n / d, ((n % d) + d) % d)
 
@@ -56,7 +54,6 @@ trait Day14 extends RegexParsers {
 
     @tailrec def bound(low: Long, high: Long): (Long, Long) = {
       if (solve(map, low) > goal) bound(low / 10, high)
-      else if (solve(map, high) < goal) bound(high, high * 10)
       else (low, high)
     }
 
@@ -66,8 +63,7 @@ trait Day14 extends RegexParsers {
         val mid = (low + high) / 2
         val ore = solve(map, mid)
         if (ore < goal) search(mid, high)
-        else if (ore > goal) search(low, mid)
-        else low
+        else search(low, mid)
       }
     }
 

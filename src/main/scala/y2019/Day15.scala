@@ -60,7 +60,7 @@ trait Day15 extends Intcode {
       for (cell <- queue) {
         for {
           dir <- 1 to 4
-          neighbor = move(cell, dir) if grid.getOrElse(neighbor, UNKNOWN) != WALL
+          neighbor = move(cell, dir) if grid(neighbor) != WALL
         } {
           if (neighbor == (0, 0)) {
             distance += 1
@@ -96,7 +96,7 @@ trait Day15 extends Intcode {
     val (_, grid) = discoverGrid(code)
 
     def next(board: Board): Board = board ++ board.collect {
-      case (p, BLANK) if dirs.exists(d => board.getOrElse(move(p, d), UNKNOWN) == OXYGEN) => p -> OXYGEN
+      case (p, BLANK) if dirs.exists(d => board(move(p, d)) == OXYGEN) => p -> OXYGEN
     }
 
     @tailrec def recurse(nxt: Board, cur: Board, count: Int = 0): Int = {

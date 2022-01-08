@@ -88,9 +88,6 @@ trait Day23 {
           (idx to maxRoomIdx).forall(i => config(room)(i) == amp) => false
         // my heuristic: if dest is homeRoom(0) & homeRoom(1) is empty, not allowed
         case ((_, _), (room, i)) if room == homeRoom && i < maxRoomIdx && config(room)(i + 1) == '.' => false
-        // my heuristic: nobody ever moves from 1 to 0 in a room
-        // (homeRoom, 1) is the only option
-        case ((room, i), (room2, j)) if room == room2 && i <= maxRoomIdx && j < i => false
         case _ => true
       }
     }
