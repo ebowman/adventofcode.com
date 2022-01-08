@@ -24,9 +24,8 @@ trait Day18 extends JavaTokenParsers {
 
     def expr: Parser[Long] = factor ~ rep((optWs("+") ~ factor) | (optWs("*") ~ factor)) ^^ {
       case num ~ list => list.foldLeft(num) {
-        case (x, "+" ~ y) => x + y
-        case (x, "*" ~ y) => x * y
-        case err => sys.error(s"Unexpected $err")
+        case (x, p ~ y) if p == "+" => x + y
+        case (x, _ ~ y) => x * y
       }
     }
   }
