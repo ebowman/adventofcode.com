@@ -10,7 +10,7 @@ trait Day15 {
     def pass(t: Int): Boolean =
       board.foldLeft((t, true)) {
         case ((t, true), Seq(init, max)) => (t + 1, ((init + t + 1) % max) == 0)
-        case ((t, false), _) => (t, false)
+        case ((t, f), _) => (t, f)
       }._2
 
     @tailrec def recurse(t: Int): Int =
