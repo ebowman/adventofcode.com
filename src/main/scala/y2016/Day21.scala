@@ -3,19 +3,16 @@ package y2016
 import scala.util.parsing.combinator.RegexParsers
 
 trait Day21 {
+  def swap(arr: Array[Char], i: Int, j: Int): Unit =
+    val tmp = arr(i); arr(i) = arr(j); arr(j) = tmp
+
+  def reverse(arr: Array[Char], start: Int, end: Int): Unit =
+    for i <- start to start + end / 2 if i < (end - i + start) do swap(arr, i, end - i + start)
 
   def rotate(arr: Array[Char], k: Int): Unit =
     reverse(arr, 0, k - 1)
     reverse(arr, k, arr.length - 1)
     reverse(arr, 0, arr.length - 1)
-
-  def reverse(arr: Array[Char], start: Int, end: Int): Unit =
-    for i <- start to start + end / 2 if i < (end - i + start) do swap(arr, i, end - i + start)
-
-  def swap(arr: Array[Char], i: Int, j: Int): Unit =
-    val tmp = arr(i)
-    arr(i) = arr(j)
-    arr(j) = tmp
 
   object Parser extends RegexParsers {
     def swapPos: Parser[Array[Char] => Unit] = ("swap position" ~> "\\d+".r) ~ ("with position" ~> "\\d+".r) ^^ {
@@ -62,9 +59,11 @@ trait Day21 {
 
   def solve1(input: Seq[String], letters: String): String =
     val array = letters.toCharArray
-    input.foreach { line => Parser.parseAll(Parser.allParsers, line).get.apply(array) }
+    input.foreach { line => Parser.parseAll(Parser.allParsers, line).get(array) }
     array.mkString
 
   def solve2(input: Seq[String], letters: String): String =
-    "abcdefgh".permutations.withFilter(perm => solve1(input, perm) == letters).next()
+    // not really *much* faster but a little
+    import collection.parallel.CollectionConverters.ImmutableSeqIsParallelizable
+    "abcdefgh".permutations.toSeq.par.find(perm => solve1(input, perm) == letters).get
 }
