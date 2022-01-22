@@ -15,10 +15,10 @@ trait Day09 {
     var (a, b) = (0, 0)
     var done = false
     var r = 0L
-    while (a < data.size - 1 && !done) {
+    while a < data.size - 1 && !done do {
       b = a + 1
-      while (b < data.size && !done) {
-        if (sum(data, a, b) == goal) {
+      while b < data.size && !done do {
+        if sum(data, a, b) == goal then {
           r = minMaxSum(data, a, b)
           done = true
         }
@@ -35,7 +35,7 @@ trait Day09 {
   def sum(x: IndexedSeq[Long], a: Int, b: Int): Long = {
     var i = a
     var sum: Long = 0
-    while (i <= b) {
+    while i <= b do {
       sum += x(i)
       i += 1
     }
@@ -46,7 +46,7 @@ trait Day09 {
     var min = Long.MaxValue
     var max = Long.MinValue
     var i = a
-    while (i <= b) {
+    while i <= b do {
       min = Math.min(min, x(i))
       max = Math.max(max, x(i))
       i += 1

@@ -23,12 +23,12 @@ trait Day17 {
 
     def bfs(hash: String): Path = {
       val queue = mutable.PriorityQueue[Path](Path(List((0, 0)), hash)).reverse
-      while (!queue.head.isGoal) queue.dequeue().next.foreach(queue.addOne)
+      while !queue.head.isGoal do queue.dequeue().next.foreach(queue.addOne)
       queue.head
     }
 
     def dfs(max: Int = Int.MinValue)(path: Path): Int =
-      if (path.isGoal) math.max(max, path.steps.size - 1)
+      if path.isGoal then math.max(max, path.steps.size - 1)
       else path.next.map(dfs(max)).maxOption.getOrElse(Int.MinValue)
 
     def apply(hash: String): Path = Path((0, 0) :: Nil, hash)
@@ -49,8 +49,8 @@ trait Day17 {
     val hashed: String = toHash(hash)
 
     def next: Seq[Path] =
-      for (delta <- Seq((-1, 0), (1, 0), (0, -1), (0, 1))
-           if isLegal(steps.head + delta) && isOpen(hashed, delta)) yield
+      for delta <- Seq((-1, 0), (1, 0), (0, -1), (0, 1))
+           if isLegal(steps.head + delta) && isOpen(hashed, delta) yield
         Path((steps.head + delta) :: steps, hash + deltaToDir(delta))
   }
 

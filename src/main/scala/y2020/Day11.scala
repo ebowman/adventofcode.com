@@ -22,12 +22,12 @@ trait Day11 {
 
     def solve(strategy: Strategy, seats: Seats): Int = new SolutionIterable(this, strategy).last.countOccupied
 
-    def countOccupied: Int = (for (row <- data) yield row.count(_ == OCCUPIED)).sum
+    def countOccupied: Int = (for row <- data yield row.count(_ == OCCUPIED)).sum
 
     def next(strategy: Strategy): Seats = {
       val cpy = copy()
-      for {row <- 1 to data.length - 2
-           col <- 1 to data.head.length - 2} {
+      for row <- 1 to data.length - 2
+           col <- 1 to data.head.length - 2 do {
         strategy.rule(row, col, data, cpy.data)
       }
       cpy
@@ -70,12 +70,12 @@ trait Day11 {
 
     object Strategy1 extends Strategy {
       def rule(row: Int, col: Int, data: Array[Array[Char]], cpy: Array[Array[Char]]): Unit = {
-        if (data(row)(col) == EMPTY && occupiedCount(row, col, data) == 0) cpy(row)(col) = OCCUPIED
-        else if (data(row)(col) == OCCUPIED && occupiedCount(row, col, data) >= 4) cpy(row)(col) = EMPTY
+        if data(row)(col) == EMPTY && occupiedCount(row, col, data) == 0 then cpy(row)(col) = OCCUPIED
+        else if data(row)(col) == OCCUPIED && occupiedCount(row, col, data) >= 4 then cpy(row)(col) = EMPTY
       }
 
       def occupiedCount(row: Int, col: Int, data: Array[Array[Char]]): Int = {
-        (for (n <- neighbors) yield {
+        (for n <- neighbors yield {
           data(row + n._1)(col + n._2) == OCCUPIED
         }).count(_ == true)
       }
@@ -83,8 +83,8 @@ trait Day11 {
 
     object Strategy2 extends Strategy {
       def rule(row: Int, col: Int, data: Array[Array[Char]], cpy: Array[Array[Char]]): Unit = {
-        if (data(row)(col) == EMPTY && occupiedCount(data, row, col) == 0) cpy(row)(col) = OCCUPIED
-        else if (data(row)(col) == OCCUPIED && occupiedCount(data, row, col) >= 5) cpy(row)(col) = EMPTY
+        if data(row)(col) == EMPTY && occupiedCount(data, row, col) == 0 then cpy(row)(col) = OCCUPIED
+        else if data(row)(col) == OCCUPIED && occupiedCount(data, row, col) >= 5 then cpy(row)(col) = EMPTY
       }
 
       def occupiedCount(data: Array[Array[Char]], row: Int, col: Int): Int = {
@@ -94,7 +94,7 @@ trait Day11 {
           var done = false
 
           def hasNext: Boolean = {
-            if (done) false
+            if done then false
             else {
               done = row >= 0 && row < data.length && col >= 0 && col < data(0).length
               done

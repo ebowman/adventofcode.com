@@ -33,7 +33,7 @@ trait Day13 {
     def solve2: BigInt = {
       val na = buses.map { bus =>
         var a = -bus.i
-        while (a < 0) {
+        while a < 0 do {
           a += bus.n
         }
         (bus.n, a)
@@ -53,13 +53,13 @@ trait Day13 {
       def inverse(a: BigInt, b: BigInt): BigInt = {
         @tailrec
         def euclid(a: BigInt, b: BigInt, x0: BigInt = 0, x1: BigInt = 1): BigInt =
-          if (a > 1) euclid(b, a % b, x1 - (a / b) * x0, x0) else x1
+          if a > 1 then euclid(b, a % b, x1 - (a / b) * x0, x0) else x1
 
         val x1 = euclid(a, b)
-        if (x1 < 0) x1 + b else x1
+        if x1 < 0 then x1 + b else x1
       }
 
-      if (n.isEmpty) sum
+      if n.isEmpty then sum
       else {
         val p = prod / n.head
 

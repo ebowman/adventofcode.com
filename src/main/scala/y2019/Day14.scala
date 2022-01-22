@@ -17,7 +17,7 @@ trait Day14 extends RegexParsers {
     (ingredients <~ " => ") ~ ingredient ^^ { case a ~ b => b -> a }
 
   // normal % in java/scala doesn't work, because we need a positive modulus always.
-  def divmod(n: Long, d: Long): (Long, Long) = (if (n < 0) n / d - 1L else n / d, ((n % d) + d) % d)
+  def divmod(n: Long, d: Long): (Long, Long) = (if n < 0 then n / d - 1L else n / d, ((n % d) + d) % d)
 
   def parse(input: IndexedSeq[String]): Map[String, (Long, Map[String, Long])] = {
     (input.map(line => parseAll(formula, line).get) map { case (ing, ings) =>
@@ -28,7 +28,7 @@ trait Day14 extends RegexParsers {
   def solve(map: Map[String, (Long, Map[String, Long])], fuel: Long = 1): Long = {
     @tailrec def recurse(input: (Map[String, Long], Map[String, Long])): Long = {
       val (needs, have) = (input._1, input._2)
-      if (needs.size == 1 && needs.head._1 == "ORE") needs.head._2
+      if needs.size == 1 && needs.head._1 == "ORE" then needs.head._2
       else {
         val need = needs.filterNot(_._1 == "ORE").head._1
         val (amt: Long, ingredients) = map(need)
@@ -36,7 +36,7 @@ trait Day14 extends RegexParsers {
           case (d, 0L) => (d, 0L) // completely used
           case (d, m) => (d + 1, m) // we need one more but we have leftovers
         }
-        recurse(ingredients.foldLeft((needs - need, if (leftover == 0) have else have + (need -> (amt - leftover)))) {
+        recurse(ingredients.foldLeft((needs - need, if leftover == 0 then have else have + (need -> (amt - leftover)))) {
           case ((need, have), (ing, amount)) =>
             (need + (ing -> (need.getOrElse(ing, 0L) + used * amount - have.getOrElse(ing, 0L))), have - ing)
         })
@@ -53,16 +53,16 @@ trait Day14 extends RegexParsers {
     val goal = 1000000000000L
 
     @tailrec def bound(low: Long, high: Long): (Long, Long) = {
-      if (solve(map, low) > goal) bound(low / 10, high)
+      if solve(map, low) > goal then bound(low / 10, high)
       else (low, high)
     }
 
     @tailrec def search(low: Long, high: Long): Long = {
-      if (low >= high - 1) low
+      if low >= high - 1 then low
       else {
         val mid = (low + high) / 2
         val ore = solve(map, mid)
-        if (ore < goal) search(mid, high)
+        if ore < goal then search(mid, high)
         else search(low, mid)
       }
     }

@@ -6,10 +6,10 @@ trait Day18 {
     val inputIter = input.iterator
     val rowIter = array.iterator
     rowIter.next() // skip the top slop row
-    while (inputIter.hasNext) {
+    while inputIter.hasNext do {
       val inputRow = inputIter.next()
       val row = rowIter.next()
-      for (i <- 1 to inputRow.length) {
+      for i <- 1 to inputRow.length do {
         row(i) = inputRow(i - 1) match {
           case '#' => true
           case '.' => false
@@ -17,7 +17,7 @@ trait Day18 {
       }
     }
     val dim = array.length - 2
-    if (pinned) {
+    if pinned then {
       array(1)(1) = true
       array(dim)(1) = true
       array(1)(dim) = true
@@ -34,12 +34,12 @@ trait Day18 {
 
     def next: Grid = {
       val nextBoard = mkGrid(dim)
-      for {y <- 1 to dim
-           x <- 1 to dim} {
+      for y <- 1 to dim
+           x <- 1 to dim do {
         val lit = Cursor(x, y).lit
-        nextBoard(y)(x) = if (board(y)(x)) lit == 2 || lit == 3 else lit == 3
+        nextBoard(y)(x) = if board(y)(x) then lit == 2 || lit == 3 else lit == 3
       }
-      if (pinned) {
+      if pinned then {
         nextBoard(1)(1) = true
         nextBoard(1)(dim) = true
         nextBoard(dim)(1) = true

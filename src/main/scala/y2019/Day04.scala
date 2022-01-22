@@ -6,8 +6,8 @@ trait Day04 {
 
   def twoAdjecent(str: String): Boolean = {
     @tailrec def recurse(s: String, prev: Int): Boolean = {
-      if (s.isEmpty) false
-      else if (s.head == prev) true
+      if s.isEmpty then false
+      else if s.head == prev then true
       else recurse(s.tail, s.head)
     }
 
@@ -16,7 +16,7 @@ trait Day04 {
 
   def adjecentPairs(str: String): Boolean = {
     @tailrec def recurse(s: String, seen: Map[Char, Int]): Map[Char, Int] = {
-      if (s.isEmpty) seen
+      if s.isEmpty then seen
       else recurse(s.tail, seen + (s.head -> (seen.getOrElse(s.head, 0) + 1)))
     }
 
@@ -25,8 +25,8 @@ trait Day04 {
 
   def neverDecreasing(str: String): Boolean = {
     @tailrec def recurse(s: String, prev: Int): Boolean = {
-      if (s.isEmpty) true
-      else if (prev > s.head) false
+      if s.isEmpty then true
+      else if prev > s.head then false
       else recurse(s.tail, s.head)
     }
 

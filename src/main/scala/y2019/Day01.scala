@@ -10,7 +10,7 @@ trait Day01 {
   @tailrec
   final def fuel2(accum: Int = 0)(mass: Int): Int = {
     val f = fuel(mass)
-    if ( f <= 0) accum
+    if  f <= 0 then accum
     else fuel2(accum + f)(f)
   }
 

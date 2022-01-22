@@ -50,11 +50,11 @@ trait Day10 {
         val (lowBot, highBot) = (bots(low), bots(high))
         (Seq(
           Seq(id -> bot.copy(values = Seq.empty)),
-          if (low >= 0) Seq(low -> lowBot.copy(values = (lowBot.values :+ bot.values.head).sorted)) else Seq.empty,
-          if (high >= 0) Seq(high -> highBot.copy(values = (highBot.values :+ bot.values.last).sorted)) else Seq.empty
+          if low >= 0 then Seq(low -> lowBot.copy(values = (lowBot.values :+ bot.values.head).sorted)) else Seq.empty,
+          if high >= 0 then Seq(high -> highBot.copy(values = (highBot.values :+ bot.values.last).sorted)) else Seq.empty
         ).flatten, Seq(
-          if (low < 0) Seq(((-low - 1) -> bot.values.head)) else Seq.empty,
-          if (high < 0) Seq(((-high - 1) -> bot.values.last)) else Seq.empty
+          if low < 0 then Seq(((-low - 1) -> bot.values.head)) else Seq.empty,
+          if high < 0 then Seq(((-high - 1) -> bot.values.last)) else Seq.empty
         ).flatten)
       } match {
         case Some((changedBots, changedOutputs)) =>

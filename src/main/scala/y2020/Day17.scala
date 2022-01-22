@@ -23,12 +23,12 @@ trait Day17 {
 
   def solve[T](input: IndexedSeq[String], count: Int = 6, ops: Ops[T]): Int = {
     var board = ops.mkBoard(input)
-    for (_ <- 0 until count) {
+    for _ <- 0 until count do {
       val nextBoard = ops.nextBoard()
       val neighborCount = ops.neighborCount()
-      for (pt <- board; neighbor <- ops.neighbors(pt)) neighborCount(neighbor) += 1
-      for ((pt, count) <- neighborCount)
-        if ((board.contains(pt) && count == 2 || count == 3) || (!board.contains(pt) && count == 3)) nextBoard.add(pt)
+      for pt <- board; neighbor <- ops.neighbors(pt) do neighborCount(neighbor) += 1
+      for (pt, count) <- neighborCount do
+        if (board.contains(pt) && count == 2 || count == 3) || (!board.contains(pt) && count == 3) then nextBoard.add(pt)
       board = nextBoard.toSet
     }
     board.size
@@ -41,16 +41,16 @@ trait Day17 {
     }
 
     def neighbors(pt: P3): Iterator[P3] = {
-      val deltaIter = (for (x <- -1 to 1; y <- -1 to 1; z <- -1 to 1
-                            if !(x == 0 && y == 0 && z == 0)) yield (x, y, z)).iterator
+      val deltaIter = (for x <- -1 to 1; y <- -1 to 1; z <- -1 to 1
+                            if !(x == 0 && y == 0 && z == 0) yield (x, y, z)).iterator
       deltaIter.map(_ + pt)
     }
 
     def mkBoard(seed: IndexedSeq[String]): Set[P3] = {
-      (for {
+      (for
         y <- seed.indices
         x <- seed(y).indices if seed(y).charAt(x) == ACTIVE
-      } yield (x, y, 0)).toSet
+      yield (x, y, 0)).toSet
     }
 
     def nextBoard(): mutable.Set[P3] = mutable.Set[P3]()
@@ -70,16 +70,16 @@ trait Day17 {
     }
 
     def neighbors(pt: P4): Iterator[P4] = {
-      val deltaIter = (for (x <- -1 to 1; y <- -1 to 1; z <- -1 to 1; w <- -1 to 1
-                            if !(x == 0 && y == 0 && z == 0 && w == 0)) yield (x, y, z, w)).iterator
+      val deltaIter = (for x <- -1 to 1; y <- -1 to 1; z <- -1 to 1; w <- -1 to 1
+                            if !(x == 0 && y == 0 && z == 0 && w == 0) yield (x, y, z, w)).iterator
       deltaIter.map(_ + pt)
     }
 
     def mkBoard(seed: IndexedSeq[String]): Set[P4] = {
-      (for {
+      (for
         y <- seed.indices
         x <- seed(y).indices if seed(y).charAt(x) == ACTIVE
-      } yield (x, y, 0, 0)).toSet
+      yield (x, y, 0, 0)).toSet
     }
 
     def nextBoard() = mutable.Set[P4]()

@@ -9,11 +9,11 @@ trait Day19 {
 
     @tailrec def recurse(): Int = {
       val winner = elves.indexOf(n)
-      if (winner >= 0) winner
+      if winner >= 0 then winner
       else {
         var i = 0
-        while (i < n) {
-          if (elves(i) != 0) {
+        while i < n do {
+          if elves(i) != 0 then {
             val next = elves.indexWhere(_ != 0, i + 1) match {
               case -1 => elves.indexWhere(_ != 0, 0)
               case n => n
@@ -32,9 +32,9 @@ trait Day19 {
 
   def solve2(n: Int): Int = {
     val fast = true
-    if (fast) {
+    if fast then {
       @tailrec def recurse(i: Int): Int =
-        if (i * 3 < n) recurse(i * 3)
+        if i * 3 < n then recurse(i * 3)
         else n - i
       recurse(1)
     } else {
@@ -43,11 +43,11 @@ trait Day19 {
       val prev = { val pr = Array.range(-1, n - 1); pr(0) = pr.length - 1; pr }
       var count = n
 
-      @inline @tailrec def advance(c: Int, n: Int): Int = if (n == 0) c else advance(next(c), n - 1)
+      @inline @tailrec def advance(c: Int, n: Int): Int = if n == 0 then c else advance(next(c), n - 1)
       @inline def opposite(c: Int): Int = advance(c, count / 2)
       var cursor = 0
-      while (values.indexOf(n) == -1) {
-        if (count > 0 && (count % 1000) == 0) println(count)
+      while values.indexOf(n) == -1 do {
+        if count > 0 && (count % 1000) == 0 then println(count)
         val opp = opposite(cursor)
         values(cursor) += values(opp)
         values(opp) = 0

@@ -25,10 +25,10 @@ trait Day21 extends Parser {
   def findImpossibles(ingredients: Seq[Ingredient]): Map[String, String] = {
     val counter = mutable.Map[String, Int]().withDefaultValue(0)
     val maybes = mutable.Map[String, mutable.Set[String]]()
-    for (ingredient <- ingredients) {
+    for ingredient <- ingredients do {
       ingredient.ingredients.foreach(ingredient => counter(ingredient) += 1)
       ingredient.allergans.foreach { allergan =>
-        if (maybes.contains(allergan)) maybes(allergan) = maybes(allergan).intersect(ingredient.ingredients.toSet)
+        if maybes.contains(allergan) then maybes(allergan) = maybes(allergan).intersect(ingredient.ingredients.toSet)
         else maybes(allergan) = mutable.Set[String]() ++ ingredient.ingredients
       }
     }
@@ -36,7 +36,7 @@ trait Day21 extends Parser {
     @tailrec
     def recurse(maybes: mutable.Map[String, mutable.Set[String]],
                 impossible: Map[String, String] = Map.empty): Map[String, String] = {
-      if (maybes.isEmpty) impossible
+      if maybes.isEmpty then impossible
       else {
         val (allergan, ingredients) = maybes.minBy(_._2.size)
         val next = ingredients.head

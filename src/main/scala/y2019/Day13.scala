@@ -11,7 +11,7 @@ trait Day13 extends Intcode {
     val sink = new Sink {
       override def put(value: Long): Unit = {
         queue.enqueue(value)
-        if (queue.size == 3) {
+        if queue.size == 3 then {
           val x = queue.dequeue().toInt
           val y = queue.dequeue().toInt
           val tileId = queue.dequeue().toInt
@@ -38,10 +38,10 @@ trait Day13 extends Intcode {
     val sink = new Sink {
       override def put(value: Long): Unit = {
         queue.enqueue(value)
-        if (queue.size == 3) {
+        if queue.size == 3 then {
           val x = queue.dequeue().toInt
           val y = queue.dequeue().toInt
-          if (x == -1 && y == 0) score = queue.dequeue().toInt
+          if x == -1 && y == 0 then score = queue.dequeue().toInt
           else {
             val tileId = queue.dequeue().toInt
             board((x, y)) = tileId
@@ -49,8 +49,8 @@ trait Day13 extends Intcode {
               case 3 =>
                 paddle = (x, y)
               case 4 =>
-                if (x < paddle._1) paddleCommands.put(-1)
-                else if (x > paddle._1) paddleCommands.put(1)
+                if x < paddle._1 then paddleCommands.put(-1)
+                else if x > paddle._1 then paddleCommands.put(1)
               case _ =>
             }
           }
@@ -60,7 +60,7 @@ trait Day13 extends Intcode {
     }
     val source = new Source {
       override def take(): Long = {
-        if (paddleCommands.isEmpty) paddleCommands.put(0)
+        if paddleCommands.isEmpty then paddleCommands.put(0)
         paddleCommands.take()
       }
     }

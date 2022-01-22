@@ -26,7 +26,7 @@ trait Day16 {
 
     def takeUntil(n: Int, f: (String => Boolean)): Seq[String] = {
       @tailrec def recurse(i: Int = 0, accum: List[String] = Nil): Seq[String] =
-        if (accum.nonEmpty && f(accum.head)) accum.reverse
+        if accum.nonEmpty && f(accum.head) then accum.reverse
         else recurse(i + 1, take(n) :: accum)
 
       recurse()
@@ -48,17 +48,17 @@ trait Day16 {
 
     def isEmpty: Boolean = bits.stack.size < 8
 
-    def exhaust: State = if (isEmpty) this else parse(this).exhaust
+    def exhaust: State = if isEmpty then this else parse(this).exhaust
 
     def mutate1(f: List[Long] => Long): State = copy(values = List(f(values)))
 
     def mutateR(f: (Long, Long) => Long): State = copy(values = List(values.reduce(f)))
 
-    def mutateOp(f: (Long, Long) => Boolean): State = copy(values = List(if (f(values(1), values(0))) 1 else 0))
+    def mutateOp(f: (Long, Long) => Boolean): State = copy(values = List(if f(values(1), values(0)) then 1 else 0))
   }
 
   def handleState(op: Int, state: State): State = {
-    if (op == 4) state.pushValue(state.bits.takeUntil(5, _ (0) == '0').map(_.tail).mkString.b2l)
+    if op == 4 then state.pushValue(state.bits.takeUntil(5, _ (0) == '0').map(_.tail).mkString.b2l)
     else {
       var subState = state.bits.take(1).b2i match {
         case 0 => State(bits = StackString(state.bits.take(state.bits.take(15).b2i))).exhaust

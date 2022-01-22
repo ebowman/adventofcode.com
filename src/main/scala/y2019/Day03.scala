@@ -29,10 +29,10 @@ trait Geom {
     }
 
     def intersects(hl: HorizLine, vl: VertLine): Option[Point] = {
-      if (vl.a.x < hl.a.x) None // vl left of hl
-      else if (vl.a.x > hl.b.x) None // vl right of hl
-      else if (vl.a.y > hl.a.y) None // vl above hl
-      else if (vl.b.y < hl.a.y) None // vl below hl
+      if vl.a.x < hl.a.x then None // vl left of hl
+      else if vl.a.x > hl.b.x then None // vl right of hl
+      else if vl.a.y > hl.a.y then None // vl above hl
+      else if vl.b.y < hl.a.y then None // vl below hl
       else Some(Point(vl.a.x, hl.a.y))
     }
 
@@ -59,8 +59,8 @@ trait Geom {
 
   object Line {
     def apply(a: Point, b: Point): Line = {
-      if (a.x == b.x) if (a.y < b.y) VertLine(a, b) else VertLine(b, a)
-      else if (a.x < b.x) HorizLine(a, b) else HorizLine(b, a)
+      if a.x == b.x then if a.y < b.y then VertLine(a, b) else VertLine(b, a)
+      else if a.x < b.x then HorizLine(a, b) else HorizLine(b, a)
     }
   }
 
@@ -74,7 +74,7 @@ trait Day03 extends Geom {
   val D: Regex = """D(\d+)""".r
 
   def mkPaths(input: Seq[String]): Seq[Seq[Line]] = {
-    for (line <- input) yield {
+    for line <- input yield {
       val points = line.split(",").foldLeft(Seq(Point(0, 0))) {
         case (seq, ins) => ins match {
           case R(n) => seq :+ seq.last.copy(x = seq.last.x + n.toInt)
@@ -88,9 +88,9 @@ trait Day03 extends Geom {
   }
 
   def mkIntersections(paths: Seq[Seq[Line]]): Seq[Point] =
-    for {a <- paths.head
+    for a <- paths.head
          b <- paths.tail.head
-         pt <- a.intersects(b) if pt != Point(0, 0)} yield pt
+         pt <- a.intersects(b) if pt != Point(0, 0) yield pt
 
 
   def part1(input: IndexedSeq[String]): Int =
@@ -100,12 +100,12 @@ trait Day03 extends Geom {
     val paths = mkPaths(input)
     val intersections = mkIntersections(paths)
 
-    val traversals = for {
+    val traversals = for
       intersection <- intersections
       path <- paths
       subPathTmp = path.zip(path.tail).takeWhile(ab => !ab._1.contains(intersection)) if subPathTmp.nonEmpty
       subPath = subPathTmp.head._1 +: subPathTmp.map(_._2)
-    } yield (intersection, subPath.init.zip(subPath.tail).foldLeft(subPath.head.length) {
+    yield (intersection, subPath.init.zip(subPath.tail).foldLeft(subPath.head.length) {
       case (d, (prev, next)) if next.contains(intersection) && (prev.a == next.a || prev.b == next.a) =>
         d + next.a.manhattanDistance(intersection)
       case (d, (prev, next)) if next.contains(intersection) && (prev.a == next.b || prev.b == next.b) =>

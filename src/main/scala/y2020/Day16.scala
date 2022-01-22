@@ -29,10 +29,10 @@ trait Day16 extends RegexParsers {
 
   def part1(input: IndexedSeq[String]): Int = {
     val (rules, _, nearby) = parse(input)
-    (for {
+    (for
       near <- nearby
       field <- near.fields if rules.forall(_.valid(field) == false)
-    } yield {
+    yield {
       field
     }).sum
   }
@@ -42,17 +42,17 @@ trait Day16 extends RegexParsers {
     val validTickets = nearby.filter(_.valid(rules))
 
     // possible rules that could map the field indexed by the key
-    val groups = (for {
+    val groups = (for
       i <- 0 until validTickets.map(_.fields.size).max
       rule <- rules if validTickets.forall(ticket => rule.valid(ticket.fields(i)))
-    } yield (i, rule)).groupBy(_._1).view.mapValues(_.map(_._2).toSet)
+    yield (i, rule)).groupBy(_._1).view.mapValues(_.map(_._2).toSet)
 
     // recurse until there is 1 row per field left. To do that we find the "next"
     // set of rules with one one rule in it, and then remove that rule from all
     // the others. We keep track of which rules we have already processed in 'done'.
     @tailrec
     def recurse(groups: Map[Int, Set[Rule]], done: Set[Rule] = Set.empty): Map[Int, Rule] = {
-      if (groups.forall(_._2.size == 1)) groups.view.mapValues(_.head).toMap
+      if groups.forall(_._2.size == 1) then groups.view.mapValues(_.head).toMap
       else {
         val (newRules, filteredRule) =
           groups.find(p => p._2.size == 1 && !done.contains(p._2.head)).get match {
@@ -73,7 +73,7 @@ trait Day16 extends RegexParsers {
     val result = recurse(groups.toMap)
 
     // pull out all the fields from my ticket that start with "departure"
-    val indices = for (i <- result.keys if result(i).name.startsWith("departure")) yield i
+    val indices = for i <- result.keys if result(i).name.startsWith("departure") yield i
 
     // return the product
     indices.map(i => mine.fields(i)).map(_.toLong).product

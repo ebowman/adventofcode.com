@@ -21,7 +21,7 @@ trait Day05 {
 
   case class Intcode(memory: Array[Int]) {
     @tailrec final def execute(cursor: Int = 0, input: Int = 0, output: Int = 0): Int = {
-      def read(c: Int, mode: Boolean): Int = if (mode) memory(c) else memory(memory(c))
+      def read(c: Int, mode: Boolean): Int = if mode then memory(c) else memory(memory(c))
 
       val (iADD, iMUL, iIN, iOUT, iJIT, iJIF, iSTLT, iSTEQ) = (1, 2, 3, 4, 5, 6, 7, 8)
       PackedInstruction(memory(cursor)) match {
@@ -43,23 +43,23 @@ trait Day05 {
         case op if op.opcode == iJIT =>
           val op1 = read(cursor + 1, op.mode1)
           val op2 = read(cursor + 2, op.mode2)
-          if (op1 != 0) execute(op2, input, output)
+          if op1 != 0 then execute(op2, input, output)
           else execute(cursor + 3, input, output)
         case op if op.opcode == iJIF =>
           val op1 = read(cursor + 1, op.mode1)
           val op2 = read(cursor + 2, op.mode2)
-          if (op1 == 0) execute(op2, input, output)
+          if op1 == 0 then execute(op2, input, output)
           else execute(cursor + 3, input, output)
         case op if op.opcode == iSTLT =>
           val op1 = read(cursor + 1, op.mode1)
           val op2 = read(cursor + 2, op.mode2)
-          if (op1 < op2) memory(memory(cursor + 3)) = 1
+          if op1 < op2 then memory(memory(cursor + 3)) = 1
           else memory(memory(cursor + 3)) = 0
           execute(cursor + 4, input, output)
         case op if op.opcode == iSTEQ =>
           val op1 = read(cursor + 1, op.mode1)
           val op2 = read(cursor + 2, op.mode2)
-          if (op1 == op2) memory(memory(cursor + 3)) = 1
+          if op1 == op2 then memory(memory(cursor + 3)) = 1
           else memory(memory(cursor + 3)) = 0
           execute(cursor + 4, input, output)
         case stop if stop.opcode == 99 => output

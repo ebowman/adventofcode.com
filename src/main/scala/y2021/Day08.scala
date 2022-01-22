@@ -2,13 +2,12 @@ package y2021
 
 trait Day08 {
 
-  def solve1(input: Seq[String]): Int = {
+  def solve1(input: Seq[String]): Int =
     val inputs = input.map(_.split("\\|")(1).split("\\s+").filter(_.nonEmpty))
     val magic = Set(2, 3, 4, 7)
     inputs.flatMap(_.map(_.length)).count(magic)
-  }
 
-  def solve2(input: Seq[String]): Int = {
+  def solve2(input: Seq[String]): Int =
     val Pipe = """(.*?)\|(.*)""".r
     input.map {
       case Pipe(left, right) =>
@@ -28,5 +27,4 @@ trait Day08 {
       val map = IndexedSeq(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9)
       digits.map(map.indexOf).mkString.toInt
     }.sum
-  }
 }

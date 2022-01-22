@@ -11,15 +11,15 @@ trait Day12 {
 
   case class Machine(program: Seq[String], cursor: Int = 0, regs: Map[String, Int]) {
     def next: Either[Machine, Map[String, Int]] = {
-      if (cursor >= program.size) Right(regs)
+      if cursor >= program.size then Right(regs)
       else {
         Left(program(cursor) match {
           case Cpy(r1, r2) =>
-            copy(cursor = cursor + 1, regs = regs + (r2 -> (if (r1.head.isLetter) regs(r1) else r1.toInt)))
+            copy(cursor = cursor + 1, regs = regs + (r2 -> (if r1.head.isLetter then regs(r1) else r1.toInt)))
           case Inc(reg) => copy(cursor = cursor + 1, regs = regs + (reg -> (regs(reg) + 1)))
           case Dec(reg) => copy(cursor = cursor + 1, regs = regs + (reg -> (regs(reg) - 1)))
           case Jnz(reg, jmp) => copy(cursor = cursor +
-            (if (reg.head.isLetter) if (regs(reg) == 0) 1 else jmp.toInt else if (reg.toInt == 0) 1 else jmp.toInt))
+            (if reg.head.isLetter then if regs(reg) == 0 then 1 else jmp.toInt else if reg.toInt == 0 then 1 else jmp.toInt))
           case "" => copy(cursor = cursor + 1)
         })
       }

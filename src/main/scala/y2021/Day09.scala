@@ -9,13 +9,10 @@ trait Day09 {
 
     def get(y: Int, x: Int) = Try(array(y)(x)).getOrElse(9)
 
-    (for {y <- array.indices
-          x <- array(y).indices
-          v = get(y, x) if
-            v < get(y, x - 1) &&
-              v < get(y, x + 1) &&
-              v < get(y - 1, x) &&
-              v < get(y + 1, x)} yield v + 1).sum
+    (for y <- array.indices
+         x <- array(y).indices
+         v = get(y, x) if v < get(y, x - 1) && v < get(y, x + 1) && v < get(y - 1, x) && v < get(y + 1, x)
+    yield v + 1).sum
   }
 
   def solve2(input: Seq[String]): Int = {
@@ -28,18 +25,17 @@ trait Day09 {
     def breadthFirst(seen: Set[(Int, Int)] = Set.empty)(pt: (Int, Int)): Set[(Int, Int)] = {
       val (y, x) = pt
       val v = get(y, x)
-      if (v == 9 || seen.contains(pt)) seen
-      else {
-        Seq((y, x - 1), (y, x + 1), (y - 1, x), (y + 1, x)).filter(
-          pt => get2(pt) >= v).foldLeft(seen + pt)(breadthFirst(_)(_))
-      }
+      if v == 9 || seen.contains(pt) then seen
+      else Seq((y, x - 1), (y, x + 1), (y - 1, x), (y + 1, x)).filter(
+        pt => get2(pt) >= v).foldLeft(seen + pt)(breadthFirst(_)(_))
     }
 
-    val lowPoints = for {
-      y <- array.indices
-      x <- array(y).indices
-      v = get(y, x) if
-        v < get(y, x - 1) && v < get(y, x + 1) && v < get(y - 1, x) && v < get(y + 1, x)} yield (y, x)
+    val lowPoints =
+      for
+        y <- array.indices
+        x <- array(y).indices
+        v = get(y, x) if v < get(y, x - 1) && v < get(y, x + 1) && v < get(y - 1, x) && v < get(y + 1, x)
+      yield (y, x)
 
     lowPoints.map(breadthFirst()).map(_.size).sorted.reverse.take(3).product
   }

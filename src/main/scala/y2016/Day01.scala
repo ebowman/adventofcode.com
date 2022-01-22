@@ -23,7 +23,7 @@ trait Day01 {
       def dist: Int = math.abs(x) + math.abs(y)
 
       @tailrec final def follow(instructions: Seq[String]): Pos = {
-        if (instructions.isEmpty) this
+        if instructions.isEmpty then this
         else {
           instructions.head match {
             case L(n) => left.advance(n.toInt).follow(instructions.tail)
@@ -53,12 +53,12 @@ trait Day01 {
       def dist: Int = math.abs(x) + math.abs(y)
 
       def path(endPoint: Pos): Seq[(Int, Int)] =
-        if (x == endPoint.x) {
-          val r = if (y < endPoint.y) y + 1 to endPoint.y else endPoint.y until y
-          for (i <- r) yield (x, i)
+        if x == endPoint.x then {
+          val r = if y < endPoint.y then y + 1 to endPoint.y else endPoint.y until y
+          for i <- r yield (x, i)
         } else {
-          val r = if (x < endPoint.x) x + 1 to endPoint.x else endPoint.x until x
-          for (i <- r) yield (i, y)
+          val r = if x < endPoint.x then x + 1 to endPoint.x else endPoint.x until x
+          for i <- r yield (i, y)
         }
 
       def follow(instructions: Seq[String], seen: Set[(Int, Int)] = Set((0, 0))): Pos = {

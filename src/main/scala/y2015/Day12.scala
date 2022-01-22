@@ -17,9 +17,9 @@ trait Day12 extends JavaTokenParsers {
       | floatingPointNumber ^^ (s => JsonNumber(BigDecimal(s)))
     )
 
-  def obj: Parser[JsonObject] = "{" ~> repsep(member, ",") <~ "}" ^^ JsonObject
+  def obj: Parser[JsonObject] = "{" ~> repsep(member, ",") <~ "}" ^^ this.JsonObject.apply
 
-  def arr: Parser[JsonArray] = "[" ~> repsep(expr, ",") <~ "]" ^^ JsonArray
+  def arr: Parser[JsonArray] = "[" ~> repsep(expr, ",") <~ "]" ^^ this.JsonArray.apply
 
   def member: Parser[(String, Json)] = (stringLiteral <~ ":") ~ expr ^^ {
     case k ~ v => trimQuotes(k) -> v
@@ -45,7 +45,7 @@ trait Day12 extends JavaTokenParsers {
 
   case class JsonObject(entries: List[(String, Json)]) extends Json {
     override def count: Int = {
-      if (entries.exists(_._2 == JsonString("red"))) {
+      if entries.exists(_._2 == JsonString("red")) then {
         0
       } else {
         (entries.collect {

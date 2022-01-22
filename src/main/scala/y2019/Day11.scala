@@ -52,9 +52,9 @@ trait Day11 extends Intcode {
       val height = grid.keys.map(_._1).max - grid.keys.map(_._1).min + 1
       val width = grid.keys.map(_._2).max - grid.keys.map(_._2).min + 1
       val array = Array.ofDim[Char](height, width)
-      for {y <- 0 until height
+      for y <- 0 until height
            x <- 0 until width
-           key = (y, x)} {
+           key = (y, x) do {
         array(y)(x) = grid.get(key) match {
           case Some(1) => 'X'
           case _ => ' '

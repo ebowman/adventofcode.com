@@ -52,7 +52,7 @@ trait Day15 {
   def combineCalories(ings: Seq[Ingredient], cursor: Cursor, exactCalories: Int): Int = {
     val tmp = ings.zip(cursor.values)
     val calories = (tmp.map { case (ing, amt) => ing.calories * amt }).sum
-    if (calories == exactCalories) sumUp(tmp)
+    if calories == exactCalories then sumUp(tmp)
     else 0
   }
 
@@ -72,7 +72,7 @@ trait Day15 {
     def next: Option[Cursor] = {
       @scala.annotation.tailrec
       def recur(n: Cursor): Cursor = {
-        if (n.isDone || n.isValid) n
+        if n.isDone || n.isValid then n
         else recur(n.incr)
       }
 
@@ -89,7 +89,7 @@ trait Day15 {
     private def incr: Cursor = {
       @scala.annotation.tailrec
       def helper(arr: Array[Int], cur: Int = 0): Array[Int] = {
-        if (arr(cur) == sum) {
+        if arr(cur) == sum then {
           arr(cur) = 0
           helper(arr, cur + 1)
         } else {

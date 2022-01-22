@@ -22,7 +22,7 @@ trait Day04 {
     def sumUnmarked: Int = (0 until 100).filter(i => x(i) != -1).filterNot(isMarked).sum
 
     def play(v: Int): Boolean = {
-      if (coordOf(v) != (-1, -1)) mark(v)
+      if coordOf(v) != (-1, -1) then mark(v)
       isBingo
     }
 
@@ -35,12 +35,12 @@ trait Day04 {
     val iter = lines.iterator
     val plays = iter.next().split(",").map(_.toInt).toSeq
     var set = Set[Board]()
-    while (iter.hasNext) {
+    while iter.hasNext do {
       iter.next()
       val bits = iter.take(5).flatMap(line =>
         line.split("""\s+""")).filter(_.trim.nonEmpty).map(_.toInt).toIndexedSeq
       val b = Board()
-      for (y <- 0 until 5; x <- 0 until 5) b.put((x, y), bits(y * 5 + x))
+      for y <- 0 until 5; x <- 0 until 5 do b.put((x, y), bits(y * 5 + x))
       set += b
     }
     (plays, set)
@@ -51,9 +51,9 @@ trait Day04 {
     var done = false
     var score = 0
     val playIter = plays.iterator
-    while (!done) {
+    while !done do {
       val next = playIter.next()
-      for (b <- boards if b.play(next)) {
+      for b <- boards if b.play(next) do {
         done = true
         score = b.sumUnmarked * next
       }
@@ -66,14 +66,14 @@ trait Day04 {
     var done = false
     var score = 0
     val playIter = plays.iterator
-    while (!done) {
+    while !done do {
       var next = playIter.next()
-      if (boards.size == 1) {
+      if boards.size == 1 then {
         val b = boards.head
         b.play(next)
         done = true
         score = b.sumUnmarked * next
-      } else for (b <- boards if b.play(next)) boards = boards - b
+      } else for b <- boards if b.play(next) do boards = boards - b
     }
     score
   }

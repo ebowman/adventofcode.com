@@ -52,8 +52,8 @@ trait Day04 extends RegexParsers {
 
   def validate(map: Map[String, String]): Boolean = {
     val result = requiredFields.forall(map.keySet.contains)
-    if (result && extended) {
-      map.forall { case (k, v) => if (!rules.contains(k)) true else rules(k)(v) }
+    if result && extended then {
+      map.forall { case (k, v) => if !rules.contains(k) then true else rules(k)(v) }
     } else result
   }
 }

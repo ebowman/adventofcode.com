@@ -27,7 +27,7 @@ trait Part1 extends Common {
 
   // return (and, or)
   private final def parseMask(maskStr: String, shift: Int = 0)(and: Long = MASK, or: Long = 0): (Long, Long) = {
-    if (maskStr.isEmpty) (and, or)
+    if maskStr.isEmpty then (and, or)
     else {
       val f = parseMask(maskStr.init, shift + 1) _
       maskStr.last match {
@@ -69,7 +69,7 @@ trait Part2 extends Common {
     // The first rule ("0's are unchanged") is trivially satisfied.
     @tailrec
     def recurse(bits: Seq[Int], masks: Seq[Op] = Seq(_ | orMask, _ | orMask)): Seq[Op] = {
-      if (bits.isEmpty) masks
+      if bits.isEmpty then masks
       else {
         def or: Long => Long = _ | (1L << bits.head)
 
@@ -87,7 +87,7 @@ trait Part2 extends Common {
   // For the float bits, we need to generate values at those bits that are both a 0 and a 1.
   // The or mask satisfies rule #2, "1s are overwritten". Rule #1 is trivial ("no change")
   private final def parseMask(maskStr: String, shift: Int = 0)(float: Long = 0, or: Long = 0): (Long, Long) = {
-    if (maskStr.isEmpty) (float, or)
+    if maskStr.isEmpty then (float, or)
     else {
       val f = parseMask(maskStr.init, shift + 1) _
       maskStr.last match {

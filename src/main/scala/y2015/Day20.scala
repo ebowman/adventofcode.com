@@ -9,8 +9,8 @@ trait Day20 {
   // using streams way too slow, both time & space inefficient :(
   def solve(n: Int): Int = {
     val houses = new Array[Int](n / 10)
-    for (i <- 1 to n / 10) {
-      for (j <- i to n / 10 by i) {
+    for i <- 1 to n / 10 do {
+      for j <- i to n / 10 by i do {
         houses(j - 1) += i * 10
       }
     }
@@ -19,8 +19,8 @@ trait Day20 {
 
   def solve2(n: Int): Int = {
     val houses = new Array[Int](11 * n)
-    for (i <- 1 to n / 11) {
-      for (j <- i to i * 50 by i) {
+    for i <- 1 to n / 11 do {
+      for j <- i to i * 50 by i do {
         houses(j - 1) += i * 11
       }
     }

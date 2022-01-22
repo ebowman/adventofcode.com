@@ -24,7 +24,7 @@ trait Day05 {
     }
 
     private def next: Option[SeatFinder] = {
-      if (code.isEmpty) None
+      if code.isEmpty then None
       else {
         code.head match {
           case 'F' => Some(copy(code = code.tail, rowMax = rowMax - (rowMax - rowMin) / 2 - 1))

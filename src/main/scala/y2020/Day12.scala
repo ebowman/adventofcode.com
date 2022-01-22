@@ -13,16 +13,16 @@ trait Day12 {
     val Ins: Regex = """([A-Z])([0-9]+)""".r
 
     @tailrec
-    final def left(d: (Int, Int), n: Int): (Int, Int) = if (n == 0) d else left((-d._2, d._1), n - 1)
+    final def left(d: (Int, Int), n: Int): (Int, Int) = if n == 0 then d else left((-d._2, d._1), n - 1)
 
     @tailrec
-    final def right(d: (Int, Int), n: Int): (Int, Int) = if (n == 0) d else right((d._2, -d._1), n - 1)
+    final def right(d: (Int, Int), n: Int): (Int, Int) = if n == 0 then d else right((d._2, -d._1), n - 1)
 
     def manhattanDistance: Int = math.abs(row) + math.abs(col)
 
     @tailrec
     final def evolve(ins: Iterable[String], s: Ship = this): Ship =
-      if (ins.isEmpty) s else evolve(ins.tail, s.next(ins.head))
+      if ins.isEmpty then s else evolve(ins.tail, s.next(ins.head))
 
     def next(direction: String): Ship
   }

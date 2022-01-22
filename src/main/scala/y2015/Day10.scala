@@ -4,7 +4,7 @@ trait Day10 {
 
   @scala.annotation.tailrec
   final def iterate(str: String, count: Int): String = {
-    if (count == 0) str
+    if count == 0 then str
     else iterate(speaknsay(str), count - 1)
   }
 
@@ -14,18 +14,18 @@ trait Day10 {
 
     @scala.annotation.tailrec
     def recurse(s: String, cursor: Int, b: StringBuilder): StringBuilder = {
-      if (cursor == s.length) {
-        if (count > 0) {
+      if cursor == s.length then {
+        if count > 0 then {
           b.append(count)
           b.append(cur)
         }
         b
       }
       else {
-        if (s(cursor) == cur) {
+        if s(cursor) == cur then {
           count += 1
         } else {
-          if (count > 0) {
+          if count > 0 then {
             b.append(count)
             b.append(cur)
           }

@@ -22,9 +22,9 @@ trait Day12 {
   case class Body(pos: Vec3, vel: Vec3) {
     def computeGravity(that: Body): Vec3 = {
       Vec3(
-        if (pos.x < that.pos.x) 1 else if (pos.x > that.pos.x) -1 else 0,
-        if (pos.y < that.pos.y) 1 else if (pos.y > that.pos.y) -1 else 0,
-        if (pos.z < that.pos.z) 1 else if (pos.z > that.pos.z) -1 else 0
+        if pos.x < that.pos.x then 1 else if pos.x > that.pos.x then -1 else 0,
+        if pos.y < that.pos.y then 1 else if pos.y > that.pos.y then -1 else 0,
+        if pos.z < that.pos.z then 1 else if pos.z > that.pos.z then -1 else 0
       )
     }
 
@@ -49,7 +49,7 @@ trait Day12 {
     def e: Int = bodies.map(_.e).sum
 
     def iterate(n: Int): System = {
-      @tailrec def recurse(s: System, n: Int): System = if (n == 0) s else recurse(s.next, n - 1)
+      @tailrec def recurse(s: System, n: Int): System = if n == 0 then s else recurse(s.next, n - 1)
 
       recurse(this, n)
     }
@@ -63,13 +63,13 @@ trait Day12 {
         system.bodies.map(body => (body.pos.z, body.vel.z)).toSet)
 
     @tailrec def recurse(s: System, n: Int = 1, nx: Int = 0, ny: Int = 0, nz: Int = 0): Seq[Int] = {
-      if (nx > 0 && ny > 0 && nz > 0) Seq(nx, ny, nz)
+      if nx > 0 && ny > 0 && nz > 0 then Seq(nx, ny, nz)
       else {
         val nxt = s.next
         recurse(nxt, n + 1,
-          if (nx == 0 && nxt.bodies.map(body => (body.pos.x, body.vel.x)).toSet == origX) n else nx,
-          if (ny == 0 && nxt.bodies.map(body => (body.pos.y, body.vel.y)).toSet == origY) n else ny,
-          if (nz == 0 && nxt.bodies.map(body => (body.pos.z, body.vel.z)).toSet == origZ) n else nz)
+          if nx == 0 && nxt.bodies.map(body => (body.pos.x, body.vel.x)).toSet == origX then n else nx,
+          if ny == 0 && nxt.bodies.map(body => (body.pos.y, body.vel.y)).toSet == origY then n else ny,
+          if nz == 0 && nxt.bodies.map(body => (body.pos.z, body.vel.z)).toSet == origZ then n else nz)
       }
     }
 

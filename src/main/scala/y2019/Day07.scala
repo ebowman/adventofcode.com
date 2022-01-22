@@ -25,7 +25,7 @@ trait Day07 {
                      outputs: ArrayBlockingQueue[Int]) {
 
     @tailrec final def execute(cursor: Int = 0): Unit = {
-      def read(c: Int, mode: Boolean): Int = if (mode) memory(c) else memory(memory(c))
+      def read(c: Int, mode: Boolean): Int = if mode then memory(c) else memory(memory(c))
 
       val (iADD, iMUL, iIN, iOUT, iJIT, iJIF, iSTLT, iSTEQ) = (1, 2, 3, 4, 5, 6, 7, 8)
       PackedInstruction(memory(cursor)) match {
@@ -50,7 +50,7 @@ trait Day07 {
         case op if op.opcode == iJIT =>
           val op1 = read(cursor + 1, op.mode1)
           val op2 = read(cursor + 2, op.mode2)
-          if (op1 != 0) execute(op2)
+          if op1 != 0 then execute(op2)
           else execute(cursor + 3)
         /*
       case op if op.opcode == iJIF =>
@@ -62,7 +62,7 @@ trait Day07 {
         case op if op.opcode == iSTLT =>
           val op1 = read(cursor + 1, op.mode1)
           val op2 = read(cursor + 2, op.mode2)
-          if (op1 < op2) memory(memory(cursor + 3)) = 1
+          if op1 < op2 then memory(memory(cursor + 3)) = 1
           else memory(memory(cursor + 3)) = 0
           execute(cursor + 4)
         /*

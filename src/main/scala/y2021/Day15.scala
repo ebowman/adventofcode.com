@@ -4,7 +4,7 @@ trait Day15 {
   case class Coord(x: Int, y: Int) extends Ordered[Coord] {
     def neighbors: Seq[Coord] = Seq(Coord(x - 1, y), Coord(x + 1, y), Coord(x, y - 1), Coord(x, y + 1))
 
-    override def compare(that: Coord): Int = if (y == that.y) x - that.x else y - that.y
+    override def compare(that: Coord): Int = if y == that.y then x - that.x else y - that.y
   }
 
   case class Path(pt: Coord = Coord(0, 0), cost: Int = 0) extends Ordered[Path] {
@@ -13,7 +13,7 @@ trait Day15 {
 
   object Puzzle {
     def apply(input: Seq[String]): Puzzle = {
-      val map = (for (y <- input.indices; x <- input(y).indices) yield Coord(x, y) -> s"${input(y)(x)}".toInt).toMap
+      val map = (for y <- input.indices; x <- input(y).indices yield Coord(x, y) -> s"${input(y)(x)}".toInt).toMap
       Puzzle(map, Coord(input.head.length - 1, input.size - 1))
     }
   }
@@ -24,7 +24,7 @@ trait Day15 {
       val queue = mutable.PriorityQueue[Path]().reverse
       val visited = mutable.Set[Coord]()
       queue.addOne(Path())
-      while (queue.nonEmpty && queue.head.pt != goal) {
+      while queue.nonEmpty && queue.head.pt != goal do {
         val head = queue.dequeue()
         head.pt.neighbors.filter(map.contains).filterNot(visited).map { pt =>
           Path(pt, head.cost + map(pt))

@@ -4,15 +4,15 @@ import scala.annotation.tailrec
 
 trait Day10 {
   @tailrec private final def gcd(n: (Int, Int)): Int = {
-    if (n._2 == 0) n._1
+    if n._2 == 0 then n._1
     else gcd((n._2, n._1 % n._2))
   }
 
   private def parse(input: IndexedSeq[String]): Seq[(Int, Int)] = {
-    for {
+    for
       y <- input.indices
       x <- input.head.indices if input(y).charAt(x) == '#'
-    } yield (x, y)
+    yield (x, y)
   }
 
   def findBest(points: Seq[(Int, Int)]): ((Int, Int), Int) = {
@@ -54,11 +54,11 @@ trait Day10 {
     @tailrec def recurse(asteroids: Seq[Seq[(Int, Int)]],
                          cursor: Int = 0,
                          accum: Seq[(Int, Int)] = Seq.empty): Seq[(Int, Int)] = {
-      if (asteroids.isEmpty) accum
-      else if (cursor >= asteroids.length) recurse(asteroids, 0, accum)
+      if asteroids.isEmpty then accum
+      else if cursor >= asteroids.length then recurse(asteroids, 0, accum)
       else {
         val next = asteroids(cursor)
-        if (next.tail.nonEmpty) recurse(
+        if next.tail.nonEmpty then recurse(
           (asteroids.take(cursor) :+ next.tail) ++ asteroids.drop(cursor + 1),
           cursor + 1,
           accum :+ next.head)

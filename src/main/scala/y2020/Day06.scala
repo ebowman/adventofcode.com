@@ -19,7 +19,7 @@ trait Day06 {
   def parseWord(word: String): Int = {
     @tailrec
     def recurse(w: String, bits: Int = 0): Int = {
-      if (w.isEmpty) bits
+      if w.isEmpty then bits
       else recurse(w.tail, bits | (1 << w.head - 'a'))
     }
 
@@ -29,7 +29,7 @@ trait Day06 {
   def countBits(word: Int): Int = {
     @tailrec
     def recurse(w: Int, c: Int = 0): Int = {
-      if (w == 0) c
+      if w == 0 then c
       else recurse(w >> 1, c + (w & 1))
     }
 

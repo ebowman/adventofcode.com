@@ -25,7 +25,7 @@ class Day18Spec extends AnyFlatSpec with Matchers with Day18 {
 
   it should "solve the first puzzle input" in {
     var board = parse(Loader(this, "day18.txt"))
-    for (i <- 1 to 100) {
+    for i <- 1 to 100 do {
       board = board.next
     }
     board.lit shouldBe 821
@@ -33,7 +33,7 @@ class Day18Spec extends AnyFlatSpec with Matchers with Day18 {
 
   it should "solve the second puzzle input" in {
     var board = parse(Loader(this, "day18.txt"), pinned = true)
-    for (i <- 1 to 100) {
+    for i <- 1 to 100 do {
       board = board.next
     }
     board.lit shouldBe 886

@@ -16,8 +16,8 @@ trait Day08 {
   case class Display(pixels: IndexedSeq[IndexedSeq[Boolean]]) {
     def rect(x: Int, y: Int): Display = {
       @tailrec def recurse(display: Display, x1: Int = 0, y1: Int = 0): Display = {
-        if (y1 == y) display
-        else if (x1 == x) recurse(display, 0, y1 + 1)
+        if y1 == y then display
+        else if x1 == x then recurse(display, 0, y1 + 1)
         else recurse(display.copy(pixels = display.pixels.updated(y1, display.pixels(y1).updated(x1, true))), x1 + 1, y1)
       }
 
@@ -26,7 +26,7 @@ trait Day08 {
 
     def rotateColumn(x: Int, n: Int): Display = {
       @tailrec def recurse(display: Display, y: Int = 0): Display =
-        if (y == pixels.size) display
+        if y == pixels.size then display
         else recurse(display.copy(
           pixels = display.pixels.updated(y,
             display.pixels(y).updated(x, pixels((y + pixels.size - n) % pixels.size)(x)))), y + 1)
@@ -36,7 +36,7 @@ trait Day08 {
 
     def rotateRow(y: Int, n: Int): Display = {
       @tailrec def recurse(display: Display, x: Int = 0): Display =
-        if (x == pixels.head.size) display
+        if x == pixels.head.size then display
         else recurse(display.copy(
           pixels = display.pixels.updated(y,
             display.pixels(y).updated(x, pixels(y)((x + pixels.head.size - n) % pixels.head.size)))), x + 1)
@@ -55,7 +55,7 @@ trait Day08 {
 
     def lit: Int = pixels.map(row => row.count(_ == true)).sum
 
-    override def toString: String = pixels.map(row => row.map(p => if (p) 'X' else ' ').mkString("|")).mkString("\n")
+    override def toString: String = pixels.map(row => row.map(p => if p then 'X' else ' ').mkString("|")).mkString("\n")
   }
 
   def solve(input: Seq[String]): Display = input.foldLeft(Display()) {

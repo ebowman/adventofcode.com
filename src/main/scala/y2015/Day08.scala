@@ -7,7 +7,7 @@ trait Day08 {
   def escaped(str: String): (Int, Int) = {
     @tailrec
     def recurse(s: String, b: StringBuilder = new StringBuilder): StringBuilder = {
-      if (s.isEmpty) b
+      if s.isEmpty then b
       else s(0) match {
         case '\\' => s(1) match {
           case '\\' =>
@@ -31,7 +31,7 @@ trait Day08 {
 
   def encode(str: String): (Int, Int) = {
     def recurse(s: String, b: StringBuilder = new StringBuilder("\"")): StringBuilder = {
-      if (s.isEmpty) b
+      if s.isEmpty then b
       else {
         s(0) match {
           case '"' =>

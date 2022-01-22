@@ -14,7 +14,7 @@ trait Day15 {
       }._2
 
     @tailrec def recurse(t: Int): Int =
-      if (pass(t)) t
+      if pass(t) then t
       else recurse(t + 1)
 
     recurse(0)

@@ -59,7 +59,7 @@ trait Day08 extends RegexParsers {
       }
 
       @tailrec
-      final def solve: Int = if (hasNext) this.next.solve else result
+      final def solve: Int = if hasNext then this.next.solve else result
     }
 
   }
@@ -70,8 +70,8 @@ trait Day08 extends RegexParsers {
     def run: (Boolean, Int) = {
       @tailrec
       def recurse(cursor: Int = 0, accum: Int = 0, seen: Set[Int] = Set()): (Boolean, Int) = {
-        if (cursor >= instructions.length) (true, accum)
-        else if (seen.contains(cursor)) (false, accum)
+        if cursor >= instructions.length then (true, accum)
+        else if seen.contains(cursor) then (false, accum)
         else {
           instructions(cursor) match {
             case Nop(_) => recurse(cursor + 1, accum, seen + cursor)

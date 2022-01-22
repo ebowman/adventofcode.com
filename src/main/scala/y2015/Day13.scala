@@ -4,7 +4,7 @@ trait Day13 {
 
   def happinessSeq(s: Seq[Person]): Int = {
     val tmp = (s.last +: s :+ s.head).toIndexedSeq
-    (for (i <- 1 to s.size) yield {
+    (for i <- 1 to s.size yield {
       tmp(i).effects(tmp(i - 1).name) + tmp(i).effects(tmp(i + 1).name)
     }).sum
   }

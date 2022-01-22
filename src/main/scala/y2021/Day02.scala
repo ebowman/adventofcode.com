@@ -27,14 +27,14 @@ trait Day02 {
 
   def solve1(ins: Seq[String]): Int = {
     @tailrec def recurse(ship: Ship, ins: Seq[String]): Ship =
-      if (ins.isEmpty) ship else recurse(ship.next(ins.head), ins.tail)
+      if ins.isEmpty then ship else recurse(ship.next(ins.head), ins.tail)
     val r = recurse(Ship(), ins)
     r.pos * r.depth
   }
 
   def solve2(ins: Seq[String]): Int = {
     @tailrec def recurse(ship: Ship2, ins: Seq[String]): Ship2 =
-      if (ins.isEmpty) ship else recurse(ship.next(ins.head), ins.tail)
+      if ins.isEmpty then ship else recurse(ship.next(ins.head), ins.tail)
     val r = recurse(Ship2(), ins)
     r.pos * r.depth
   }

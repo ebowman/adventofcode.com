@@ -25,9 +25,9 @@ class Day04Spec extends AnyFlatSpec with Matchers with Day04 {
 
     var count = 0
     fields.clear()
-    for (l <- input) {
-      if (l.isEmpty) {
-        if (validate(fields.toMap)) count += 1
+    for l <- input do {
+      if l.isEmpty then {
+        if validate(fields.toMap) then count += 1
         fields.clear()
       } else parseAll(line, l)
     }
@@ -37,14 +37,14 @@ class Day04Spec extends AnyFlatSpec with Matchers with Day04 {
   it should "pass the test" in {
     var count = 0
     fields.clear()
-    for (l <- Loader(this, "day04.txt")) {
-      if (l.isEmpty) {
-        if (validate(fields.toMap)) count += 1
+    for l <- Loader(this, "day04.txt") do {
+      if l.isEmpty then {
+        if validate(fields.toMap) then count += 1
         fields.clear()
       } else parseAll(line, l)
     }
-    if (fields.nonEmpty) {
-      if (validate(fields.toMap)) count += 1
+    if fields.nonEmpty then {
+      if validate(fields.toMap) then count += 1
       fields.clear()
     }
     count shouldBe 228
@@ -55,14 +55,14 @@ class Day04Spec extends AnyFlatSpec with Matchers with Day04 {
     extended = true
     var count = 0
     fields.clear()
-    for (l <- Loader(this, "day04.txt")) {
-      if (l.isEmpty) {
-        if (validate(fields.toMap)) count += 1
+    for l <- Loader(this, "day04.txt") do {
+      if l.isEmpty then {
+        if validate(fields.toMap) then count += 1
         fields.clear()
       } else parseAll(line, l)
     }
-    if (fields.nonEmpty) {
-      if (validate(fields.toMap)) count += 1
+    if fields.nonEmpty then {
+      if validate(fields.toMap) then count += 1
       fields.clear()
     }
     count shouldBe 175

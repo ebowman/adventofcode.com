@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 trait Day25 {
 
   @tailrec final def transform(loopSize: Long, subject: Long, accum: Long = 1): Long = {
-    if (loopSize == 0) accum
+    if loopSize == 0 then accum
     else transform(loopSize - 1, subject, (accum * subject) % 20201227)
   }
 
@@ -18,7 +18,7 @@ trait Day25 {
   def findKey(publicKey: Long): Entity = {
     @tailrec def recurse(loop: Long = 1, accum: Long = 1): Long = {
       val key = (accum * 7) % 20201227
-      if (key == publicKey) loop
+      if key == publicKey then loop
       else recurse(loop + 1, key)
     }
 

@@ -9,13 +9,13 @@ class Day22Spec extends AnyFlatSpec with Matchers with Day22 {
     var game = Game(Player("me", hit = 10, available = 250), Player("boss", hit = 13, damage = 8), debug = true)
 
     var mana = Seq("Poison", "", "MagicMissile", "")
-    while (!game.isOver) {
+    while !game.isOver do {
       def f(p: Player): Boolean = {
         mana.isEmpty || p.newMana.get.name.startsWith(mana.head)
       }
 
       game = game.next(f).head
-      if (mana.nonEmpty) mana = mana.tail
+      if mana.nonEmpty then mana = mana.tail
     }
     game.isOver shouldBe true
     game.time shouldBe 4

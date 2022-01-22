@@ -60,8 +60,8 @@ object Lights {
     def toggle(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = !array(x) })
 
     private def operate(range: Rect, write: (Int, Array[Boolean]) => Unit): Unit = {
-      for (y <- range.top until range.top + range.height) {
-        for (x <- range.left until range.left + range.width) {
+      for y <- range.top until range.top + range.height do {
+        for x <- range.left until range.left + range.width do {
           write(x, grid(y))
         }
       }
@@ -76,8 +76,8 @@ object Lights {
     def turnOn(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = array(x) + 1 })
 
     private def operate(range: Rect, write: (Int, Array[Int]) => Unit): Unit = {
-      for (y <- range.top until range.top + range.height) {
-        for (x <- range.left until range.left + range.width) {
+      for y <- range.top until range.top + range.height do {
+        for x <- range.left until range.left + range.width do {
           write(x, grid(y))
         }
       }

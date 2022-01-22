@@ -6,7 +6,7 @@ trait Day11 {
     def name: String
 
     override def compare(that: Item): Int = {
-      if (this.name.compare(that.name) == 0) {
+      if this.name.compare(that.name) == 0 then {
         (this, that) match {
           case (Microchip(_), Generator(_)) => 1
           case _ => -1
@@ -64,7 +64,7 @@ trait Day11 {
       val tags = floors.flatMap(_._2).map(_.name).toSeq.distinct
 
       def distill(f: Item => Boolean): Map[String, Int] =
-        (for (tag <- tags; (floor, items) <- floors; item <- items if f(item) && item.name == tag)
+        (for tag <- tags; (floor, items) <- floors; item <- items if f(item) && item.name == tag
           yield tag -> floor).toMap
 
       val (generators, chips) = (distill(_.isInstanceOf[Generator]), distill(_.isInstanceOf[Microchip]))
@@ -73,24 +73,24 @@ trait Day11 {
 
     def nextStates: Seq[State] = {
       // prune the search space ... once above a certain level, never go back
-      val minE = if (elevator == 1 && floors(0).isEmpty) 2
-      else if (elevator == 2 && floors(0).isEmpty && floors(1).isEmpty) 3
+      val minE = if elevator == 1 && floors(0).isEmpty then 2
+      else if elevator == 2 && floors(0).isEmpty && floors(1).isEmpty then 3
       else math.max(elevator - 1, 0)
-      for {
+      for
         nextFloor <- minE to math.min(elevator + 1, 3) if nextFloor != elevator
         items <- floors(elevator).toSeq.combinations(1) ++ floors(elevator).toSeq.combinations(2)
         nextState = copy(elevator = nextFloor, floors = floors +
           (elevator -> (floors(elevator) -- items)) + (nextFloor -> (floors(nextFloor) ++ items))) if nextState.isLegal
-      } yield nextState
+      yield nextState
     }
 
     def isLegal: Boolean = floors.values.forall(isLegalFloor)
 
-    def isLegalFloor(floor: Set[Item]): Boolean = if (floor.size < 2) true else {
+    def isLegalFloor(floor: Set[Item]): Boolean = if floor.size < 2 then true else {
       val microchips = floor.filter(_.isInstanceOf[Microchip]).map(_.name)
       val generators = floor.filter(_.isInstanceOf[Generator]).map(_.name)
       val solos = microchips -- generators
-      if (solos.nonEmpty) generators.isEmpty else true
+      if solos.nonEmpty then generators.isEmpty else true
     }
 
     def isTarget: Boolean = (0 to 2).forall(f => floors(f).isEmpty)
@@ -101,24 +101,24 @@ trait Day11 {
       val itemWidth = 4
       val canvas = {
         val tmp = Array.ofDim[Char](4, itemCount * itemWidth + 6)
-        for (y <- tmp.indices; x <- tmp.head.indices) tmp(y)(x) = ' '
+        for y <- tmp.indices; x <- tmp.head.indices do tmp(y)(x) = ' '
         tmp
       }
-      for (floor <- 1 to 4) {
+      for floor <- 1 to 4 do {
         canvas(4 - floor)(0) = 'F'
         canvas(4 - floor)(1) = s"$floor".head
         canvas(4 - floor)(3) = '.'
       }
-      for (i <- 0 until ordering.size; j <- 0 until 4) {
+      for i <- 0 until ordering.size; j <- 0 until 4 do {
         canvas(j)(6 + itemWidth * i) = '.'
       }
       canvas(3 - elevator)(3) = 'E'
-      for {
+      for
         floor <- 0 until 4
         item <- floors(floor)
         i <- 0 until itemCount
-      } {
-        if (ordering(item) == i) {
+      do {
+        if ordering(item) == i then {
           canvas(3 - floor)(6 + itemWidth * i) = item.toString.head
           canvas(3 - floor)(6 + itemWidth * i + 1) = item.toString.tail.head
           canvas(3 - floor)(6 + itemWidth * i + 2) = item.toString.tail.tail.head
@@ -138,7 +138,7 @@ trait Day11 {
       val queue = collection.mutable.PriorityQueue[StatePath]().reverse
       val visited = collection.mutable.Set[(Int, Seq[(Int, Int)])]()
       queue.addOne(this)
-      while (queue.nonEmpty && !queue.head.states.head.isTarget) {
+      while queue.nonEmpty && !queue.head.states.head.isTarget do {
         val path = queue.dequeue()
         path.nextPaths.filterNot(p => visited(p.states.head.simplify)).foreach { path =>
           queue.addOne(path)

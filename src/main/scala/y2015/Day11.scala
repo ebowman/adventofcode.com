@@ -12,7 +12,7 @@ trait Day11 {
       !password.contains("i") && !password.contains("l") && !password.contains("o")
     }
     lazy val repeatingPair: Boolean = {
-      if (password.length > 1) {
+      if password.length > 1 then {
         def pair(x: String) = x(0) == x(1)
 
         val pairs = password.sliding(2).filter(pair).zipWithIndex.toSeq
@@ -24,7 +24,7 @@ trait Day11 {
     def safeIncr: Password = {
       @scala.annotation.tailrec
       def recurse(pw: Password): Password = {
-        if (pw.valid) pw
+        if pw.valid then pw
         else recurse(pw.incr)
       }
 
@@ -34,11 +34,11 @@ trait Day11 {
     def incr: Password = {
       @scala.annotation.tailrec
       def helper(arr: Array[Char], cur: Int = 0): Array[Char] = {
-        if (cur == arr.length) {
+        if cur == arr.length then {
           // rolled over
           arr :+ 'b'
         } else {
-          if (arr(cur) == 'z') {
+          if arr(cur) == 'z' then {
             arr(cur) = 'a'
             helper(arr, cur + 1)
           } else {

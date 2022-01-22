@@ -7,7 +7,7 @@ trait Day02 {
   def solve1(input: Seq[String]): String = {
     case class Pad(val pos: Int = 5) {
       def advance(code: String): Int = {
-        if (code.isEmpty) pos
+        if code.isEmpty then pos
         else {
           code.head match {
             case 'U' =>
@@ -64,7 +64,7 @@ trait Day02 {
     }
 
     @tailrec def recurse(lines: Seq[String], code: List[Int] = Nil): String = {
-      if (lines.isEmpty) code.reverse.mkString
+      if lines.isEmpty then code.reverse.mkString
       else recurse(lines.tail, Pad(code.headOption.getOrElse(5)).advance(lines.head) :: code)
     }
 
@@ -74,7 +74,7 @@ trait Day02 {
   def solve2(input: Seq[String]): String = {
     case class Pad(val pos: Char = '5') {
       def advance(code: String): Char = {
-        if (code.isEmpty) pos
+        if code.isEmpty then pos
         else {
           code.head match {
             case 'U' =>
@@ -147,7 +147,7 @@ trait Day02 {
     }
 
     @tailrec def recurse(lines: Seq[String], code: List[Char] = Nil): String = {
-      if (lines.isEmpty) code.reverse.mkString
+      if lines.isEmpty then code.reverse.mkString
       else recurse(lines.tail, Pad(code.headOption.getOrElse('5')).advance(lines.head) :: code)
     }
 

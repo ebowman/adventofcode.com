@@ -29,7 +29,7 @@ trait Day09 {
   }
 
   def solve2(input: String, accum: Long = 0): Long = {
-    if (!input.contains("(")) accum + input.length
+    if !input.contains("(") then accum + input.length
     else {
       val open = input.indexOf("(")
       val close = input.indexOf(")")

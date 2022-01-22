@@ -6,13 +6,13 @@ trait Day23 {
 
   def part1(input: Int): Int = {
     @tailrec def goCrabby(cups: Seq[Int], n: Int): Seq[Int] = {
-      if (n == 0) cups
+      if n == 0 then cups
       else {
         val remaining = cups.drop(4)
 
         @tailrec def nextDestIdx(cup: Int): Int =
-          if (remaining.contains(cup)) remaining.indexOf(cup)
-          else if (cup - 1 < cups.min) nextDestIdx(cups.max)
+          if remaining.contains(cup) then remaining.indexOf(cup)
+          else if cup - 1 < cups.min then nextDestIdx(cups.max)
           else nextDestIdx(cup - 1)
 
         val leftCount = nextDestIdx(cups.head) + 1
@@ -21,7 +21,7 @@ trait Day23 {
     }
 
     @tailrec def rotate1toHead(seq: Seq[Int]): Seq[Int] =
-      if (seq.head == 1) seq
+      if seq.head == 1 then seq
       else rotate1toHead(seq.tail :+ seq.head)
 
     rotate1toHead(goCrabby(input.toString.map(_ - '0'), 100)).tail.mkString.toInt
@@ -39,13 +39,13 @@ trait Day23 {
     }
 
     @tailrec def gocrabby(current: Int, n: Int = 10000000): Unit = {
-      if (n == 0) ()
+      if n == 0 then ()
       else {
         val (first, middle, last) = (cups(current), cups(cups(current)), cups(cups(cups(current))))
 
         @tailrec def nextLabel(label: Int): Int = {
-          val maybe = if (label == 1) 1000000 else label - 1
-          if (maybe == first || maybe == middle || maybe == last) nextLabel(maybe) else maybe
+          val maybe = if label == 1 then 1000000 else label - 1
+          if maybe == first || maybe == middle || maybe == last then nextLabel(maybe) else maybe
         }
 
         val dest = nextLabel(current)

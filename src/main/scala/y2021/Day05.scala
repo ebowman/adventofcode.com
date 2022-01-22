@@ -14,20 +14,20 @@ trait Day05 {
 
     def visit(f: ((Int, Int)) => Unit): Unit = {
       val delta =
-        if (a._1 == b._1)
-          if (a._2 < b._2) (0, 1)
+        if a._1 == b._1 then
+          if a._2 < b._2 then (0, 1)
           else (0, -1)
-        else if (a._2 == b._2)
-          if (a._1 < b._1) (1, 0)
+        else if a._2 == b._2 then
+          if a._1 < b._1 then (1, 0)
           else (-1, 0)
-        else if (a._1 < b._1)
-          if (a._2 < b._2) (1, 1)
+        else if a._1 < b._1 then
+          if a._2 < b._2 then (1, 1)
           else (1, -1)
-        else if (a._2 < b._2) (-1, 1)
+        else if a._2 < b._2 then (-1, 1)
         else (-1, -1)
       f(a)
       var cur = (a._1 + delta._1, a._2 + delta._2)
-      while (cur != b) {
+      while cur != b do {
         f(cur)
         cur = (cur._1 + delta._1, cur._2 + delta._2)
       }

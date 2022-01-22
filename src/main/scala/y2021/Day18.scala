@@ -9,10 +9,10 @@ trait Day18 {
 
   object NumOps {
     @tailrec def reduceImpl(seq: Seq[Num]): Seq[Num] = {
-      val tmp = if (seq.canExplode) seq.explode
-      else if (seq.canSplit) seq.split
+      val tmp = if seq.canExplode then seq.explode
+      else if seq.canSplit then seq.split
       else seq
-      if (tmp.canReduce) reduceImpl(tmp) else tmp
+      if tmp.canReduce then reduceImpl(tmp) else tmp
     }
   }
 
@@ -51,7 +51,7 @@ trait Day18 {
     def magnitude: Int = {
       var copy = seq.toArray
       var maxDepth = copy.maxBy(_.depth).depth
-      while (maxDepth > 0) {
+      while maxDepth > 0 do {
         val i = copy.indexWhere(_.depth == maxDepth)
         copy(i) = Num(3 * copy(i).num + Try(2 * copy(i + 1).num).getOrElse(0), copy(i).depth - 1)
         copy = copy.take(i + 1) ++ copy.drop(i + 2)
@@ -63,7 +63,7 @@ trait Day18 {
 
   def parse(str: String): Seq[Num] = {
     @tailrec def recurse(in: String, depth: Int = 0, accum: List[Num] = Nil): Seq[Num] = {
-      if (in.isEmpty) accum.reverse
+      if in.isEmpty then accum.reverse
       else in.head match {
         case '[' => recurse(in.tail, depth + 1, accum)
         case ']' => recurse(in.tail, depth - 1, accum)

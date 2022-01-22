@@ -1,4 +1,4 @@
-scalaVersion := "2.13.7"
+scalaVersion := "3.1.0"
 resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public/"
 
 libraryDependencies ++= Seq(
@@ -10,5 +10,5 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.10" % "test"
 )
 
-scalacOptions += "-unchecked"
-scalacOptions += "-deprecation"
+scalacOptions ++= Seq("-unchecked", "-deprecation")
+// scalacOptions ++= Seq("-rewrite", "-new-syntax")

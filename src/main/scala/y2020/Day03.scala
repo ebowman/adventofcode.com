@@ -11,11 +11,11 @@ object Day03 {
 
     private case class Cursor(x: Int = 0, y: Int = 0) {
       def next: Option[Cursor] = {
-        if (y + slope._2 >= rows.length) None
+        if y + slope._2 >= rows.length then None
         else Some(Cursor((x + slope._1) % width, y + slope._2))
       }
 
-      def tree: Int = if (rows(y)(x) == '#') 1 else 0
+      def tree: Int = if rows(y)(x) == '#' then 1 else 0
 
       @scala.annotation.tailrec
       final def solve(trees: Int = 0): Int = {

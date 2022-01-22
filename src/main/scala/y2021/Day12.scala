@@ -7,7 +7,7 @@ trait Day12 {
 
   @tailrec final def parseInput(input: Seq[String],
                                 edges: Map[String, Seq[String]] = Map()): Map[String, Seq[String]] = {
-    if (input.isEmpty) edges
+    if input.isEmpty then edges
     else {
       val Array(x, y) = input.head.split("-")
       parseInput(input.tail,
@@ -19,11 +19,11 @@ trait Day12 {
     val edges = parseInput(input)
     val queue = mutable.Queue(Seq("start"))
     var count = 0
-    while (queue.nonEmpty) {
+    while queue.nonEmpty do {
       val path = queue.dequeue()
-      for (next <- edges(path.last)) {
-        if (next == "end") count += 1
-        else if (!next.forall(_.isLower) || !path.contains(next)) {
+      for next <- edges(path.last) do {
+        if next == "end" then count += 1
+        else if !next.forall(_.isLower) || !path.contains(next) then {
           queue.enqueue(path :+ next)
         }
       }
@@ -35,12 +35,12 @@ trait Day12 {
     val edges = parseInput(input)
     val queue = mutable.Queue(Seq("start"))
     var count = 0
-    while (queue.nonEmpty) {
+    while queue.nonEmpty do {
       val path = queue.dequeue()
-      for (next <- edges(path.last)) {
-        val backPressure = if (next.forall(_.isLower) && path.contains(next)) Seq("<") else Seq.empty
-        if (next == "end") count += 1
-        else if (next != "start" && path.head != "<" || backPressure.isEmpty)
+      for next <- edges(path.last) do {
+        val backPressure = if next.forall(_.isLower) && path.contains(next) then Seq("<") else Seq.empty
+        if next == "end" then count += 1
+        else if next != "start" && path.head != "<" || backPressure.isEmpty then
           queue.enqueue((backPressure ++ path) :+ next)
       }
     }

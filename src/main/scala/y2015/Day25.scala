@@ -6,7 +6,7 @@ package y2015
 
 /* Advances (1,1) -> (2, 1) -> (1, 2) -> (3, 1) -> (2, 2) -> (1, 3) */
 case class Cursor(row: Int, column: Int) {
-  def next: Cursor = if (row - 1 == 0) Cursor(row + column, 1) else Cursor(row - 1, column + 1)
+  def next: Cursor = if row - 1 == 0 then Cursor(row + column, 1) else Cursor(row - 1, column + 1)
 }
 
 object Cursor {

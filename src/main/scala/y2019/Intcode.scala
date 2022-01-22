@@ -91,7 +91,7 @@ trait Intcode {
 
     private object Instruction {
       @tailrec private def modes(x: Int, seq: Seq[Int] = Seq.empty): Seq[Int] =
-        if (seq.length == 3) seq else modes(x / 10, seq :+ (x - 10 * (x / 10)))
+        if seq.length == 3 then seq else modes(x / 10, seq :+ (x - 10 * (x / 10)))
 
       def apply(op: Int): Instruction = Instruction(byId(op - 100 * (op / 100)), modes(op / 100))
     }
@@ -127,27 +127,27 @@ trait Intcode {
         case op@Instruction(Out, _) =>
           val out = op.read()
           sink.put(out)
-          if (singleStep) op.next()
+          if singleStep then op.next()
           else execute(op.next(), singleStep)
         case op@Instruction(Jit, _) =>
           val value = op.read()
           val jump = op.read().toInt
-          if (value != 0) execute(jump, singleStep)
+          if value != 0 then execute(jump, singleStep)
           else execute(op.next(), singleStep)
         case op@Instruction(Jif, _) =>
           val value = op.read()
           val jump = op.read().toInt
-          if (value == 0) execute(jump, singleStep)
+          if value == 0 then execute(jump, singleStep)
           else execute(op.next(), singleStep)
         case op@Instruction(Stlt, _) =>
           val op1 = op.read()
           val op2 = op.read()
-          op.write(if (op1 < op2) 1 else 0)
+          op.write(if op1 < op2 then 1 else 0)
           execute(op.next(), singleStep)
         case op@Instruction(Steq, _) =>
           val op1 = op.read()
           val op2 = op.read()
-          op.write(if (op1 == op2) 1 else 0)
+          op.write(if op1 == op2 then 1 else 0)
           execute(op.next(), singleStep)
         case op@Instruction(Arb, _) =>
           relativeBase += op.read().toInt

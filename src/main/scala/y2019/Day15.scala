@@ -34,7 +34,7 @@ trait Day15 extends Intcode {
                          dir: Int,
                          grid: Board): ((Int, Int), Board) = {
 
-      if (goal != (0, 0) && !containsReachableUnexplored(grid)) (goal, grid + (goal -> OXYGEN))
+      if goal != (0, 0) && !containsReachableUnexplored(grid) then (goal, grid + (goal -> OXYGEN))
       else {
         machine.step(dir) match {
           case 0 =>
@@ -55,17 +55,17 @@ trait Day15 extends Intcode {
     var visited = Set[(Int, Int)]()
     var distance = 1
     var queue = goal :: Nil
-    while (queue.nonEmpty) {
+    while queue.nonEmpty do {
       var newQueue = List.empty[(Int, Int)]
-      for (cell <- queue) {
-        for {
+      for cell <- queue do {
+        for
           dir <- 1 to 4
           neighbor = move(cell, dir) if grid(neighbor) != WALL
-        } {
-          if (neighbor == (0, 0)) {
+        do {
+          if neighbor == (0, 0) then {
             distance += 1
             return distance
-          } else if (!visited.contains(neighbor)) {
+          } else if !visited.contains(neighbor) then {
             newQueue = neighbor :: newQueue
             visited = visited + neighbor
           }
@@ -100,7 +100,7 @@ trait Day15 extends Intcode {
     }
 
     @tailrec def recurse(nxt: Board, cur: Board, count: Int = 0): Int = {
-      if (cur == nxt) count + 1
+      if cur == nxt then count + 1
       else recurse(nxt = next(nxt), cur = nxt, count + 1)
     }
 

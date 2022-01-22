@@ -23,7 +23,7 @@ trait Day13 {
       val queue = collection.mutable.PriorityQueue[List[(Int, Int)]]()(Ordering.by(_.size)).reverse
       val visited = collection.mutable.Set[(Int, Int)]()
       queue.addOne(List((1, 1)))
-      while (queue.nonEmpty && queue.head.head != target) {
+      while queue.nonEmpty && queue.head.head != target do {
         val path = queue.dequeue()
         next(path.head).filterNot(visited).foreach { head =>
           queue.addOne(head :: path)

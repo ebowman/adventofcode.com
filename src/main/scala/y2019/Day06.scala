@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 trait Day06 {
   @tailrec final def parse(input: Seq[String],
                            orbits: Map[String, String] = Map()): Map[String, String] = {
-    if (input.isEmpty) orbits
+    if input.isEmpty then orbits
     else {
       val Array(left, right) = input.head.split("\\)")
       parse(input.tail, orbits = orbits + (right -> left))

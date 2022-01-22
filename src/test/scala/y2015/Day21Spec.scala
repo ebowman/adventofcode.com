@@ -29,25 +29,25 @@ class Day21Spec extends AnyFlatSpec with Matchers with Day21 {
   lazy val boss = Player("Boss", hit = 109, damage = 8, armor = 2)
 
   "The final engine" should "find the cheapest way to win (part 1)" in {
-    val winners = for {
+    val winners = for
       weapon <- Items.weapons
       armor <- Items.armors
       ring <- Items.rings.combinations(2)
       player = Player("Player").loadUp(ring :+ weapon :+ armor)
       endGame = Game(player, boss).play if endGame.playerWins
-    } yield endGame
+    yield endGame
 
     winners.minBy(_.player.cost).player.cost shouldBe 111
   }
 
   it should "find the most expensive way to lose (part 2)" in {
-    val losers = for {
+    val losers = for
       weapon <- Items.weapons
       armor <- Items.armors
       ring <- Items.rings.combinations(2)
       player = Player("Player").loadUp(ring :+ weapon :+ armor)
       endGame = Game(player, boss).play if !endGame.playerWins
-    } yield endGame
+    yield endGame
 
     losers.maxBy(_.player.cost).player.cost shouldBe 188
   }

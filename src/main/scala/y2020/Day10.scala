@@ -27,10 +27,10 @@ trait Day10 {
       def countReps(in: String, rep: String): Int =
         s"""${rep(0)}+""".r.findAllMatchIn(in).count(_.toString.length == rep.length)
 
-      if (count == deltas.length) accum.product
+      if count == deltas.length then accum.product
       else {
         val reps = countReps(deltas, "1" * (count + 2))
-        if (reps == 0) recurse(accum, trib.tail, count + 1)
+        if reps == 0 then recurse(accum, trib.tail, count + 1)
         else recurse(accum :+ math.pow(trib.head.toDouble, reps).toLong, trib.tail, count + 1)
       }
     }

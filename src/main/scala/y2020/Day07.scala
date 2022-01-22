@@ -22,7 +22,7 @@ trait Day07 extends RegexParsers {
 
     @tailrec
     def recurse(bags: Seq[Bag], parents: Seq[Bag] = Seq.empty): Seq[Bag] = {
-      if (bags.isEmpty) parents
+      if bags.isEmpty then parents
       else {
         val newParents = bags.flatMap(getParent).distinct
         recurse(newParents, (parents ++ newParents).distinct)

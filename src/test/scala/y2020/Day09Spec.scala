@@ -45,7 +45,7 @@ class Day09Spec extends AnyFlatSpec with Matchers with Day09 {
 
   it should "pass part 2" in {
     var i = 0
-    while (i < 10) {
+    while i < 10 do {
       part2(liveData, 466456641) shouldBe 55732936
       i += 1
     }

@@ -9,13 +9,13 @@ trait Day04 {
       case R(letters, sectorId, checksum) =>
         letters.filterNot(_ == '-').foreach(c => map(c) += 1)
         val check = map.toSeq.sortWith {
-          case (l, r) => if (l._2 == r._2) r._1 > l._1 else l._2 > r._2
+          case (l, r) => if l._2 == r._2 then r._1 > l._1 else l._2 > r._2
         }.map(_._1).mkString
-        if (check.startsWith(checksum)) Some(sectorId.toInt) else None
+        if check.startsWith(checksum) then Some(sectorId.toInt) else None
     }
   }
 
-  private def rotate(count: Int)(c: Char): Char = if (c == '-') ' ' else ((((c - 'a') + count) % 26) + 'a').toChar
+  private def rotate(count: Int)(c: Char): Char = if c == '-' then ' ' else ((((c - 'a') + count) % 26) + 'a').toChar
 
   def solve1(input: Seq[String]): Int = input.flatMap(isValid).sum
 

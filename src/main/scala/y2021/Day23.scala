@@ -18,12 +18,12 @@ trait Day23 {
     val cost: Int = states.map(_.cost).sum
     val latestConfig: State = states.head
 
-    def nextMove: Seq[StatePath] = for {
+    def nextMove: Seq[StatePath] = for
       nextAmpCoord <- coords if latestConfig.at(nextAmpCoord) != '.'
       nextPath <- latestConfig.nextPaths(nextAmpCoord) if latestConfig.isLegalPath(nextPath)
       nextState = latestConfig.generateNextConfig(nextPath) if !states.contains(nextState)
       cost = State.energy(latestConfig.at(nextAmpCoord)) * (nextPath.size - 1)
-    } yield copy(states = State(config = nextState, cost = cost) :: states)
+    yield copy(states = State(config = nextState, cost = cost) :: states)
 
     override def compare(that: StatePath): Int = this.cost - that.cost
 
@@ -38,14 +38,14 @@ trait Day23 {
       val queue = mutable.PriorityQueue[StatePath]().reverse
       val visited = mutable.Set[State]()
       queue.addOne(StatePath(List(this)))
-      while (queue.nonEmpty && !queue.head.latestConfig.matches(finalState)) {
+      while queue.nonEmpty && !queue.head.latestConfig.matches(finalState) do {
         val path = queue.dequeue()
         path.nextMove.filterNot(p => visited(p.latestConfig)).foreach { path =>
           queue.addOne(path)
           visited.add(path.latestConfig)
         }
       }
-      if (print) println(queue.head)
+      if print then println(queue.head)
       queue.head.cost
     }
 
@@ -59,7 +59,7 @@ trait Day23 {
         }
 
       @tailrec def subPaths(accum: List[List[Point]] = Nil)(path: List[Point]): List[List[Point]] =
-        if (path.size == 1) accum
+        if path.size == 1 then accum
         else subPaths(path :: accum)(path.tail)
 
       longestAvailablePaths(List(from)).flatMap(subPaths())
@@ -95,7 +95,7 @@ trait Day23 {
     override def toString: String = {
       def hallway: IndexedSeq[Char] = config(0)
 
-      if (config(1).size == 2) {
+      if config(1).size == 2 then {
         s"\n${"#" * 13}\n" +
           s"#${hallway.mkString}#\n" +
           s"###${config(1)(0)}#${config(2)(0)}#${config(3)(0)}#${config(4)(0)}### ${cost}\n" +

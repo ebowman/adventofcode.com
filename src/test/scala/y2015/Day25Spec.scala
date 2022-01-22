@@ -72,7 +72,7 @@ class Day25Spec extends AnyFlatSpec with Matchers {
         _._2.next
       }
 
-    for (v <- values) {
+    for v <- values do {
       cursors.contains(v) shouldBe true
     }
   }
@@ -82,7 +82,7 @@ class Day25Spec extends AnyFlatSpec with Matchers {
 
     @scala.annotation.tailrec
     def recurse(gen: Generator = Generator.origin): Generator = {
-      if (gen.cursor == dest) gen
+      if gen.cursor == dest then gen
       else recurse(gen.next)
     }
 

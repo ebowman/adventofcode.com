@@ -14,15 +14,15 @@ trait Day22 {
         def f(p: Player): Boolean = {
           m.isEmpty || p.newMana.get.name.startsWith(m.head)
         }
-        (for {
+        (for
           g <- gs
-          n <- if (!filter) g.next() else g.next(f)
-        } yield {
-          if (n.isOver) {
+          n <- if !filter then g.next() else g.next(f)
+        yield {
+          if n.isOver then {
             Seq(Seq(g, n).reverse)
           }
           else {
-            recurse(Seq(n), if (filter) m.tail else Seq.empty).map { s => s :+ g }
+            recurse(Seq(n), if filter then m.tail else Seq.empty).map { s => s :+ g }
           }
         }).flatten
       }
@@ -33,16 +33,16 @@ trait Day22 {
     import Game.minSpent
 
     def next(filter: Player => Boolean = { _ => true }): Seq[Game] = {
-      if (debug) println(s"time = $time")
-      if ((time % 2) == 0) { // player turn
+      if debug then println(s"time = $time")
+      if (time % 2) == 0 then { // player turn
         val players = player.mananize(minSpent, time).filter(filter)
-        if (players.isEmpty) Seq(copy(player = player.copy(outOfMoney = true), time = time + 1))
-        for {
+        if players.isEmpty then Seq(copy(player = player.copy(outOfMoney = true), time = time + 1))
+        for
           player <- players
-        } yield {
-          if (debug) println("-- Player turn --")
-          if (debug) println(s"- Player has ${player.hit} hit points, ${player.armor} armor, ${player.available + player.newMana.get.cost} mana")
-          if (debug) println(s"- Boss has ${boss.hit} hit points")
+        yield {
+          if debug then println("-- Player turn --")
+          if debug then println(s"- Player has ${player.hit} hit points, ${player.armor} armor, ${player.available + player.newMana.get.cost} mana")
+          if debug then println(s"- Boss has ${boss.hit} hit points")
           // play the effects of existing mana
           val (p1, b1) = player.mana.foldLeft((player, boss)) {
             case ((player, boss), mana) => mana.playerTurn(debug, time, player, boss)
@@ -57,30 +57,30 @@ trait Day22 {
           val p5 = p2.expire(debug, time)
 
           val g = copy(player = p5, boss = b3, time = time + 1)
-          if (g.isOver && p5.spent < minSpent) {
+          if g.isOver && p5.spent < minSpent then {
             minSpent = p5.spent
             println(s"minSpent = $minSpent")
           }
           g
         }
       } else { // boss turn
-        if (debug) println("-- Boss turn --")
-        if (debug) println(s"- Player has ${player.hit} hit points, ${player.armor} armor, ${player.available} mana")
-        if (debug) println(s"- Boss has ${boss.hit} hit points")
+        if debug then println("-- Boss turn --")
+        if debug then println(s"- Player has ${player.hit} hit points, ${player.armor} armor, ${player.available} mana")
+        if debug then println(s"- Boss has ${boss.hit} hit points")
 
         // play the effects of existing mana
         val (p1, b1) = player.mana.foldLeft((player, boss)) {
           case ((player, boss), mana) => mana.bossTurn(debug, time, player, boss)
         }
 
-        if (!b1.dead) {
+        if !b1.dead then {
           val delta1 = b1.damage - p1.armor
-          val p2 = if (p1.hit == player.hit || delta1 >= 1) {
+          val p2 = if p1.hit == player.hit || delta1 >= 1 then {
             val damage = Math.max(delta1, 1)
-            if (p1.armor > 0) {
-              if (debug) println(s"Boss attacks for ${b1.damage} - ${p1.armor} = $damage damage!")
+            if p1.armor > 0 then {
+              if debug then println(s"Boss attacks for ${b1.damage} - ${p1.armor} = $damage damage!")
             } else {
-              if (debug) println(s"Boss attacks for $damage damage!")
+              if debug then println(s"Boss attacks for $damage damage!")
             }
             p1.copy(hit = p1.hit - damage)
           } else p1
@@ -118,7 +118,7 @@ case class Player(name: String,
 
   def expire(debug: Boolean, time: Int): Player = {
     val expired = mana.filter(_.expired(time + 1))
-    if (debug) println(s"Expired $expired from $this")
+    if debug then println(s"Expired $expired from $this")
     val player = copy(mana = mana.diff(expired))
     // turn off expired
     expired.foldLeft(player) {
@@ -154,12 +154,12 @@ trait Mana {
   def bossTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = (player, boss)
 
   def turnOn(debug: Boolean, player: Player, boss: Player): (Player, Player) = {
-    if (debug) println(s"Player casts $name")
+    if debug then println(s"Player casts $name")
     (player, boss)
   }
 
   def turnOff(debug: Boolean, player: Player): Player = {
-    if (debug && lifespan > 1) println(s"$name wears off.")
+    if debug && lifespan > 1 then println(s"$name wears off.")
     player
   }
 }
@@ -175,10 +175,10 @@ object Mana {
     val lifespan = 1
 
     override def turnOn(debug: Boolean, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 4) {
-        if (debug) println(s"Player casts $name, dealing 4 damage. This kills the boss, and the player wins.")
+      if boss.hit <= 4 then {
+        if debug then println(s"Player casts $name, dealing 4 damage. This kills the boss, and the player wins.")
       } else {
-        if (debug) println(s"Player casts $name, dealing 4 damage.")
+        if debug then println(s"Player casts $name, dealing 4 damage.")
       }
       (player, boss.copy(hit = boss.hit - 4))
     }
@@ -189,10 +189,10 @@ object Mana {
     val lifespan = 1
 
     override def turnOn(debug: Boolean, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 2) {
-        if (debug) println(s"Player casts $name, dealing 2 damage, and healing 2 hit points. This kills the boss, and the player wins.")
+      if boss.hit <= 2 then {
+        if debug then println(s"Player casts $name, dealing 2 damage, and healing 2 hit points. This kills the boss, and the player wins.")
       } else {
-        if (debug) println(s"Player casts $name, dealing 2 damage, and healing 2 hit points.")
+        if debug then println(s"Player casts $name, dealing 2 damage, and healing 2 hit points.")
       }
       (player.copy(hit = player.hit + 2), boss.copy(hit = boss.hit - 2))
     }
@@ -203,22 +203,22 @@ object Mana {
     val lifespan = 6
 
     override def turnOn(debug: Boolean, player: Player, boss: Player): (Player, Player) = {
-      if (debug) println(s"Player casts $name, gets increasing armor by 7")
+      if debug then println(s"Player casts $name, gets increasing armor by 7")
       (player.copy(armor = player.armor + 7), boss)
     }
 
     override def playerTurn(debug: Boolean, time: Int, p: Player, b: Player): (Player, Player) = {
-      if (debug) println(s"Shield's timer is now ${lifespan - age(time)}")
+      if debug then println(s"Shield's timer is now ${lifespan - age(time)}")
       (p, b)
     }
 
     override def bossTurn(debug: Boolean, time: Int, p: Player, b: Player): (Player, Player) = {
-      if (debug) println(s"Shield's timer is now ${lifespan - age(time)}")
+      if debug then println(s"Shield's timer is now ${lifespan - age(time)}")
       (p, b)
     }
 
     override def turnOff(debug: Boolean, player: Player): Player = {
-      if (debug) println(s"$name wears off.")
+      if debug then println(s"$name wears off.")
       player.copy(armor = player.armor - 7)
     }
   }
@@ -228,19 +228,19 @@ object Mana {
     val lifespan = 6
 
     override def playerTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 3) {
-        if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}. This kills the boss, and the player wins.")
+      if boss.hit <= 3 then {
+        if debug then println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}. This kills the boss, and the player wins.")
       } else {
-        if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}")
+        if debug then println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}")
       }
       (player, boss.copy(hit = boss.hit - 3))
     }
 
     override def bossTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = {
-      if (boss.hit <= 3) {
-        if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}. This kills the boss, and the player wins.")
+      if boss.hit <= 3 then {
+        if debug then println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}. This kills the boss, and the player wins.")
       } else {
-        if (debug) println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}")
+        if debug then println(s"$name deals 3 damage, its timer is now ${lifespan - age(time)}")
       }
       (player, boss.copy(hit = boss.hit - 3))
     }
@@ -251,12 +251,12 @@ object Mana {
     val lifespan = 5
 
     override def playerTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = {
-      if (debug) println(s"$name provides 101 rama, its timer is now ${lifespan - age(time)}")
+      if debug then println(s"$name provides 101 rama, its timer is now ${lifespan - age(time)}")
       (player.copy(available = player.available + 101), boss)
     }
 
     override def bossTurn(debug: Boolean, time: Int, player: Player, boss: Player): (Player, Player) = {
-      if (debug) println(s"$name provides 101 rama, its timer is now ${lifespan - age(time)}")
+      if debug then println(s"$name provides 101 rama, its timer is now ${lifespan - age(time)}")
       (player.copy(available = player.available + 101), boss)
     }
   }

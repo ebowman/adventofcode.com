@@ -23,7 +23,7 @@ trait Day24 {
   }
 
   @tailrec final def parse(i: String, c: Coord = Coord()): Coord = {
-    if (i.isEmpty) c
+    if i.isEmpty then c
     else {
       i.head match {
         case dir@('e' | 'w') => parse(i.tail, c.adjacent(dir.toString))
@@ -39,7 +39,7 @@ trait Day24 {
   def mkBoard(init: Board = Map.empty): Map[Coord, Boolean] = Map[Coord, Boolean]() ++ init
 
   @tailrec final def parseBoard(input: IndexedSeq[String], b: Board = mkBoard()): Board = {
-    if (input.isEmpty) b
+    if input.isEmpty then b
     else {
       val coord = parse(input.head)
       parseBoard(input.tail, b + (coord -> !Try(b(coord)).getOrElse(WHITE)))
@@ -52,17 +52,17 @@ trait Day24 {
 
   def part2(input: IndexedSeq[String]): Int = {
     @tailrec def play(board: Board, n: Int = 100): Map[Coord, Boolean] = {
-      if (n == 0) board
+      if n == 0 then board
       else {
         val toExamine = board.keysIterator.flatMap(k => k +: k.neighbors).toSet
         play(board ++ toExamine.flatMap { coord =>
-          if (board.get(coord).contains(BLACK)) {
+          if board.get(coord).contains(BLACK) then {
             val blacks = coord.neighbors.count(c => Try(board(c)).getOrElse(false))
-            if (blacks == 0 || blacks > 2) Some(coord -> WHITE)
+            if blacks == 0 || blacks > 2 then Some(coord -> WHITE)
             else None
           } else {
             val blacks = coord.neighbors.count(c => Try(board(c)).getOrElse(false))
-            if (blacks == 2) Some(coord -> BLACK)
+            if blacks == 2 then Some(coord -> BLACK)
             else None
           }
         }, n - 1)

@@ -17,13 +17,13 @@ trait Day14 {
 
   def hash(str: String): String = toHex(messageDigest.digest(str.getBytes))
 
-  @tailrec final def stretch(str: String, n: Int = 2016): String = if (n == 0) str else stretch(hash(str), n - 1)
+  @tailrec final def stretch(str: String, n: Int = 2016): String = if n == 0 then str else stretch(hash(str), n - 1)
 
   def toHex(buf: Array[Byte]): String = Bytes.from(buf).encodeHex(false)
 
   def solve(part2: Boolean = false): Int = {
     @tailrec def recurse(input: LazyList[(Int, String)], keys: List[Int] = Nil): Int = {
-      if (keys.size == 64) keys.head
+      if keys.size == 64 then keys.head
       else input.head._2 match {
         case Three(reps) =>
           input.tail.take(1000).find(_._2.contains(s"${reps.head}" * 5)) match {
@@ -34,6 +34,6 @@ trait Day14 {
       }
     }
 
-    if (part2) recurse(stretchSeq) else recurse(hashSeq)
+    if part2 then recurse(stretchSeq) else recurse(hashSeq)
   }
 }

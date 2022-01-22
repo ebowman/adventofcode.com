@@ -1026,16 +1026,16 @@ object Day05 extends App {
   def isNice2(str: String): Boolean = {
 
     var passed = false
-    for (i <- 0 until str.length - 3 if !passed) {
+    for i <- 0 until str.length - 3 if !passed do {
       val piece = str.substring(i, i + 2)
-      if (str.substring(i + 2).contains(piece)) {
+      if str.substring(i + 2).contains(piece) then {
         passed = true
       }
     }
-    if (passed) {
+    if passed then {
       passed = false
-      for (i <- 0 until str.length - 2 if !passed) {
-        if (str(i) == str(i + 2)) passed = true
+      for i <- 0 until str.length - 2 if !passed do {
+        if str(i) == str(i + 2) then passed = true
       }
     }
     passed

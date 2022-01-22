@@ -7,7 +7,7 @@ trait Day03 {
     input.map {
       case R(s1, s2, s3) =>
         val sides = Seq(s1.toInt, s2.toInt, s3.toInt).sorted
-        if (sides.init.sum > sides.last) 1 else 0
+        if sides.init.sum > sides.last then 1 else 0
     }.sum
   }
 

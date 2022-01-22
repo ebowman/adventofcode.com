@@ -18,7 +18,7 @@ trait Day14 {
       val fullCycles = time / (duration + rest)
       val remainder = time % (duration + rest)
       val moving = remainder < duration
-      if (moving) {
+      if moving then {
         fullCycles * speed * duration + remainder * speed
       } else {
         (fullCycles + 1) * speed * duration
@@ -30,7 +30,7 @@ trait Day14 {
     def raceUntil(t: Int): Int = {
       @scala.annotation.tailrec
       def recurse(r: Race): Race = {
-        if (r.time == t) r
+        if r.time == t then r
         else recurse(r.next)
       }
 
@@ -40,7 +40,7 @@ trait Day14 {
     def next: Race = {
       val bestDist = deer.map(_.dist(time + 1)).max
       val nextDeer = deer.map { d =>
-        if (d.dist(time + 1) == bestDist) d.copy(score = d.score + 1)
+        if d.dist(time + 1) == bestDist then d.copy(score = d.score + 1)
         else d
       }
       copy(deer = nextDeer, time = time + 1)

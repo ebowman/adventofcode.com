@@ -29,7 +29,7 @@ trait Day19 extends RegexParsers {
           // rules you have". In this case, "4" is enough.
           val p42 = dict(42).build(dict)
           val p31 = dict(31).build(dict)
-          "(" + (for (i <- 1 to 4) yield { s"($p42{$i}$p31{$i})" }).mkString("|") + ")"
+          "(" + (for i <- 1 to 4 yield { s"($p42{$i}$p31{$i})" }).mkString("|") + ")"
         case _ =>
           patterns.map(id => dict(id).build(dict)).mkString
       }

@@ -29,10 +29,10 @@ trait Day02 {
   def part1(input: String): Int = Intcode.compile(input, Seq(1 -> 12, 2 -> 2)).execute().memory(0)
 
   def part2(input: String): Int = {
-    (for {
+    (for
       noun <- 0 to 99
       verb <- 0 to 99
       output = Intcode.compile(input, Seq(1 -> noun, 2 -> verb)).execute().memory(0) if output == 19690720
-    } yield 100 * noun + verb).head
+    yield 100 * noun + verb).head
   }
 }

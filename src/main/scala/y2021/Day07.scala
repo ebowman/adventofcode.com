@@ -4,7 +4,7 @@ trait Day07 {
   def solve1(input: String): Int = {
     val crabs = input.split(",").map(_.toInt)
     (crabs.min to crabs.max).foldLeft(Int.MaxValue) {
-      case (min, i) => math.min(min, (for (j <- crabs if i != j) yield math.abs(i - j)).sum)
+      case (min, i) => math.min(min, (for j <- crabs if i != j yield math.abs(i - j)).sum)
     }
   }
 

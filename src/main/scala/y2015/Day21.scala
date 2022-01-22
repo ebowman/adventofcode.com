@@ -17,7 +17,7 @@ trait Day21 {
     def loadUp(items: Seq[Item]): Player = {
       @tailrec
       def recurse(p: Player, i: Seq[Item]): Player = {
-        if (i.isEmpty) p
+        if i.isEmpty then p
         else {
           recurse(p.copy(
             damage = p.damage + i.head.damage,
@@ -39,10 +39,10 @@ trait Day21 {
       @tailrec
       def recurse(game: Game): Game = {
         val newBoss = game.player.attack(game.boss)
-        if (newBoss.dead) Game(game.player, newBoss)
+        if newBoss.dead then Game(game.player, newBoss)
         else {
           val newPlayer = newBoss.attack(game.player)
-          if (newPlayer.dead) Game(newPlayer, newBoss)
+          if newPlayer.dead then Game(newPlayer, newBoss)
           else recurse(Game(newPlayer, newBoss))
         }
       }
