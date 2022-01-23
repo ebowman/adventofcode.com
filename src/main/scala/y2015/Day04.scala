@@ -1,14 +1,16 @@
 package y2015
 
+import at.favre.lib.bytes.Bytes
 import java.security.MessageDigest
 
-object Day04 extends App {
-  def solve(secret: String): Int =
-    LazyList.from(0).map(i => (i, digest(secret + i))).find(_._2.startsWith("00000")).map(_._1).get
+trait Day04 {
+  val md = MessageDigest.getInstance("MD5")
 
-  def digest(str: String): String = hexify(MessageDigest.getInstance("MD5").digest(str.getBytes))
+  @inline private def digest(str: String): String = toHexStr(md.digest(str.getBytes))
 
-  def hexify(buf: Array[Byte]): String = buf.map("%02X".format(_)).mkString
+  @inline private def toHexStr(buf: Array[Byte]): String = Bytes.from(buf).encodeHex(true)
 
-  println(solve("ckczppom"))
+  def solve(secret: String, zeros: Int): Int =
+    Iterator.from(0).map(i => (i, digest(secret + i))).dropWhile((_, d) => !d.startsWith("0" * zeros)).next()._1
+
 }
