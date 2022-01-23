@@ -6,27 +6,14 @@ import util.Loader
 
 class Day08Spec extends AnyFlatSpec with Matchers with Day08 {
 
-  "Basic test" should "pass" in {
-    this.escaped("\"\"") shouldBe(2, 0)
-    this.escaped("\"abc\"") shouldBe(5, 3)
-    this.escaped("\"aaa\\\"aaa\"") shouldBe(10, 7)
-    this.escaped("\"\\x27\"") shouldBe(6, 1)
+  private lazy val input = util.Loader(this, "day08.txt").toSeq
+
+  it should "pass part 1" in {
+    input.map(escape).map((a, b) => a - b).sum shouldBe 1333
   }
-  it should "pass the first part of the test" in {
+
+  it should "pass part 2" in {
     val lines = Loader(this, "day08.txt")
-    lines.map(escaped).map(ab => ab._1 - ab._2).sum shouldBe 1333
+    lines.map(encode).map((a, b) => b - a).sum shouldBe 2046
   }
-
-  "Part 2" should "pass the basic tests" in {
-    this.encode("\"\"") shouldBe(2, 6)
-    this.encode("\"abc\"") shouldBe(5, 9)
-    this.encode("\"aaa\\\"aaa\"") shouldBe(10, 16)
-    this.encode("\"\\x27\"") shouldBe(6, 11)
-  }
-
-  it should "pass the final test" in {
-    val lines = Loader(this, "day08.txt")
-    lines.map(encode).map(ab => ab._2 - ab._1).sum shouldBe 2046
-  }
-
 }

@@ -4,50 +4,39 @@ import scala.annotation.tailrec
 
 trait Day08 {
 
-  def escaped(str: String): (Int, Int) = {
-    @tailrec
-    def recurse(s: String, b: StringBuilder = new StringBuilder): StringBuilder = {
-      if s.isEmpty then b
-      else s(0) match {
-        case '\\' => s(1) match {
-          case '\\' =>
-            b.append("\\")
-            recurse(s.drop(2), b)
-          case '"' =>
-            b.append("\"")
-            recurse(s.drop(2), b)
+  def escape(str: String): (Int, Int) = {
+    val sb = new StringBuilder
+
+    @tailrec def recurse(s: String): Int = {
+      if s.isEmpty then sb.length
+      else if s(0) == '\\' then
+        s(1) match {
+          case '\\' | '"' =>
+            sb.append(s(1))
+            recurse(s.drop(2))
           case 'x' =>
-            b.append(".")
-            recurse(s.drop(4), b)
+            sb.append(".")
+            recurse(s.drop(4))
         }
-        case c =>
-          b.append(c)
-          recurse(s.tail, b)
-      }
+      else
+        sb.append(s.head)
+        recurse(s.tail)
     }
 
-    (str.length, recurse(str.tail.init).length)
+    (str.length, recurse(str.tail.init))
   }
 
-  def encode(str: String): (Int, Int) = {
-    def recurse(s: String, b: StringBuilder = new StringBuilder("\"")): StringBuilder = {
-      if s.isEmpty then b
-      else {
+  def encode(str: String): (Int, Int) =
+    val sb = new StringBuilder("\"")
+
+    @tailrec def recurse(s: String): Int =
+      if s.isEmpty then sb.length + 1
+      else
         s(0) match {
-          case '"' =>
-            b.append("\\\"")
-            recurse(s.tail, b)
-          case '\\' =>
-            b.append("\\\\")
-            recurse(s.tail, b)
-          case c =>
-            b.append(c)
-            recurse(s.tail, b)
+          case '"' | '\\' => sb.append(s"\\${s(0)}")
+          case c => sb.append(c)
         }
-      }
-    }
+        recurse(s.tail)
 
-    val encoded = recurse(str).append("\"")
-    (str.length, encoded.length)
-  }
+    (str.length, recurse(str))
 }
