@@ -1,55 +1,38 @@
 package y2015
 
+import scala.annotation.tailrec
+
 trait Day11 {
+  def threeInARow(a: Array[Char]): Boolean = (a(1) == a(0) + 1) && (a(2) == a(1) + 1)
 
-  case class Password(password: String) {
-    lazy val has3: Boolean = {
-      def check(a: String): Boolean = (a(1) == a(0) + 1) && (a(2) == a(1) + 1)
+  def has3(password: Array[Char]): Boolean = password.sliding(3).exists(threeInARow)
 
-      password.sliding(3).exists(check)
-    }
-    lazy val noIllegalChars: Boolean = {
-      !password.contains("i") && !password.contains("l") && !password.contains("o")
-    }
-    lazy val repeatingPair: Boolean = {
-      if password.length > 1 then {
-        def pair(x: String) = x(0) == x(1)
+  def noIllegalChars(password: Array[Char]): Boolean = !password.exists(c => c == 'i' || c == 'l' || c == 'o')
 
-        val pairs = password.sliding(2).filter(pair).zipWithIndex.toSeq
-        pairs.size > 1 && pairs.zip(pairs.tail).filterNot(x => x._1._1 == x._2._1).map(_._1._1).nonEmpty
-      } else false
-    }
-    lazy val valid: Boolean = has3 && noIllegalChars && repeatingPair
+  def twoInARow(x: Array[Char]): Boolean = x(0) == x(1)
 
-    def safeIncr: Password = {
-      @scala.annotation.tailrec
-      def recurse(pw: Password): Password = {
-        if pw.valid then pw
-        else recurse(pw.incr)
-      }
+  def repeatingPair(password: Array[Char]): Boolean =
+    password.length < 2 ||
+      password.sliding(2).filter(twoInARow).sliding(2).exists(x => x.size > 1 && !(x.head sameElements x(1)))
 
-      recurse(incr)
+  def valid(password: Array[Char]): Boolean =
+    noIllegalChars(password) && has3(password) && repeatingPair(password)
+
+  @tailrec final def nextPassword(password: Array[Char]): Array[Char] =
+    nextRotation(password.reverse).reverse match {
+      case next if valid(next) => next
+      case next => nextPassword(next)
     }
 
-    def incr: Password = {
-      @scala.annotation.tailrec
-      def helper(arr: Array[Char], cur: Int = 0): Array[Char] = {
-        if cur == arr.length then {
-          // rolled over
-          arr :+ 'b'
-        } else {
-          if arr(cur) == 'z' then {
-            arr(cur) = 'a'
-            helper(arr, cur + 1)
-          } else {
-            arr(cur) = (arr(cur) + 1).toChar
-            arr
-          }
-        }
-      }
-
-      Password(new String(helper(password.reverse.toCharArray)).reverse)
-    }
+  @tailrec final def nextRotation(arr: Array[Char], cur: Int = 0): Array[Char] = {
+    if cur == arr.length then arr :+ 'b'
+    else if arr(cur) == 'z' then
+      arr(cur) = 'a'
+      nextRotation(arr, cur + 1)
+    else
+      arr(cur) = (arr(cur) + 1).toChar
+      arr
   }
 
+  def solve(input: String): String = new String(nextPassword(input.toCharArray))
 }
