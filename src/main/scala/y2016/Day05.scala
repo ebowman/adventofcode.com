@@ -1,5 +1,7 @@
 package y2016
 
+import at.favre.lib.bytes.Bytes
+
 import java.security.MessageDigest
 import scala.annotation.tailrec
 import scala.util.Try
@@ -12,7 +14,7 @@ trait Day05 {
     def hash(str: String): String = {
       md.reset()
       md.digest(str.getBytes()).foldLeft(new StringBuilder) {
-        case (sb, c) => sb.append(String.format("%02x", c)); sb
+        case (sb, c) => sb.append(Bytes.from(c).encodeHex(false)); sb
       }.toString()
     }
 
