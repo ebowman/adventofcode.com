@@ -2,112 +2,97 @@ package y2015
 
 import scala.util.parsing.combinator.RegexParsers
 
-object Lights {
-
-  trait Grid {
-    def countTurnedOn(): Int
-
-    def turnOn(rect: Rect): Unit
-
-    def turnOff(rect: Rect): Unit
-
-    def toggle(rect: Rect): Unit
-  }
-
-  trait Command {
-    def range: Rect
-
-    def operate(grid: Grid): Grid
-  }
-
-  trait InstructionParser extends RegexParsers {
-    override def skipWhitespace = false
-
-    def num: Parser[Int] = """\d+""".r ^^ {
-      _.toInt
-    }
-
-    def pair: Parser[(Int, Int)] = (num <~ ",") ~ num ^^ { case x ~ y => (x, y) }
-
-    def range: Parser[Rect] = (pair <~ " through ") ~ pair ^^ { case tl ~ br => Rect.mkRect(tl._1, tl._2, br._1, br._2) }
-
-    def turnOn: Parser[TurnOn] = ("turn on" ~ " ") ~> range ^^ {
-      TurnOn.apply
-    }
-
-    def turnOff: Parser[TurnOff] = ("turn off" ~ " ") ~> range ^^ {
-      TurnOff.apply
-    }
-
-    def toggle: Parser[Toggle] = ("toggle" ~ " ") ~> range ^^ {
-      Toggle.apply
-    }
-
-    def command: Parser[Command] = turnOn | turnOff | toggle
-  }
+trait Day06 {
 
   case class Rect(left: Int, top: Int, width: Int, height: Int)
 
-  class BitGrid(width: Int, height: Int) extends Grid {
-    val grid = Array.ofDim[Boolean](height, width)
+  trait Grid[T] {
+    val grid: Array[Array[T]]
 
-    def countTurnedOn(): Int = grid.map(_.count(_ == true)).sum
+    def countOn(): Int
 
-    def turnOn(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = true })
+    def turnOn(rect: Rect): Grid[T]
 
-    def turnOff(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = false })
+    def turnOff(rect: Rect): Grid[T]
 
-    def toggle(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = !array(x) })
+    def toggle(rect: Rect): Grid[T]
 
-    private def operate(range: Rect, write: (Int, Array[Boolean]) => Unit): Unit = {
-      for y <- range.top until range.top + range.height do {
-        for x <- range.left until range.left + range.width do {
-          write(x, grid(y))
-        }
-      }
-    }
+    def operate(range: Rect, write: (Int, Array[T]) => Unit): Grid[T] =
+      for y <- range.top until range.top + range.height
+          x <- range.left until range.left + range.width do
+        write(x, grid(y))
+      this
   }
 
-  class IntGrid(width: Int, height: Int) extends Grid {
-    val grid = Array.ofDim[Int](height, width)
+  sealed trait Command {
+    def range: Rect
 
-    def countTurnedOn(): Int = grid.map(_.sum).sum
-
-    def turnOn(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = array(x) + 1 })
-
-    private def operate(range: Rect, write: (Int, Array[Int]) => Unit): Unit = {
-      for y <- range.top until range.top + range.height do {
-        for x <- range.left until range.left + range.width do {
-          write(x, grid(y))
-        }
-      }
-    }
-
-    def turnOff(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = Math.max(0, array(x) - 1) })
-
-    def toggle(rect: Rect): Unit = operate(rect, { case (x, array) => array(x) = array(x) + 2 })
+    def operate(grid: Grid[_]): Grid[_]
   }
 
   case class TurnOn(range: Rect) extends Command {
-    override def operate(grid: Grid): Grid = {
-      grid.turnOn(range); grid
-    }
+    override def operate(grid: Grid[_]): Grid[_] = grid.turnOn(range)
   }
 
   case class TurnOff(range: Rect) extends Command {
-    override def operate(grid: Grid): Grid = {
-      grid.turnOff(range); grid
-    }
+    override def operate(grid: Grid[_]): Grid[_] = grid.turnOff(range)
   }
 
   case class Toggle(range: Rect) extends Command {
-    override def operate(grid: Grid): Grid = {
-      grid.toggle(range); grid
+    override def operate(grid: Grid[_]): Grid[_] = grid.toggle(range)
+  }
+
+  class BitGrid(width: Int, height: Int) extends Grid[Boolean] {
+    val grid: Array[Array[Boolean]] = Array.ofDim[Boolean](height, width)
+
+    def countOn(): Int = grid.map(_.count(_ == true)).sum
+
+    def turnOn(rect: Rect): Grid[Boolean] = operate(rect, (x, array) => array(x) = true)
+
+    def turnOff(rect: Rect): Grid[Boolean] = operate(rect, (x, array) => array(x) = false)
+
+    def toggle(rect: Rect): Grid[Boolean] = operate(rect, (x, array) => array(x) = !array(x))
+  }
+
+  class IntGrid(width: Int, height: Int) extends Grid[Int] {
+    val grid: Array[Array[Int]] = Array.ofDim[Int](height, width)
+
+    def countOn(): Int = grid.map(_.sum).sum
+
+    def turnOn(rect: Rect): Grid[Int] = operate(rect, (x, array) => array(x) = array(x) + 1)
+
+    def turnOff(rect: Rect): Grid[Int] = operate(rect, (x, array) => array(x) = Math.max(0, array(x) - 1))
+
+    def toggle(rect: Rect): Grid[Int] = operate(rect, (x, array) => array(x) += 2)
+  }
+
+  def solve1(input: Seq[String]): Int =
+    InstructionParser.compile(input, new BitGrid(1000, 1000)).countOn()
+
+  def solve2(input: Seq[String]): Int =
+    InstructionParser.compile(input, new IntGrid(1000, 1000)).countOn()
+
+  object InstructionParser extends RegexParsers {
+    override def skipWhitespace = false
+
+    def num: Parser[Int] = """\d+""".r ^^ (_.toInt)
+
+    def pair: Parser[(Int, Int)] = (num <~ ",") ~ num ^^ { case x ~ y => (x, y) }
+
+    def range: Parser[Rect] = (pair <~ " through ") ~ pair ^^ {
+      case tl ~ br => Rect(tl._1, tl._2, br._1 - tl._1 + 1, br._2 - tl._2 + 1)
     }
-  }
 
-  object Rect {
-    def mkRect(x1: Int, y1: Int, x2: Int, y2: Int): Rect = Rect(x1, y1, x2 - x1 + 1, y2 - y1 + 1)
-  }
+    def turnOn: Parser[TurnOn] = ("turn on" ~ " ") ~> range ^^ TurnOn.apply
 
+    def turnOff: Parser[TurnOff] = ("turn off" ~ " ") ~> range ^^ TurnOff.apply
+
+    def toggle: Parser[Toggle] = ("toggle" ~ " ") ~> range ^^ Toggle.apply
+
+    def command: Parser[Command] = turnOn | turnOff | toggle
+
+    def compile(input: Seq[String], grid: Grid[_]): Grid[_] =
+      input.foreach(line => parseAll(command, line).get.operate(grid))
+      grid
+  }
 }
