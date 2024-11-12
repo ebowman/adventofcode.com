@@ -11,4 +11,3 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
-//scalacOptions ++= Seq("-rewrite", "-source:3.4-migration")
