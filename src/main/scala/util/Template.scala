@@ -26,7 +26,7 @@ def mainTest(year: String, day: String): String =
      |  lazy val input: IndexedSeq[String] = Loader(this, "day${day}.txt").toIndexedSeq
      |  lazy val testInput: IndexedSeq[String] = Loader(this, "day${day}.test.txt").toIndexedSeq
      |  lazy val testInput2: IndexedSeq[String] = Loader(this, "day${day}.test2.txt").toIndexedSeq
-     |     |
+     |
      |  it should "solve part 1 test" in {
      |
      |  }
