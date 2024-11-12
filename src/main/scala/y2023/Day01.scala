@@ -1,12 +1,10 @@
 
 package y2023
 
-import scala.annotation.tailrec
-
 // see https://adventofcode.com/2023/day/1
 trait Day01 {
 
-  val toMap = List[(String, String)](
+  private val toMap = List[(String, String)](
     "one" -> "o1e",
     "two" -> "t2o",
     "three" -> "th3ee",
@@ -18,7 +16,7 @@ trait Day01 {
     "nine" -> "n9ne",
   )
 
-  val revMap = toMap.map(kv => kv._1.reverse -> kv._2)
+  private val revMap = toMap.map(kv => kv._1.reverse -> kv._2)
 
   def fix(str: String): String =
     toMap.foldLeft(str)((acc, pair) => acc.replace(pair._1, pair._2))
