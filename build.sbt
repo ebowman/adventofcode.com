@@ -10,5 +10,5 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.18" % "test"
 )
 
-scalacOptions ++= Seq("-unchecked", "-deprecation")
-// scalacOptions ++= Seq("-rewrite", "-new-syntax")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+//scalacOptions ++= Seq("-rewrite", "-source:3.4-migration")

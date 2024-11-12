@@ -27,19 +27,19 @@ trait Day06 {
   sealed trait Command {
     def range: Rect
 
-    def operate(grid: Grid[_]): Grid[_]
+    def operate(grid: Grid[?]): Grid[?]
   }
 
   case class TurnOn(range: Rect) extends Command {
-    override def operate(grid: Grid[_]): Grid[_] = grid.turnOn(range)
+    override def operate(grid: Grid[?]): Grid[?] = grid.turnOn(range)
   }
 
   case class TurnOff(range: Rect) extends Command {
-    override def operate(grid: Grid[_]): Grid[_] = grid.turnOff(range)
+    override def operate(grid: Grid[?]): Grid[?] = grid.turnOff(range)
   }
 
   case class Toggle(range: Rect) extends Command {
-    override def operate(grid: Grid[_]): Grid[_] = grid.toggle(range)
+    override def operate(grid: Grid[?]): Grid[?] = grid.toggle(range)
   }
 
   class BitGrid(width: Int, height: Int) extends Grid[Boolean] {
@@ -91,7 +91,7 @@ trait Day06 {
 
     def command: Parser[Command] = turnOn | turnOff | toggle
 
-    def compile(input: Seq[String], grid: Grid[_]): Grid[_] =
+    def compile(input: Seq[String], grid: Grid[?]): Grid[?] =
       input.foreach(line => parseAll(command, line).get.operate(grid))
       grid
   }

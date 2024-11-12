@@ -32,6 +32,7 @@ trait Day13 {
     folds.foldLeft(points) {
       case (points, ('x', line)) => points.map(foldX(line))
       case (points, ('y', line)) => points.map(foldY(line))
+      case unknown => sys.error(s"Unknown fold: $unknown")
     }
   }
 

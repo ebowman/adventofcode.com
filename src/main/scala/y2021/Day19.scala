@@ -2,6 +2,7 @@ package y2021
 
 import scala.annotation.tailrec
 import collection.mutable
+import scala.language.implicitConversions
 
 trait Day19 {
   type Coord = (Int, Int, Int)

@@ -2,7 +2,7 @@ package y2019
 
 import scala.annotation.tailrec
 import scala.util.Random
-
+import scala.util.control.Breaks.{break, breakable}
 
 trait Day15 extends Intcode {
   type Board = Map[(Int, Int), Int]
@@ -54,26 +54,28 @@ trait Day15 extends Intcode {
     val (goal, grid) = discoverGrid(code)
     var visited = Set[(Int, Int)]()
     var distance = 1
-    var queue = goal :: Nil
-    while queue.nonEmpty do {
-      var newQueue = List.empty[(Int, Int)]
-      for cell <- queue do {
-        for
-          dir <- 1 to 4
-          neighbor = move(cell, dir) if grid(neighbor) != WALL
-        do {
-          if neighbor == (0, 0) then {
-            distance += 1
-            return distance
-          } else if !visited.contains(neighbor) then {
-            newQueue = neighbor :: newQueue
-            visited = visited + neighbor
+    var queue = List(goal)
+
+    breakable:
+      while (queue.nonEmpty) {
+        var newQueue = List.empty[(Int, Int)]
+        for (cell <- queue) {
+          for (dir <- 1 to 4) {
+            val neighbor = move(cell, dir)
+            if (grid(neighbor) != WALL) {
+              if (neighbor == (0, 0)) {
+                distance += 1
+                break()
+              } else if (!visited.contains(neighbor)) {
+                newQueue = neighbor :: newQueue
+                visited += neighbor
+              }
+            }
           }
         }
+        queue = newQueue
+        distance += 1
       }
-      queue = newQueue
-      distance += 1
-    }
     distance
   }
 

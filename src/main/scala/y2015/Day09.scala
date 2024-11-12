@@ -4,6 +4,8 @@ import scala.collection.mutable
 import scala.util.parsing.combinator.RegexParsers
 
 trait Day09 {
+  def solve(input: Seq[String]): (Int, Int) = new Solver(input).minMax
+
   class Solver(input: Seq[String]) {
     lazy val minMax: (Int, Int) = {
       val parser = new GraphParser(input)
@@ -17,11 +19,11 @@ trait Day09 {
     class GraphParser(input: Seq[String]) extends RegexParsers {
       val places: mutable.Set[String] = mutable.Set[String]()
       val paths: mutable.Map[String, mutable.Map[String, Int]] =
-        new mutable.HashMap[String, mutable.Map[String, Int]]() {
-          override def default(key: String): mutable.Map[String, Int] =
-            put(key, mutable.Map[String, Int]())
-            apply(key)
-        }
+        new mutable.HashMap[String, mutable.Map[String, Int]]().withDefault(key => {
+          val defaultValue = mutable.Map[String, Int]()
+          paths(key) = defaultValue
+          defaultValue
+        })
       input.foreach(line => parseAll(edge, line))
 
       def edge: Parser[Unit] = place ~ ("to" ~> place) ~ ("=" ~> distance) ^^ {
@@ -36,6 +38,4 @@ trait Day09 {
       def distance: Parser[Int] = """\d+""".r ^^ (_.toInt)
     }
   }
-
-  def solve(input: Seq[String]): (Int, Int) = new Solver(input).minMax
 }

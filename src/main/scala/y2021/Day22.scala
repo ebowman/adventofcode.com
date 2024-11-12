@@ -30,7 +30,7 @@ trait Day22 {
     type tuple = (Int, Int, Int, Int, Int, Int)
 
     private def listToTuple[A](seq: Seq[A]): Product =
-      Class.forName("scala.Tuple" + seq.size).getConstructors.apply(0).newInstance(seq: _*).asInstanceOf[Product]
+      Class.forName("scala.Tuple" + seq.size).getConstructors.apply(0).newInstance(seq*).asInstanceOf[Product]
 
     import deriving._
     def apply(line: String): Cube =

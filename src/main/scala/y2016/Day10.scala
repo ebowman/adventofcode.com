@@ -65,7 +65,7 @@ trait Day10 {
   }
 
   def solve(input: Seq[String], lowSeek: Int, highSeek: Int): (Int, Int) = {
-    val State(_, outputs, _, Some(found)) = State(input, lowSeek, highSeek).evaluate
+    val State(_, outputs, _, Some(found)) = (State(input, lowSeek, highSeek).evaluate: @unchecked)
     (found, (0 to 2).map(outputs).product)
   }
 }

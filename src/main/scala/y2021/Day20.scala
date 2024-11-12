@@ -19,7 +19,7 @@ trait Day20 {
           val inSpace = minX >= x + x1 || maxX <= x + x1 || minY >= y + y1 || maxY <= y + y1
           index = (index << 1) | (if empty == '#' && inSpace || inputImage((x + x1, y + y1)) then 1 else 0)
         }
-        (if algo(index) == '#' then outputImage.add _ else outputImage.remove _) ((x, y))
+        (if algo(index) == '#' then (z: (Int, Int)) => outputImage.add(z) else (z: (Int, Int)) => outputImage.remove(z)) ((x, y))
       }
       empty = if empty == '#' then algo.last else algo.head
       outputImage

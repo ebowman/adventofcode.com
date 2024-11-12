@@ -20,6 +20,7 @@ trait Part1 extends Common {
     instructions.foldLeft((0L, 0L)) {
       case (_, Mask(m)) => parseMask(m)()
       case ((and, or), Write(addr, value)) => memory(addr.toInt) = (value.toLong & and) | or; (and, or)
+      case unknown => sys.error(s"Unknown instruction: $unknown")
     }
 
     memory.values.sum
@@ -29,7 +30,7 @@ trait Part1 extends Common {
   private final def parseMask(maskStr: String, shift: Int = 0)(and: Long = MASK, or: Long = 0): (Long, Long) = {
     if maskStr.isEmpty then (and, or)
     else {
-      val f = parseMask(maskStr.init, shift + 1) _
+      val f = (x: Long, y: Long) => parseMask(maskStr.init, shift + 1)(x, y)
       maskStr.last match {
         case 'X' => f(and, or)
         case '0' => f(and & ~(1L << shift), or)
@@ -50,6 +51,7 @@ trait Part2 extends Common {
       case (_, Mask(m)) => parseMask(m)()
       case ((float, or), Write(addr, value)) =>
         floatOps(or, float).map(_ (addr.toLong)).foreach(addr => memory(addr) = value.toLong); (float, or)
+      case unknown => sys.error(s"Unknown instruction: $unknown")
     }
 
     memory.values.sum
@@ -89,7 +91,7 @@ trait Part2 extends Common {
   private final def parseMask(maskStr: String, shift: Int = 0)(float: Long = 0, or: Long = 0): (Long, Long) = {
     if maskStr.isEmpty then (float, or)
     else {
-      val f = parseMask(maskStr.init, shift + 1) _
+      val f = (x: Long, y: Long) => parseMask(maskStr.init, shift + 1)(x, y)
       maskStr.last match {
         case 'X' => f(float | (1L << shift), or)
         case '0' => f(float, or)
