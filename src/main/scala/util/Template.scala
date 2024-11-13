@@ -1,6 +1,6 @@
 package util
 
-import java.io.{BufferedReader, PrintWriter}
+import java.io.{BufferedReader, PrintWriter, StringWriter}
 import java.nio.file.{Files, Paths}
 
 def mainSrc(year: String, day: String): String =
@@ -44,14 +44,18 @@ def mainTest(year: String, day: String): String =
      |""".stripMargin
 
 
-def downloadInput(year: String, day: String, dest: String): Unit =
+def downloadInput(year: String, day: String): String =
   import scala.sys.process.*
   val url = s"https://adventofcode.com/$year/day/${day.toInt}/input"
   val cookies = "cat .session".!!.trim
   val conn = new java.net.URI(url).toURL.openConnection().asInstanceOf[java.net.HttpURLConnection]
   conn.setRequestMethod("GET")
   conn.setRequestProperty("Cookie", s"session=$cookies")
+  if (conn.getResponseCode != 200) {
+    throw new RuntimeException(s"Failed to connect, response code: ${conn.getResponseCode}")
+  }
   val in = new BufferedReader(new java.io.InputStreamReader(conn.getInputStream))
+  val dest = new StringWriter()
   val out = new PrintWriter(dest)
   var input = in.readLine()
   while input != null do
@@ -59,6 +63,15 @@ def downloadInput(year: String, day: String, dest: String): Unit =
     input = in.readLine()
   in.close()
   out.close()
+  dest.toString
+
+def exists(path: String): Boolean = Files.exists(Paths.get(path))
+
+def write(content: => String, path: String): Unit =
+  if !exists(path) then new PrintWriter(path) {
+    this.write(content)
+    this.close()
+  }
 
 @main def template(args: String*): Unit =
   val year = args(0)
@@ -68,18 +81,8 @@ def downloadInput(year: String, day: String, dest: String): Unit =
   val rezPath = s"src/main/resources/y$year/day$day.txt"
   val testRezPath = s"src/main/resources/y$year/day$day.test.txt"
   val testRezPath2 = s"src/main/resources/y$year/day$day.test2.txt"
-  val mainSrcContent = mainSrc(year, day)
-  if !Files.exists(Paths.get(srcPath)) then new PrintWriter(srcPath) {
-    write(mainSrcContent); close()
-  }
-  if !Files.exists(Paths.get(testPath)) then new PrintWriter(testPath) {
-    write(mainTest(year, day)); close()
-  }
-  if !Files.exists(Paths.get(rezPath)) then downloadInput(year, day, rezPath)
-  if !Files.exists(Paths.get(testRezPath)) then new PrintWriter(testRezPath) {
-    write(""); close()
-  }
-  if !Files.exists(Paths.get(testRezPath2)) then new PrintWriter(testRezPath2) {
-    write("");
-    close()
-  }
+  write(mainSrc(year, day), srcPath)
+  write(mainTest(year, day), testPath)
+  write("", testRezPath)
+  write("", testRezPath2)
+  write(downloadInput(year, day), rezPath)
