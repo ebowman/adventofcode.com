@@ -4,8 +4,7 @@ import java.io.{BufferedReader, PrintWriter}
 import java.nio.file.{Files, Paths}
 
 def mainSrc(year: String, day: String): String =
-  s"""
-     |package y${year}
+  s"""package y${year}
      |
      |// see https://adventofcode.com/$year/day/${day.toInt}
      |trait Day${day} {
@@ -14,8 +13,7 @@ def mainSrc(year: String, day: String): String =
      |""".stripMargin
 
 def mainTest(year: String, day: String): String =
-  s"""
-     |package y${year}
+  s"""package y${year}
      |
      |import org.scalatest.flatspec.AnyFlatSpec
      |import org.scalatest.matchers.should._
