@@ -1,109 +1,59 @@
 package y2015
 
-import scala.annotation.tailrec
-
-/*
-Frosting: capacity 4, durability -2, flavor 0, texture 0, calories 5
-Candy: capacity 0, durability 5, flavor -1, texture 0, calories 8
-Butterscotch: capacity -1, durability 0, flavor 5, texture 0, calories 6
-Sugar: capacity 0, durability 0, flavor -2, texture 2, calories 1
- */
-trait Day15 {
-
-  val Parser = """([a-zA-Z]+): capacity (-?\d+), durability (-?\d+), flavor (-?\d+), texture (-?\d+), calories (-?\d+)""".r
-
-  def parse(str: String): Ingredient = {
-    str match {
-      case Parser(name, cap, dur, flav, text, cal) =>
-        Ingredient(name, cap.toInt, dur.toInt, flav.toInt, text.toInt, cal.toInt)
-    }
-  }
-
-  def solve(ingredients: Seq[Ingredient], totalVolume: Int): Int = {
-    @tailrec
-    def recurse(c: Option[Cursor], max: Int = 0): Int = {
-      c match {
-        case None => max
-        case Some(crs) =>
-          val newMax = Math.max(max, combine(ingredients, crs)) // compiler bug! temp var required!
-          recurse(crs.next, newMax)
-      }
-    }
-
-    recurse(Some(Cursor(ingredients.size, totalVolume)))
-  }
-
-  def combine(ings: Seq[Ingredient], cursor: Cursor): Int = sumUp(ings.zip(cursor.values))
-
-  def solveCalories(ingredients: Seq[Ingredient], totalVolume: Int, calories: Int): Int = {
-    @tailrec
-    def recurse(c: Option[Cursor], max: Int = 0): Int = {
-      c match {
-        case None => max
-        case Some(crs) =>
-          val newMax = Math.max(max, combineCalories(ingredients, crs, calories))
-          recurse(crs.next, newMax)
-      }
-    }
-
-    recurse(Some(Cursor(ingredients.size, totalVolume)))
-  }
-
-  def combineCalories(ings: Seq[Ingredient], cursor: Cursor, exactCalories: Int): Int = {
-    val tmp = ings.zip(cursor.values)
-    val calories = (tmp.map { case (ing, amt) => ing.calories * amt }).sum
-    if calories == exactCalories then sumUp(tmp)
-    else 0
-  }
-
-  private def sumUp(ingredients: Seq[(Ingredient, Int)]) = {
-    def ck(x: Int) = Math.max(x, 0)
-
-    ck((ingredients.map { case (ing, amt) => ing.capacity * amt }).sum) *
-      ck((ingredients.map { case (ing, amt) => ing.durability * amt }).sum) *
-      ck((ingredients.map { case (ing, amt) => ing.flavor * amt }).sum) *
-      ck((ingredients.map { case (ing, amt) => ing.texture * amt }).sum)
-  }
-
+trait Day15:
   case class Ingredient(name: String, capacity: Int, durability: Int, flavor: Int, texture: Int, calories: Int)
 
-  case class Cursor(sum: Int, values: Array[Int]) {
+  private val Parser =
+  """([a-zA-Z]+): capacity (-?\d+), durability (-?\d+), flavor (-?\d+), texture (-?\d+), calories (-?\d+)""".r
 
-    def next: Option[Cursor] = {
-      @scala.annotation.tailrec
-      def recur(n: Cursor): Cursor = {
-        if n.isDone || n.isValid then n
-        else recur(n.incr)
-      }
+  def parse(str: String): Ingredient = str match
+      case Parser(name, cap, dur, flav, text, cal) =>
+        Ingredient(name, cap.toInt, dur.toInt, flav.toInt, text.toInt, cal.toInt)
 
-      recur(this.incr) match {
-        case r if r.isValid => Some(r)
-        case _ => None
-      }
-    }
+  def solve(ingredients: Seq[Ingredient], totalVolume: Int): Int =
+    // Generate only valid combinations that sum to totalVolume
+    def generateValidCombinations(remaining: Int, numIngredients: Int): Iterator[List[Int]] =
+      if (numIngredients == 1) Iterator(List(remaining))
+      else for
+        i <- Iterator.range(0, remaining + 1)
+        rest <- generateValidCombinations(remaining - i, numIngredients - 1)
+      yield i :: rest
 
-    private def isValid: Boolean = values.sum == sum
+    def scoreRecipe(amounts: List[Int]): Int =
+      val properties = List(
+        ingredients.zip(amounts).map { case (ing, amt) => ing.capacity * amt }.sum,
+        ingredients.zip(amounts).map { case (ing, amt) => ing.durability * amt }.sum,
+        ingredients.zip(amounts).map { case (ing, amt) => ing.flavor * amt }.sum,
+        ingredients.zip(amounts).map { case (ing, amt) => ing.texture * amt }.sum
+      )
+      if (properties.exists(_ <= 0)) 0 else properties.product
 
-    private def isDone: Boolean = values.forall(_ == sum)
+    generateValidCombinations(totalVolume, ingredients.size)
+      .map(scoreRecipe)
+      .max
+  end solve
 
-    private def incr: Cursor = {
-      @scala.annotation.tailrec
-      def helper(arr: Array[Int], cur: Int = 0): Array[Int] = {
-        if arr(cur) == sum then {
-          arr(cur) = 0
-          helper(arr, cur + 1)
-        } else {
-          arr(cur) = arr(cur) + 1
-          arr
-        }
-      }
+  def solveCalories(ingredients: Seq[Ingredient], totalVolume: Int, targetCalories: Int): Int =
+    def generateValidCombinations(remaining: Int, numIngredients: Int): Iterator[List[Int]] =
+      if (numIngredients == 1) Iterator(List(remaining))
+      else for
+        i <- Iterator.range(0, remaining + 1)
+        rest <- generateValidCombinations(remaining - i, numIngredients - 1)
+      yield i :: rest
 
-      Cursor(sum, helper(values))
-    }
-  }
+    def scoreRecipeWithCalories(amounts: List[Int]): Int =
+      val calories = ingredients.zip(amounts).map { case (ing, amt) => ing.calories * amt }.sum
+      if (calories != targetCalories) return 0
+      val properties = List(
+        ingredients.zip(amounts).map { case (ing, amt) => ing.capacity * amt }.sum,
+        ingredients.zip(amounts).map { case (ing, amt) => ing.durability * amt }.sum,
+        ingredients.zip(amounts).map { case (ing, amt) => ing.flavor * amt }.sum,
+        ingredients.zip(amounts).map { case (ing, amt) => ing.texture * amt }.sum
+      )
+      if (properties.exists(_ <= 0)) 0 else properties.product
 
-  object Cursor {
-    def apply(n: Int, sum: Int): Cursor =
-      Cursor(sum, new Array[Int](n)).next.get
-  }
-}
+    generateValidCombinations(totalVolume, ingredients.size)
+      .map(scoreRecipeWithCalories)
+      .max
+  end solveCalories
+end Day15
