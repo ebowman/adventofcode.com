@@ -1,41 +1,43 @@
 package y2016
 
-import scala.annotation.tailrec
-import scala.util.matching.Regex
+trait Day09:
+  def solve1(input: String): Int =
+    var pos = 0
+    var result = 0
 
-trait Day09 {
+    while (pos < input.length) do
+      input(pos) match
+        case '(' =>
+          // Find the closing parenthesis
+          val closePos = input.indexOf(')', pos)
+          val Array(length, repeat) = input.substring(pos + 1, closePos).split('x').map(_.toInt)
+          result += length * repeat
+          pos = closePos + length + 1
+        case _ =>
+          result += 1
+          pos += 1
+    result
 
-  private val Marker = """\((\d+)x(\d+)\)""".r
-  private val Marker2 = """\((\d+)x(\d+)\).*""".r
+  def solve2(input: String): Long =
+    def getDecompressedLength(str: String, start: Int, end: Int): Long =
+      var pos = start
+      var result = 0L
 
-  def solve1(input: String): Int = {
-    @tailrec def recurse(i: String, sb: StringBuilder = new StringBuilder): String = {
-      Marker.findFirstMatchIn(i) match {
-        case Some(m) =>
-          sb.append(i.take(m.start))
-          i.drop(m.start) match {
-            case Marker2(x, y) =>
-              val toAppend = i.slice(m.end, m.end + x.toInt) * y.toInt
-              sb.append(toAppend)
-              recurse(i.drop(m.end + x.toInt), sb)
-          }
-        case None =>
-          sb.append(i)
-          sb.toString()
-      }
-    }
+      while (pos < end) do
+        str(pos) match
+          case '(' =>
+            val closePos = str.indexOf(')', pos)
+            val Array(length, repeat) = str.substring(pos + 1, closePos).split('x').map(_.toInt)
+            val segmentStart = closePos + 1
+            val segmentEnd = segmentStart + length
+            val decompressedSegmentLength = getDecompressedLength(str, segmentStart, segmentEnd)
+            result += decompressedSegmentLength * repeat
+            pos = segmentEnd
+          case _ =>
+            result += 1
+            pos += 1
+      result
+    end getDecompressedLength
 
-    recurse(input).length
-  }
-
-  def solve2(input: String, accum: Long = 0): Long = {
-    if !input.contains("(") then accum + input.length
-    else {
-      val open = input.indexOf("(")
-      val close = input.indexOf(")")
-      val marker = input.slice(open + 1, close).split("x").map(_.toInt)
-      solve2(input.drop(close + 1 + marker(0)),
-        accum + open + solve2(input.slice(close + 1, close + 1 + marker(0)) * marker(1)))
-    }
-  }
-}
+    getDecompressedLength(input, 0, input.length)
+end Day09
