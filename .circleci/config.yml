@@ -8,7 +8,6 @@ jobs:
     working_directory: ~/repo
 
     environment:
-      SBT_OPTS: -Xmx6000m
       TERM: dumb
 
     steps:
