@@ -1,28 +1,16 @@
-version: 2.1
+steps:
+  - checkout
 
-jobs:
-  build:
-    docker:
-      - image: cimg/openjdk:23.0.1
+  - restore_cache:
+      keys:
+        - v1-dependencies-{{ checksum "build.sbt" }}
+        - v1-dependencies-
 
-    working_directory: ~/repo
+  - run: cat /dev/null | sbt "set Test / parallelExecution := false" Test/compile
 
-    environment:
-      TERM: dumb
+  - save_cache:
+      paths:
+        - ~/.m2
+      key: v1-dependencies--{{ checksum "build.sbt" }}
 
-    steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "build.sbt" }}
-            - v1-dependencies-
-
-      - run: cat /dev/null | sbt Test/compile
-
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies--{{ checksum "build.sbt" }}
-
-      - run: cat /dev/null | sbt test
+  - run: cat /dev/null | sbt "set Test / parallelExecution := false" test
