@@ -65,7 +65,7 @@ trait Day23:
     runProgram(input).mulCount
 
   def isComposite(n: Long): Boolean =
-    n > 1 && (2L to math.sqrt(n).toLong).exists(n % _ == 0)
+    n > 1 && (2L to math.sqrt(n.toDouble).toLong).exists(n % _ == 0)
 
   def solvePart2(input: Seq[String]): Int =
     val initialState = runProgram(input.take(8), 1)
