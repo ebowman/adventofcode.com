@@ -3,7 +3,7 @@ package y2023
 // see https://adventofcode.com/2023/day/21
 // solution inspired by https://github.com/villuna/aoc23/wiki/A-Geometric-solution-to-advent-of-code-2023,-day-21
 trait Day21:
-  def solvePart1(input: Seq[String], steps: Int): Int =
+  def solve(input: Seq[String], steps: Int): Int =
     Garden(input.map(_.trim.toVector).toVector).countReachablePlots(steps)
 
   def solvePart2(input: Seq[String], steps: Long): Long =

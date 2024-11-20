@@ -11,11 +11,11 @@ class Day21Spec extends AnyFlatSpec with Matchers with Day21 {
   lazy val testInput2: IndexedSeq[String] = Loader(this, "day21.test2.txt").toIndexedSeq
 
   it should "solve part 1 test" in {
-    solvePart1(testInput, 6) shouldBe 16
+    solve(testInput, 6) shouldBe 16
   }
 
   it should "solve part 1" in {
-    solvePart1(input, 64) shouldBe 3737
+    solve(input, 64) shouldBe 3737
   }
 
   it should "solve part 2 test" in {
