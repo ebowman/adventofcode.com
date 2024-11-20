@@ -65,37 +65,56 @@ trait Day23:
 
     if ignoreSlopes then
       val graph = buildGraph()
-      def dfs(pos: Pos, visited: Set[Pos]): Int =
-        if pos == end then 0
-        else
-          graph.getOrElse(pos, List.empty)
-            .filterNot(edge => visited.contains(edge.dest))
-            .map(edge => edge.len + dfs(edge.dest, visited + edge.dest))
-            .maxOption
-            .getOrElse(Int.MinValue)
 
-      dfs(start, Set(start))
+      def iterativeDFS(): Int =
+        case class State(pos: Pos, visited: Set[Pos], length: Int)
+        var maxLength = Int.MinValue
+        val stack = collection.mutable.Stack[State]()
+        stack.push(State(start, Set(start), 0))
+
+        while stack.nonEmpty do
+          val State(pos, visited, length) = stack.pop()
+          if pos == end then
+            maxLength = maxLength.max(length)
+          else
+            graph.getOrElse(pos, List.empty)
+              .filterNot(edge => visited.contains(edge.dest))
+              .foreach(edge =>
+                stack.push(State(edge.dest, visited + edge.dest, length + edge.len)))
+
+        maxLength
+
+      iterativeDFS()
     else
-      def dfs(pos: Pos, visited: Set[Pos]): Int =
-        if pos == end then visited.size - 1
-        else
-          val moves = grid(pos.row)(pos.col) match
-            case Cell.SlopeUp => List(Pos(pos.row - 1, pos.col))
-            case Cell.SlopeRight => List(Pos(pos.row, pos.col + 1))
-            case Cell.SlopeDown => List(Pos(pos.row + 1, pos.col))
-            case Cell.SlopeLeft => List(Pos(pos.row, pos.col - 1))
-            case _ => List(
-              Pos(pos.row - 1, pos.col), Pos(pos.row + 1, pos.col),
-              Pos(pos.row, pos.col - 1), Pos(pos.row, pos.col + 1)
-            )
+      def iterativeDFS(): Int =
+        case class State(pos: Pos, visited: Set[Pos])
+        var maxLength = Int.MinValue
+        val stack = collection.mutable.Stack[State]()
+        stack.push(State(start, Set(start)))
 
-          moves.filter(isValid)
-            .filterNot(visited.contains)
-            .map(next => dfs(next, visited + next))
-            .maxOption
-            .getOrElse(Int.MinValue)
+        while stack.nonEmpty do
+          val State(pos, visited) = stack.pop()
+          if pos == end then
+            maxLength = maxLength.max(visited.size - 1)
+          else
+            val moves = grid(pos.row)(pos.col) match
+              case Cell.SlopeUp => List(Pos(pos.row - 1, pos.col))
+              case Cell.SlopeRight => List(Pos(pos.row, pos.col + 1))
+              case Cell.SlopeDown => List(Pos(pos.row + 1, pos.col))
+              case Cell.SlopeLeft => List(Pos(pos.row, pos.col - 1))
+              case _ => List(
+                Pos(pos.row - 1, pos.col), Pos(pos.row + 1, pos.col),
+                Pos(pos.row, pos.col - 1), Pos(pos.row, pos.col + 1)
+              )
 
-      dfs(start, Set(start))
+            moves.filter(isValid)
+              .filterNot(visited.contains)
+              .foreach(next =>
+                stack.push(State(next, visited + next)))
+
+        maxLength
+
+      iterativeDFS()
 
   def solvePart1(input: Seq[String]): Int =
     val grid = parseMap(input)
