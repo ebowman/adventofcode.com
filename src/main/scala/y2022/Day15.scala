@@ -1,25 +1,26 @@
 package y2022
 
-case class Point(x: Int, y: Int):
-  def manhattanDistance(other: Point): Int =
-    (x - other.x).abs + (y - other.y).abs
-
-case class Sensor(position: Point, closestBeacon: Point):
-  lazy val range: Int = position.manhattanDistance(closestBeacon)
-
-  def getCoverageAtY(y: Int): Option[Range] =
-    val yDist = (position.y - y).abs
-    if yDist > range then None
-    else
-      val xSpread = range - yDist
-      Some(Range(position.x - xSpread, position.x + xSpread))
-
-case class Range(start: Int, end: Int):
-  def clamp(min: Int, max: Int): Range =
-    Range(start.max(min), end.min(max))
-  def isEmpty: Boolean = end < start
-
 trait Day15:
+  case class Point(x: Int, y: Int):
+    def manhattanDistance(other: Point): Int =
+      (x - other.x).abs + (y - other.y).abs
+
+  case class Sensor(position: Point, closestBeacon: Point):
+    lazy val range: Int = position.manhattanDistance(closestBeacon)
+
+    def getCoverageAtY(y: Int): Option[Range] =
+      val yDist = (position.y - y).abs
+      if yDist > range then None
+      else
+        val xSpread = range - yDist
+        Some(Range(position.x - xSpread, position.x + xSpread))
+
+  case class Range(start: Int, end: Int):
+    def clamp(min: Int, max: Int): Range =
+      Range(start.max(min), end.min(max))
+
+    def isEmpty: Boolean = end < start
+
   def parseInput(input: Seq[String]): Seq[Sensor] =
     val pattern = """Sensor at x=(-?\d+), y=(-?\d+): closest beacon is at x=(-?\d+), y=(-?\d+)""".r
     input.map:
