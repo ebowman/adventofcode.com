@@ -1,47 +1,55 @@
 package y2022
 
-case class Blueprint(id: Int,
-                     oreRobotCost: Int,
-                     clayRobotCost: Int,
-                     obsidianRobotCost: (Int, Int),
-                     geodeRobotCost: (Int, Int))
-
-// Packed representation for better memory usage and faster comparison
-// Uses a single Long to store all state information
-case class State(packed: Long):
-  def ore: Int = ((packed >> 52) & 0x3F).toInt
-  def clay: Int = ((packed >> 44) & 0xFF).toInt
-  def obsidian: Int = ((packed >> 36) & 0xFF).toInt
-  def geodes: Int = ((packed >> 28) & 0xFF).toInt
-  def oreRobots: Int = ((packed >> 24) & 0xF).toInt
-  def clayRobots: Int = ((packed >> 20) & 0xF).toInt
-  def obsidianRobots: Int = ((packed >> 16) & 0xF).toInt
-  def geodeRobots: Int = ((packed >> 12) & 0xF).toInt
-  def timeLeft: Int = (packed & 0x3F).toInt
-
-object State:
-  def apply(ore: Int = 0,
-            clay: Int = 0,
-            obsidian: Int = 0,
-            geodes: Int = 0,
-            oreRobots: Int = 1,
-            clayRobots: Int = 0,
-            obsidianRobots: Int = 0,
-            geodeRobots: Int = 0,
-            timeLeft: Int): State =
-    new State(
-      ((ore.toLong & 0x3F) << 52) |
-        ((clay.toLong & 0xFF) << 44) |
-        ((obsidian.toLong & 0xFF) << 36) |
-        ((geodes.toLong & 0xFF) << 28) |
-        ((oreRobots.toLong & 0xF) << 24) |
-        ((clayRobots.toLong & 0xF) << 20) |
-        ((obsidianRobots.toLong & 0xF) << 16) |
-        ((geodeRobots.toLong & 0xF) << 12) |
-        (timeLeft.toLong & 0x3F)
-    )
-
 trait Day19:
+  case class Blueprint(id: Int,
+                       oreRobotCost: Int,
+                       clayRobotCost: Int,
+                       obsidianRobotCost: (Int, Int),
+                       geodeRobotCost: (Int, Int))
+
+  // Packed representation for better memory usage and faster comparison
+  // Uses a single Long to store all state information
+  case class State(packed: Long):
+    def ore: Int = ((packed >> 52) & 0x3F).toInt
+
+    def clay: Int = ((packed >> 44) & 0xFF).toInt
+
+    def obsidian: Int = ((packed >> 36) & 0xFF).toInt
+
+    def geodes: Int = ((packed >> 28) & 0xFF).toInt
+
+    def oreRobots: Int = ((packed >> 24) & 0xF).toInt
+
+    def clayRobots: Int = ((packed >> 20) & 0xF).toInt
+
+    def obsidianRobots: Int = ((packed >> 16) & 0xF).toInt
+
+    def geodeRobots: Int = ((packed >> 12) & 0xF).toInt
+
+    def timeLeft: Int = (packed & 0x3F).toInt
+
+  object State:
+    def apply(ore: Int = 0,
+              clay: Int = 0,
+              obsidian: Int = 0,
+              geodes: Int = 0,
+              oreRobots: Int = 1,
+              clayRobots: Int = 0,
+              obsidianRobots: Int = 0,
+              geodeRobots: Int = 0,
+              timeLeft: Int): State =
+      new State(
+        ((ore.toLong & 0x3F) << 52) |
+          ((clay.toLong & 0xFF) << 44) |
+          ((obsidian.toLong & 0xFF) << 36) |
+          ((geodes.toLong & 0xFF) << 28) |
+          ((oreRobots.toLong & 0xF) << 24) |
+          ((clayRobots.toLong & 0xF) << 20) |
+          ((obsidianRobots.toLong & 0xF) << 16) |
+          ((geodeRobots.toLong & 0xF) << 12) |
+          (timeLeft.toLong & 0x3F)
+      )
+
   def parseBlueprint(input: String): Blueprint =
     val numbers = """\d+""".r.findAllIn(input).map(_.toInt).toList
     Blueprint(
