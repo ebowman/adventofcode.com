@@ -18,7 +18,7 @@ class Day01Spec extends AnyFlatSpec with Matchers with Day01 {
   }
 
   it should "solve part 1" in {
-    println(input.map(solve).sum)
+    input.map(solve).sum shouldBe 55538
   }
 
   it should "solve part 2 test" in {
@@ -28,6 +28,6 @@ class Day01Spec extends AnyFlatSpec with Matchers with Day01 {
   }
 
   it should "solve part 2" in {
-    println(input.map(solve2).sum)
+    input.map(solve2).sum shouldBe 54875
   }
 }
