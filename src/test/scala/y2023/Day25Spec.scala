@@ -1,17 +1,9 @@
 package y2023
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should._
-import util.Loader
-
-class Day25Spec extends AnyFlatSpec with Matchers with Day25:
-
-  lazy val input: IndexedSeq[String] = Loader(this, "day25.txt").toIndexedSeq
-  lazy val testInput: IndexedSeq[String] = Loader(this, "day25.test.txt").toIndexedSeq
-  lazy val testInput2: IndexedSeq[String] = Loader(this, "day25.test2.txt").toIndexedSeq
+class Day25Spec extends util.DaySpec(new Day25):
 
   it should "solve part 1 test" in:
-    solvePart1(testInput) shouldBe 54
+    solution.solvePart1(testInput) shouldBe 54
 
   it should "solve part 1" in:
-    solvePart1(input) shouldBe 600225
+    solution.solvePart1(input) shouldBe 600225

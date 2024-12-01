@@ -4,7 +4,7 @@ import scala.util.Random
 import scala.collection.mutable
 import scala.annotation.tailrec
 
-trait Day25:
+class Day25 extends util.Day(25):
   case class Edge(a: String, b: String):
     def contains(component: String): Boolean = a == component || b == component
     def other(component: String): String = if a == component then b else a
@@ -97,8 +97,10 @@ trait Day25:
       if result._2.size == 3 then Some(result)
       else findValidCut(vertices, edges, maxAttempts - 1)
 
-  def solvePart1(input: Seq[String]): Int =
+  def solvePart1(input: IndexedSeq[String]): Any =
     val (vertices, edges) = parseInput(input)
     findValidCut(vertices, edges) match
       case Some((product, _)) => product
       case None => throw new RuntimeException("Failed to find a valid cut after maximum attempts")
+      
+  def solvePart2(input: IndexedSeq[String]): Any = ???

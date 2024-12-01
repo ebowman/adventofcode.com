@@ -38,27 +38,26 @@ trait Parser extends JavaTokenParsers {
 }
 
 // see https://adventofcode.com/2023/day/2
-trait Day02 extends Parser {
+class Day02 extends util.Day(2) with Parser:
   private val fullConfig = Config(12, 13, 14)
 
-  def solve(testInput: Seq[String]): Int =
-    testInput.map { input =>
+  def solvePart1(testInput: IndexedSeq[String]): Any =
+    testInput.map: input =>
       parseAll(game, input).get
-    }.filter { game =>
+    .filter: game =>
       game.configs.forall(isLegal)
-    }.map { game =>
+    .map: game =>
       game.id
-    }.sum
+    .sum
 
   def isLegal(config: Config): Boolean =
     config.r <= fullConfig.r && config.b <= fullConfig.b && config.g <= fullConfig.g
 
-  def solve2(testInput: Seq[String]): Int =
-    testInput.map { input =>
+  def solvePart2(testInput: IndexedSeq[String]): Any =
+    testInput.map: input =>
       parseAll(game, input).get
-    }.map { game =>
-      game.configs.foldLeft(Config()) { (acc, config) =>
+    .map: game =>
+      game.configs.foldLeft(Config()): (acc, config) =>
         Config(math.max(acc.r, config.r), math.max(acc.g, config.g), math.max(acc.b, config.b))
-      }.power
-    }.sum
-}
+      .power
+    .sum

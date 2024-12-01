@@ -2,7 +2,7 @@
 package y2023
 
 // see https://adventofcode.com/2023/day/1
-trait Day01 {
+class Day01 extends util.Day(1):
 
   private val toMap = List[(String, String)](
     "one" -> "o1e",
@@ -16,15 +16,14 @@ trait Day01 {
     "nine" -> "n9ne",
   )
 
-  private val revMap = toMap.map(kv => kv._1.reverse -> kv._2)
+  def fix(str: IndexedSeq[String]): IndexedSeq[String] =
+    str.map: row =>
+      toMap.foldLeft(row)((acc, pair) => acc.replace(pair._1, pair._2))
 
-  def fix(str: String): String =
-    toMap.foldLeft(str)((acc, pair) => acc.replace(pair._1, pair._2))
+  def solvePart1(input: IndexedSeq[String]): Any =
+    input.map: row =>
+      val rev = row.reverse
+      s"${row(row.indexWhere(_.isDigit))}${rev(rev.indexWhere(_.isDigit))}".toInt
+    .sum
 
-  def solve(input: String): Int = {
-    val rev = input.reverse
-    s"${input(input.indexWhere(_.isDigit))}${rev(rev.indexWhere(_.isDigit))}".toInt
-  }
-
-  def solve2(input: String): Int = solve(fix(input))
-}
+  def solvePart2(input: IndexedSeq[String]): Any = solvePart1(fix(input))
