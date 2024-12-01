@@ -7,38 +7,29 @@ def mainSrc(year: String, day: String): String =
   s"""package y${year}
      |
      |// see https://adventofcode.com/$year/day/${day.toInt}
-     |trait Day${day}:
-     |  def solvePart1(input: Seq[String]): Int = 0
-     |  def solvePart2(input: Seq[String]): Int = 0
+     |class Day${day} extends util.Day(${day.toInt}):
+     |  def solvePart1(input: IndexedSeq[String]): Any = ???
+     |  def solvePart2(input: IndexedSeq[String]): Any = ???
      |end Day${day}
      |""".stripMargin
 
 def mainTest(year: String, day: String): String =
   s"""package y${year}
      |
-     |import org.scalatest.flatspec.AnyFlatSpec
-     |import org.scalatest.matchers.should._
-     |import util.Loader
-     |
-     |class Day${day}Spec extends AnyFlatSpec with Matchers with Day${day}:
-     |
-     |  lazy val input: IndexedSeq[String] = Loader(this, "day${day}.txt").toIndexedSeq
-     |  lazy val testInput: IndexedSeq[String] = Loader(this, "day${day}.test.txt").toIndexedSeq
-     |  lazy val testInput2: IndexedSeq[String] = Loader(this, "day${day}.test2.txt").toIndexedSeq
+     |class Day${day}Spec extends util.DaySpec(new Day${day}):
      |
      |  it should "solve part 1 test" in:
-     |    solvePart1(testInput) shouldBe 0
+     |    solution.solvePart1(testInput) shouldBe 0
      |
      |  it should "solve part 1" in:
-     |    solvePart1(input) shouldBe 0
+     |    solution.solvePart1(input) shouldBe 0
      |
      |  it should "solve part 2 test" in:
-     |    solvePart2(testInput) shouldBe 0
+     |    solution.solvePart2(testInput) shouldBe 0
      |
      |  it should "solve part 2" in:
-     |    solvePart2(input) shouldBe 0
+     |    solution.solvePart2(input) shouldBe 0
      |""".stripMargin
-
 
 def downloadInput(year: String, day: String): String =
   import scala.sys.process.*
