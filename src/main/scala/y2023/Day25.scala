@@ -103,4 +103,5 @@ class Day25 extends util.Day(25):
       case Some((product, _)) => product
       case None => throw new RuntimeException("Failed to find a valid cut after maximum attempts")
       
+  //noinspection NotImplementedCode
   def solvePart2(input: IndexedSeq[String]): Any = ???
