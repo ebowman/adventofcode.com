@@ -6,12 +6,12 @@ class Day01 extends util.Day(1):
       case Array(left, right) => (left.toInt, right.toInt)
       case _ => throw IllegalArgumentException(s"Invalid input line: $line")
 
-  def solvePart1(input: IndexedSeq[String]): Any =
+  def solvePart1(input: IndexedSeq[String]): Int =
     val pairs = input.map(parseLine)
     val (left, right) = (pairs.map(_._1).sorted, pairs.map(_._2).sorted)
     left.zip(right).map((l, r) => math.abs(l - r)).sum
 
-  def solvePart2(input: IndexedSeq[String]): Any =
+  def solvePart2(input: IndexedSeq[String]): Int =
     val pairs = input.map(parseLine)
     val (left, right) = (pairs.map(_._1), pairs.map(_._2))
     val rightCounts = right.groupBy(identity).view.mapValues(_.size).toMap
