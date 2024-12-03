@@ -12,17 +12,16 @@ class Day03 extends util.Day(3):
 
   def solvePart2(input: IndexedSeq[String]): Int =
     val pattern = """(mul\((\d+),(\d+)\)|do\(\)|don't\(\))""".r
-
-    input.foldLeft((0, true)): 
-      case ((total, enabled), line) =>
-        pattern.findAllMatchIn(line).foldLeft((total, enabled)):
-          case ((accTotal, accEnabled), m) =>
-            m.matched match
-              case "do()" => (accTotal, true)
-              case "don't()" => (accTotal, false)
-              case mul if mul.startsWith("mul") && accEnabled =>
-                (accTotal + m.group(2).toInt * m.group(3).toInt, accEnabled)
-              case _ => (accTotal, accEnabled)
-    ._1
+    case class Payload(total: Int = 0, enabled: Boolean = true)
+    input.foldLeft(Payload()):
+      case (payload, line) =>
+        pattern.findAllMatchIn(line).foldLeft(payload): (payload, `match`) =>
+            `match`.matched match
+              case "do()" => payload.copy(enabled = true)
+              case "don't()" => payload.copy(enabled = false)
+              case _ if payload.enabled =>
+                payload.copy(total = payload.total + `match`.group(2).toInt * `match`.group(3).toInt)
+              case _ => payload
+    .total
 
 end Day03
