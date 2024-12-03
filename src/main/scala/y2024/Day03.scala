@@ -13,8 +13,7 @@ class Day03 extends util.Day(3):
   def solvePart2(input: IndexedSeq[String]): Int =
     val pattern = """(mul\((\d+),(\d+)\)|do\(\)|don't\(\))""".r
     case class Payload(total: Int = 0, enabled: Boolean = true)
-    input.foldLeft(Payload()):
-      case (payload, line) =>
+    input.foldLeft(Payload()): (payload, line) =>
         pattern.findAllMatchIn(line).foldLeft(payload): (payload, `match`) =>
             `match`.matched match
               case "do()" => payload.copy(enabled = true)
