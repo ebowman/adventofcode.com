@@ -1,6 +1,7 @@
 package y2024
 
 import scala.annotation.tailrec
+import scala.collection.parallel.CollectionConverters._
 
 class Day06 extends util.Day(6):
 
@@ -112,7 +113,7 @@ class Day06 extends util.Day(6):
       y <- 0 until height
       x <- 0 until width
       pos = Position(x, y)
-    } yield pos).count(createsLoop)
+    } yield pos).par.count(createsLoop)
 
   end solvePart2
 end Day06
