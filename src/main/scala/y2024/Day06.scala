@@ -1,7 +1,7 @@
 package y2024
 
 import scala.annotation.tailrec
-import scala.collection.parallel.CollectionConverters._
+import scala.collection.parallel.CollectionConverters.*
 
 class Day06 extends util.Day(6):
 
