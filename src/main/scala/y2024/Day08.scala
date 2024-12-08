@@ -27,8 +27,8 @@ class Day08 extends util.Day(8):
     for
       positions <- antennaGroups.values
       i <- positions.indices
-      p1 = positions(i)
       j <- 0 until i
+      p1 = positions(i)
       p2 = positions(j)
       dr = p2.row - p1.row
       dc = p2.col - p1.col
