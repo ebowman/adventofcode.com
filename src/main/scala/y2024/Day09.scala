@@ -1,6 +1,7 @@
 package y2024
 
 import scala.annotation.tailrec
+import scala.collection.parallel.CollectionConverters.*
 
 class Day09 extends util.Day(9):
 
@@ -77,8 +78,8 @@ class Day09 extends util.Day(9):
     val files = findFiles(disk)
     val filesDesc = files.sortBy(_.fileId)(Ordering[Int].reverse)
 
-    filesDesc.foldLeft(disk): (curDisk, fileInfo) =>
-      val currentPositions = curDisk.zipWithIndex.collect:
+    filesDesc.par.foldLeft(disk): (curDisk, fileInfo) =>
+      val currentPositions = curDisk.par.zipWithIndex.collect:
         case (Some(fileId), idx) if fileId == fileInfo.fileId => idx
 
       if currentPositions.isEmpty then curDisk
