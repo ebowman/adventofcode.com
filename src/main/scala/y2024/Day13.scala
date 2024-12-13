@@ -34,7 +34,7 @@ class Day13 extends util.Day(13):
     (xv, yv)
 
   private def solveMachine(m: Machine): Option[Long] =
-    // see https://www.math.uwaterloo.ca/~wgilbert/Research/GilbertPathria.pdf
+    // see https://en.wikipedia.org/wiki/Diophantine_equation
     val det = m.xb.toLong * m.ya.toLong - m.yb.toLong * m.xa.toLong
     if det == 0 then None
     else
