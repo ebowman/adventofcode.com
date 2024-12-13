@@ -38,7 +38,7 @@ class Day13 extends util.Day(13):
     def offset(offset: Long): Machine = copy(x = x + offset, y = y + offset)
 
     def solveMachine: Option[Long] =
-      // see https://en.wikipedia.org/wiki/Diophantine_equation
+      // great discussion: https://www.reddit.com/r/adventofcode/comments/1hd7irq/2024_day_13_an_explanation_of_the_mathematics/
       val det = xb.toLong * ya.toLong - yb.toLong * xa.toLong
       if det == 0 then None
       else
