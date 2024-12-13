@@ -5,13 +5,13 @@ class Day13 extends util.Day(13):
 
   def solvePart1(input: IndexedSeq[String]): Any =
     val machines = parseMachines(input)
-    val solutions = machines.flatMap(solveMachine)
+    val solutions = machines.flatMap(_.solveMachine)
     solutions.sum
 
   def solvePart2(input: IndexedSeq[String]): Any =
-    val offset = 10000000000000L
-    val machines = parseMachines(input).map(m => m.copy(x = m.x + offset, y = m.y + offset))
-    val solutions = machines.flatMap(solveMachine)
+    val offset = 10_000_000_000_000L
+    val machines = parseMachines(input).map(_.offset(offset))
+    val solutions = machines.flatMap(_.solveMachine)
     solutions.sum
 
   private def parseMachines(input: IndexedSeq[String]): IndexedSeq[Machine] =
@@ -33,22 +33,19 @@ class Day13 extends util.Day(13):
     val yv = yPart.replace("=", "").toLong
     (xv, yv)
 
-  private def solveMachine(m: Machine): Option[Long] =
-    // see https://en.wikipedia.org/wiki/Diophantine_equation
-    val det = m.xb.toLong * m.ya.toLong - m.yb.toLong * m.xa.toLong
-    if det == 0 then None
-    else
-      val aNum = m.xb.toLong * m.y - m.yb.toLong * m.x
-      if aNum % det != 0 then None
-      else
-        val a = aNum / det
-        val bNum = m.x - a * m.xa
-        if m.xb == 0 then None
-        else if bNum % m.xb.toLong != 0 then None
-        else
-          val b = bNum / m.xb
-          if a >= 0 && b >= 0 then Some(3 * a + b) else None
 
-  case class Machine(xa: Int, ya: Int, xb: Int, yb: Int, x: Long, y: Long)
+  case class Machine(xa: Int, ya: Int, xb: Int, yb: Int, x: Long, y: Long):
+    def offset(offset: Long): Machine = copy(x = x + offset, y = y + offset)
+
+    def solveMachine: Option[Long] =
+      // see https://en.wikipedia.org/wiki/Diophantine_equation
+      val det = xb.toLong * ya.toLong - yb.toLong * xa.toLong
+      if det == 0 then None
+      else
+        val aNum = xb.toLong * y - yb.toLong * x
+        val bNum = x - (aNum / det) * xa
+        if aNum % det != 0 then None
+        else if bNum % xb.toLong != 0 then None
+        else Some(3 * aNum / det + bNum / xb)
 
 end Day13
