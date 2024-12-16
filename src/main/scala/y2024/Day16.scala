@@ -1,6 +1,6 @@
 package y2024
 
-import scala.annotation.tailrec
+import scala.annotation.{tailrec, targetName}
 import scala.util.Try
 
 case class Day16() extends util.Day(16):
@@ -10,39 +10,29 @@ case class Day16() extends util.Day(16):
   def solvePart2(input: IndexedSeq[String]): Int =
     PathFinder(Grid(input)).countPositionsOnOptimalPath
 
-  enum Direction:
-    case North, East, South, West
+  case class Vec2(x: Int, y: Int):
+    @targetName("add")
+    def +(other: Vec2): Vec2 = Vec2(x + other.x, y + other.y)
 
-    def opposite: Direction = this match
-      case North => South
-      case East => West
-      case South => North
-      case West => East
+    @targetName("subtract")
+    def -(other: Vec2): Vec2 = Vec2(x - other.x, y - other.y)
+  end Vec2
 
-    def delta: (Int, Int) = this match
-      case North => (0, -1)
-      case East => (1, 0)
-      case South => (0, 1)
-      case West => (-1, 0)
-  end Direction
-
-  case class Position(x: Int, y: Int)
-
-  case class State(pos: Position, direction: Direction)
+  case class State(pos: Vec2, direction: Vec2)
 
   case class Grid(cells: IndexedSeq[String]):
     val height: Int = cells.size
     val width: Int = cells.head.length
 
-    def isWall(pos: Position): Boolean =
+    def isWall(pos: Vec2): Boolean =
       pos.x < 0 || pos.x >= width ||
         pos.y < 0 || pos.y >= height ||
         cells(pos.y)(pos.x) == '#'
 
-    def findPosition(target: Char): Position =
+    def findPosition(target: Char): Vec2 =
       val y = cells.indexWhere(_.contains(target))
       val x = cells(y).indexWhere(_ == target)
-      Position(x, y)
+      Vec2(x, y)
   end Grid
 
   private case class PathFinder(grid: Grid):
@@ -51,54 +41,37 @@ case class Day16() extends util.Day(16):
 
     def findMinimumCost: Int =
       val paths = findShortestPaths(startPos, reversed = false)
-      Direction.values
+      Directions.all
         .flatMap(d => paths.get((endPos, d)))
         .min
 
-    private def findShortestPaths(start: Position,
-                                  reversed: Boolean): Map[(Position, Direction), Int] =
-      val initialStates = if !reversed then
-        List((0, State(start, Direction.East)))
-      else
-        Direction.values.map(d => (0, State(start, d))).toList
+    def countPositionsOnOptimalPath: Int =
+      val forwardPaths = findShortestPaths(startPos, reversed = false)
+      val backwardPaths = findShortestPaths(endPos, reversed = true)
+      val minCost = Directions.all
+        .flatMap(d => forwardPaths.get((endPos, d)))
+        .min
 
-      def nextStates(state: State, cost: Int): List[(Int, State)] =
-        if !reversed then forwardMoves(state, cost)
-        else backwardMoves(state, cost)
+      (0 until grid.height).flatMap: y =>
+        (0 until grid.width).map: x =>
+          val pos = Vec2(x, y)
+          !grid.isWall(pos) && Directions.all.exists: dir =>
+            val key = (pos, dir)
+            Try:
+              forwardPaths(key) + backwardPaths(key) == minCost
+            .getOrElse(false)
+      .count(identity)
 
-      def forwardMoves(state: State, cost: Int): List[(Int, State)] =
-        val delta = state.direction.delta
-        val newPos = Position(
-          state.pos.x + delta._1,
-          state.pos.y + delta._2
-        )
-        val forward = Option.when(!grid.isWall(newPos))(
-          (cost + 1, State(newPos, state.direction))
-        )
-        val turns = List(-1, 1).map: turn =>
-          val newIndex = (4 + Direction.values.indexOf(state.direction) + turn) % 4
-          (cost + 1000, State(state.pos, Direction.values(newIndex)))
-        forward.toList ++ turns
-      end forwardMoves
+    end countPositionsOnOptimalPath
 
-      def backwardMoves(state: State, cost: Int): List[(Int, State)] =
-        val delta = state.direction.delta
-        val newPos = Position(
-          state.pos.x - delta._1,
-          state.pos.y - delta._2
-        )
-        val backward = Option.when(!grid.isWall(newPos))(
-          (cost + 1, State(newPos, state.direction))
-        )
-        val turns = Direction.values
-          .filterNot(_ == state.direction)
-          .map(d => (cost + 1000, State(state.pos, d)))
-        backward.toList ++ turns
-      end backwardMoves
+    private def findShortestPaths(start: Vec2, reversed: Boolean): Map[(Vec2, Vec2), Int] =
+      val initialStates =
+        if !reversed then List((0, State(start, Directions.East)))
+        else Directions.all.map(d => (0, State(start, d))).toList
 
       @tailrec
       def dijkstra(queue: List[(Int, State)],
-                   distances: Map[(Position, Direction), Int]): Map[(Position, Direction), Int] =
+                   distances: Map[(Vec2, Vec2), Int]): Map[(Vec2, Vec2), Int] =
         queue match
           case Nil => distances
           case (cost, state) :: rest =>
@@ -106,42 +79,44 @@ case class Day16() extends util.Day(16):
             if distances.get(key).exists(_ < cost) then
               dijkstra(rest, distances)
             else
-              val candidates = nextStates(state, cost)
+              val candidates = neighbors(state, cost, reversed)
               val (newDistances, newQueue) = candidates.foldLeft((distances, rest)):
                 case ((dists, q), (nextCost, nextState)) =>
                   val nextKey = (nextState.pos, nextState.direction)
                   if dists.get(nextKey).exists(_ <= nextCost) then (dists, q)
                   else (dists.updated(nextKey, nextCost), (nextCost, nextState) :: q)
-              dijkstra(
-                newQueue.sortBy(_._1),
-                newDistances
-              )
+              dijkstra(newQueue.sortBy(_._1), newDistances)
       end dijkstra
 
-      dijkstra(
-        initialStates,
-        initialStates.map((c, s) => ((s.pos, s.direction), c)).toMap
-      )
+      dijkstra(initialStates, initialStates.map((c, s) => ((s.pos, s.direction), c)).toMap)
     end findShortestPaths
 
-    def countPositionsOnOptimalPath: Int =
-      val forwardPaths = findShortestPaths(startPos, reversed = false)
-      val minCost = Direction.values
-        .flatMap(d => forwardPaths.get((endPos, d)))
-        .min
-      val backwardPaths = findShortestPaths(endPos, reversed = true)
+    private def neighbors(state: State, cost: Int, reversed: Boolean): List[(Int, State)] =
+      val delta = state.direction
 
-      (for
-        y <- 0 until grid.height
-        x <- 0 until grid.width
-        pos = Position(x, y)
-        if !grid.isWall(pos)
-        if Direction.values.exists: dir =>
-          val key = (pos, dir)
-          Try:
-            forwardPaths(key) + backwardPaths(key) == minCost
-          .getOrElse(false)
-      yield 1).size
-    end countPositionsOnOptimalPath
+      val forwardPos = if reversed then state.pos - delta else state.pos + delta
+      val forward = Option.when(!grid.isWall(forwardPos)):
+        (cost + 1, State(forwardPos, state.direction))
+
+      val currentIndex = Directions.all.indexOf(state.direction)
+      val turns = List(-1, 1).map: off =>
+        val newDir = Directions.all((currentIndex + off + Directions.all.size) % Directions.all.size)
+        (cost + 1000, State(state.pos, newDir))
+
+      forward.toList ++ turns
+    end neighbors
   end PathFinder
+
+  object Directions:
+    val North: Vec2 = Vec2(0, -1)
+    val East: Vec2 = Vec2(1, 0)
+    val South: Vec2 = Vec2(0, 1)
+    val West: Vec2 = Vec2(-1, 0)
+
+    val all: Seq[Vec2] = Vector(North, East, South, West)
+
+    def turn(dir: Vec2, step: Int): Vec2 =
+      val i = (all.indexOf(dir) + step + all.size) % all.size
+      all(i)
+  end Directions
 end Day16
