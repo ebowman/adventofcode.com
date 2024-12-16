@@ -41,23 +41,23 @@ case class Day16() extends util.Day(16):
 
     def findMinimumCost: Int =
       val paths = findShortestPaths(startPos, reversed = false)
-      Directions.all
+      Directions
         .flatMap(d => paths.get((endPos, d)))
         .min
 
     def countPositionsOnOptimalPath: Int =
       val forwardPaths = findShortestPaths(startPos, reversed = false)
       val backwardPaths = findShortestPaths(endPos, reversed = true)
-      val minCost = Directions.all
+      val minCost = Directions
         .flatMap(d => forwardPaths.get((endPos, d)))
         .min
 
       (0 until grid.height).flatMap: y =>
         (0 until grid.width).map: x =>
           val pos = Vec2(x, y)
-          !grid.isWall(pos) && Directions.all.exists: dir =>
-            val key = (pos, dir)
+          !grid.isWall(pos) && Directions.exists: dir =>
             Try:
+              val key = (pos, dir)
               forwardPaths(key) + backwardPaths(key) == minCost
             .getOrElse(false)
       .count(identity)
@@ -67,7 +67,7 @@ case class Day16() extends util.Day(16):
     private def findShortestPaths(start: Vec2, reversed: Boolean): Map[(Vec2, Vec2), Int] =
       val initialStates =
         if !reversed then List((0, State(start, Directions.East)))
-        else Directions.all.map(d => (0, State(start, d))).toList
+        else Directions.map(d => (0, State(start, d))).toList
 
       @tailrec
       def dijkstra(queue: List[(Int, State)],
@@ -98,25 +98,28 @@ case class Day16() extends util.Day(16):
       val forward = Option.when(!grid.isWall(forwardPos)):
         (cost + 1, State(forwardPos, state.direction))
 
-      val currentIndex = Directions.all.indexOf(state.direction)
+      val currentIndex = Directions.indexOf(state.direction)
       val turns = List(-1, 1).map: off =>
-        val newDir = Directions.all((currentIndex + off + Directions.all.size) % Directions.all.size)
-        (cost + 1000, State(state.pos, newDir))
+        val newDir = Directions((currentIndex + off + Directions.size) % Directions.size)
+        (cost + 1000, state.copy(direction = newDir))
 
-      forward.toList ++ turns
+      forward.map(_ :: turns).getOrElse(turns)
+
     end neighbors
   end PathFinder
 
-  object Directions:
+  object Directions extends Seq[Vec2]:
+
     val North: Vec2 = Vec2(0, -1)
     val East: Vec2 = Vec2(1, 0)
     val South: Vec2 = Vec2(0, 1)
     val West: Vec2 = Vec2(-1, 0)
 
-    val all: Seq[Vec2] = Vector(North, East, South, West)
+    private val all: Seq[Vec2] = Vector(North, East, South, West)
 
-    def turn(dir: Vec2, step: Int): Vec2 =
-      val i = (all.indexOf(dir) + step + all.size) % all.size
-      all(i)
+    override def apply(idx: Int): Vec2 = all(idx)
+    override def length: Int = all.length
+    override def iterator: Iterator[Vec2] = all.iterator
+
   end Directions
 end Day16
