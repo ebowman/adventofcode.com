@@ -8,7 +8,7 @@ class Day18 extends util.Day(18):
     val coords = parseCoordinates(input)
     val (width, height) = gridDimensions(coords)
 
-    val corruptedCount = if width == 7 && height == 7 then 12 else 1024
+    val corruptedCount = if width == 7 then 12 else 1024
     val corrupted = coords.take(corruptedCount).toSet
 
     val start = (0, 0)
