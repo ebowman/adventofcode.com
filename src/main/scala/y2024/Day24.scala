@@ -8,8 +8,9 @@ class Day24 extends util.Day(24):
     val circuit = parseInput(input)
     val finalWires = evaluateCircuit(circuit.operations, circuit.wires)
 
-    val zWires = finalWires.keys.filter(_.isZ).toSeq
-    val bits = zWires
+    val bits = finalWires.keys
+      .filter(_.isZ)
+      .toSeq
       .sortBy(_.zIndex)
       .reverse
       .map(w => finalWires(w).toString)
@@ -70,35 +71,30 @@ class Day24 extends util.Day(24):
   end evaluateCircuit
 
   private def findWrongOperations(circuit: Circuit): Set[Wire] =
+    val nonXorZ = for
+      op <- circuit.operations
+      if op.result.isZ && op.op != Op.XOR && op.result != circuit.highestZ
+    yield op.result
 
-    val nonXorZ = circuit.operations.collect:
-      case op if op.result.isZ && op.op != Op.XOR && op.result != circuit.highestZ =>
-        op.result
-    .toSet
+    val invalidXor = for
+      op <- circuit.operations
+      if op.op == Op.XOR && !List(op.result, op.op1, op.op2).exists(_.isXYZ)
+    yield op.result
 
-    val invalidXor = circuit.operations.collect:
-      case op if op.op == Op.XOR &&
-        !List(op.result, op.op1, op.op2).exists(_.isXYZ) =>
-        op.result
-    .toSet
+    val invalidAnd = for
+      case Operation(op1, Op.AND, op2, res) <- circuit.operations
+      if op1.name != "x00" && op2.name != "x00"
+      subop <- circuit.operations
+      if (res == subop.op1 || res == subop.op2) && subop.op != Op.OR
+    yield res
 
-    val invalidAnd = circuit.operations.collect:
-      case Operation(op1, Op.AND, op2, res)
-        if op1.name != "x00" && op2.name != "x00" =>
-        circuit.operations.collect:
-          case subop
-            if (res == subop.op1 || res == subop.op2) && subop.op != Op.OR => res
-    .flatten.toSet
+    val invalidXorOr = for
+      case Operation(_, Op.XOR, _, res) <- circuit.operations
+      subop <- circuit.operations
+      if (res == subop.op1 || res == subop.op2) && subop.op == Op.OR
+    yield res
 
-    val invalidXorOr = circuit.operations.collect:
-      case Operation(_, Op.XOR, _, res) =>
-        circuit.operations.collect:
-          case subop
-            if (res == subop.op1 || res == subop.op2) && subop.op == Op.OR => res
-    .flatten.toSet
-
-    nonXorZ ++ invalidXor ++ invalidAnd ++ invalidXorOr
-
+    nonXorZ.toSet ++ invalidXor.toSet ++ invalidAnd.toSet ++ invalidXorOr.toSet
   end findWrongOperations
 
   private case class Circuit(wires: Map[Wire, Int],
