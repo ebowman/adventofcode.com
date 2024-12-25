@@ -1,44 +1,46 @@
 package y2024
 
 class Day25 extends util.Day(25):
-  case class Pattern(heights: List[Int], raw: List[String])
 
   def solvePart1(input: IndexedSeq[String]): Int =
-    val patterns = parsePatterns(input)
-    val locks = patterns.filter(isLock)
-    val keys = patterns.filter(isKey)
-    countValidPairs(locks, keys)
+    val (locks, keys) = Pattern.parseInput(input).partition(_.isLock)
+    Pattern.countValidPairs(locks, keys)
   end solvePart1
 
-  def solvePart2(input: IndexedSeq[String]): String = ???
+  private case class Pattern(heights: List[Int], raw: List[String]):
+    def isLock: Boolean = raw.head.contains('#') && raw.last.forall(_ == '.')
 
-  private def parsePatterns(input: IndexedSeq[String]): List[Pattern] =
-    input
-      .filterNot(_.isEmpty)
-      .grouped(7)
-      .map: group =>
-        val columns = group.transpose
-        val heights = columns.map: col =>
-          if col(0) == '#' then
-            col.takeWhile(_ == '#').length
-          else
-            col.reverse.takeWhile(_ == '#').length
+  private object Pattern:
+    def parseInput(input: IndexedSeq[String]): List[Pattern] =
+      input
+        .filterNot(_.isEmpty)
+        .grouped(7)
+        .map: group =>
+          val columns = group.transpose
+          val heights = columns.map: col =>
+            if col(0) == '#' then
+              col.takeWhile(_ == '#').length
+            else
+              col.reverse.takeWhile(_ == '#').length
+          .toList
+          Pattern(heights, group.toList)
         .toList
-        Pattern(heights, group.toList)
-      .toList
-  end parsePatterns
+    end parseInput
 
-  private def isValidPair(lock: Pattern, key: Pattern): Boolean =
-    lock.heights.zip(key.heights).forall: (l, k) =>
-      l + k <= 7
+    private def isValidPair(lock: Pattern, key: Pattern): Boolean =
+      lock.heights.zip(key.heights).forall: (l, k) =>
+        l + k <= 7
 
-  private def isLock(pattern: Pattern): Boolean =
-    pattern.raw.head.contains('#') && pattern.raw.last.forall(_ == '.')
+    def countValidPairs(locks: List[Pattern], keys: List[Pattern]): Int =
+      locks
+        .cross(keys)
+        .count(isValidPair.tupled)
 
-  private def isKey(pattern: Pattern): Boolean =
-    pattern.raw.head.forall(_ == '.') && pattern.raw.last.contains('#')
+    extension [A](list: List[A])
+      private def cross[B](other: List[B]): List[(A, B)] =
+        list.flatMap(a => other.map(b => (a, b)))
+  end Pattern
 
-  private def countValidPairs(locks: List[Pattern], keys: List[Pattern]): Int =
-    locks.flatMap(lock => keys.map(key => isValidPair(lock, key))).count(identity)
+  def solvePart2(input: IndexedSeq[String]): String = ???
 
 end Day25
