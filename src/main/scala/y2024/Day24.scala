@@ -11,8 +11,7 @@ class Day24 extends util.Day(24):
     val bits = finalWires.keys
       .filter(_.isZ)
       .toSeq
-      .sortBy(_.zIndex)
-      .reverse
+      .sortBy(_.zIndex)(Ordering.Int.reverse)
       .map(w => finalWires(w).toString)
       .mkString
 
