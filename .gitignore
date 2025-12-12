@@ -3,5 +3,9 @@ target/
 .idea
 .bsp
 .session
+.claude-flow/
+.swarm/
+__pycache__/
+lib/
 
 
